@@ -1,3 +1,7 @@
+import { moduleLogger } from '@sliit-foss/module-logger';
+
+const logger = moduleLogger('Extract-Json-Array');
+
 const extractJsonArray = (responseMessage) => {
   try {
     const jsonMatch = responseMessage.match(/(\[.*\])/s);
@@ -6,7 +10,7 @@ const extractJsonArray = (responseMessage) => {
     }
     throw new Error('No valid JSON array found in the response');
   } catch (error) {
-    console.error('Error extracting JSON array:', error);
+    logger.error(`Error extracting JSON array: ${error}`);
     throw new Error('Received non-JSON response from OpenAI');
   }
 };

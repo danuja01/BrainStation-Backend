@@ -1,5 +1,5 @@
 import createError from 'http-errors';
-import { generateQuestions } from '@/services/QuestionGeneratorService';
+import { generateQuestions } from '@/services/QuestionGenerator';
 
 export const generateQuestionsController = async (req, res) => {
   try {
