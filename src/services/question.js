@@ -1,6 +1,8 @@
 import createError from 'http-errors';
 import {
   deleteQuestion,
+  fetchFlaggedQuestions,
+  flagQuestion,
   getOneQuestion,
   getQuestionById,
   getQuestions,
@@ -49,6 +51,16 @@ export const getOneQuestionService = async (query, options) => {
 
 export const deleteQuestionService = async (id) => {
   const question = await deleteQuestion(id);
+  if (!question) throw new createError(422, 'Invalid question ID');
+  return question;
+};
+
+export const getFlaggedQuestionsService = (query) => {
+  return fetchFlaggedQuestions(query);
+};
+
+export const flagQuestionService = async (id) => {
+  const question = await flagQuestion(id);
   if (!question) throw new createError(422, 'Invalid question ID');
   return question;
 };
