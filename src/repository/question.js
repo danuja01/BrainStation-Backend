@@ -1,3 +1,4 @@
+import mongoose from 'mongoose';
 import { Question } from '@/models/question';
 
 export const insertQuestion = async (data) => {
@@ -10,14 +11,16 @@ export const insertBulkQuestions = async (dataArray) => {
   await Question.insertMany(questions);
 };
 
-export const getQuestions = async ({ filter = {}, sort = { createdAt: -1 }, page, limit = 20 }) => {
-  const options = {
-    sort,
-    page,
-    limit
-  };
-  const aggregate = await Question.aggregate([{ $match: filter }]);
-  return Question.aggregatePaginate(aggregate, options);
+export const getQuestions = async ({ filter = {}, sort = { createdAt: -1 }, page = 1, limit = 20 }) => {
+  if (filter.lectureId) {
+    filter.lectureId = new mongoose.Types.ObjectId(filter.lectureId);
+  }
+
+  const aggregate = Question.aggregate([{ $match: filter }, { $sort: sort }]);
+
+  const result = await Question.aggregatePaginate(aggregate, { page, limit });
+
+  return result;
 };
 
 export const updateQuestion = async (id, data) => {

@@ -17,12 +17,17 @@ const questionSchema = new mongoose.Schema(
     },
     distractors: {
       type: [String],
-      validate: [arrayLimit, '{PATH} exceeds the limit of 3'],
+      validate: [arrayLimit, '{PATH} must have exactly 3 distractors.'],
       required: true
     },
     isFlagged: {
       type: Boolean,
       default: false
+    },
+    lectureId: {
+      type: mongoose.Schema.Types.ObjectId,
+      required: true,
+      ref: 'Lecture'
     }
   },
   { timestamps: true }
@@ -33,7 +38,6 @@ function arrayLimit(val) {
 }
 
 questionSchema.plugin(aggregatePaginate);
-
 questionSchema.index({ createdAt: 1 });
 
 export const Question = mongoose.model('Question', questionSchema);
