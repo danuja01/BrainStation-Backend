@@ -6,6 +6,8 @@ import {
   bulkInsertQuestions,
   createQuestion,
   deleteQuestion,
+  flagQuestion,
+  getFlaggedQuestions,
   getOneQuestion,
   getQuestionById,
   updateQuestion,
@@ -31,12 +33,15 @@ questionRouter.post(
   celebrate({ [Segments.BODY]: bulkInsertQuestionsSchema }),
   tracedAsyncHandler(bulkInsertQuestions)
 );
+questionRouter.get('/flagged', authorizer(['ADMIN']), tracedAsyncHandler(getFlaggedQuestions));
+
+questionRouter.post('/:id/flag', celebrate({ [Segments.PARAMS]: questionIdSchema }), tracedAsyncHandler(flagQuestion));
 
 questionRouter.get('/', tracedAsyncHandler(viewQuestions));
 
-questionRouter.get('/:id', celebrate({ [Segments.PARAMS]: questionIdSchema }), tracedAsyncHandler(getQuestionById));
-
 questionRouter.get('/one', tracedAsyncHandler(getOneQuestion));
+
+questionRouter.get('/:id', celebrate({ [Segments.PARAMS]: questionIdSchema }), tracedAsyncHandler(getQuestionById));
 
 questionRouter.patch(
   '/:id',

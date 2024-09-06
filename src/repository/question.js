@@ -10,13 +10,14 @@ export const insertBulkQuestions = async (dataArray) => {
   await Question.insertMany(questions);
 };
 
-export const getQuestions = async ({ filter = {}, sort = {}, page, limit = 20 }) => {
+export const getQuestions = async ({ filter = {}, sort = { createdAt: -1 }, page, limit = 20 }) => {
   const options = {
     sort,
     page,
     limit
   };
-  return (await page) ? Question.paginate(filter, options) : Question.find(filter).sort(sort).lean();
+  const aggregate = await Question.aggregate([{ $match: filter }]);
+  return Question.aggregatePaginate(aggregate, options);
 };
 
 export const updateQuestion = async (id, data) => {
@@ -37,4 +38,24 @@ export const getOneQuestion = async (filters, options = {}) => {
 
 export const deleteQuestion = (id) => {
   return Question.findByIdAndDelete(id);
+};
+
+// flagged questions
+export const fetchFlaggedQuestions = async ({ page, limit = 20 }) => {
+  const options = {
+    page,
+    limit
+  };
+  const filter = { isFlagged: true };
+  const aggregate = await Question.aggregate([{ $match: filter }]);
+  return Question.aggregatePaginate(aggregate, options);
+};
+
+export const flagQuestion = async (id) => {
+  const query = { _id: id };
+  const data = { isFlagged: true };
+  const question = await Question.findOneAndUpdate(query, data, {
+    new: true
+  });
+  return question;
 };

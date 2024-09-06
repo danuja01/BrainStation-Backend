@@ -1,5 +1,7 @@
 import {
   deleteQuestionService,
+  flagQuestionService,
+  getFlaggedQuestionsService,
   getOneQuestionService,
   getQuestionByIdService,
   insertBulkQuestionsService,
@@ -42,4 +44,14 @@ export const updateQuestion = async (req, res) => {
 export const deleteQuestion = async (req, res) => {
   await deleteQuestionService(req.params.id);
   return makeResponse({ res, message: 'Question deleted successfully' });
+};
+
+export const getFlaggedQuestions = async (req, res) => {
+  const questions = await getFlaggedQuestionsService(req.query);
+  return makeResponse({ res, data: questions, message: 'Flagged questions retrieved successfully' });
+};
+
+export const flagQuestion = async (req, res) => {
+  await flagQuestionService(req.params.id);
+  return makeResponse({ res, message: 'Question flagged successfully' });
 };
