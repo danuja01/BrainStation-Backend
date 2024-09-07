@@ -8,6 +8,7 @@ import compression from 'compression';
 import cors from 'cors';
 import helmet from 'helmet';
 import { pick } from 'lodash';
+import { initializeChangeStreams } from './services/changeStream';
 import { default as connectDB } from '@/database';
 import { errorHandler, queryMapper, responseInterceptor } from '@/middleware';
 import { default as routes } from '@/routes/index.routes';
@@ -62,7 +63,9 @@ app.use(responseInterceptor);
 
 app.use(errorHandler);
 
-connectDB();
+connectDB().then(() => {
+  initializeChangeStreams();
+});
 
 global.__basedir = __dirname;
 

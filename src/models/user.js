@@ -15,7 +15,6 @@ const UserSchema = new mongoose.Schema(
     },
     username: {
       type: String,
-      // Username is required only for STUDENT role
       required: function () {
         return this.role === 'STUDENT' && (!this.username || this.username.trim() === '');
       },
@@ -45,6 +44,10 @@ const UserSchema = new mongoose.Schema(
       type: String,
       enum: ['ADMIN', 'LECTURER', 'STUDENT'],
       default: 'STUDENT'
+    },
+    fcmToken: {
+      type: String,
+      default: null
     }
   },
   {
