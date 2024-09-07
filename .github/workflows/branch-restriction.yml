@@ -1,0 +1,26 @@
+name: 'Branch Restriction Check'
+run-name: 'Branch Restriction Check'
+
+on:
+  pull_request:
+    branches:
+      - main
+    types:
+      - opened
+      - reopened
+      - synchronize
+
+concurrency:
+  group: branch-restriction-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check-branch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check source branch
+        run: |
+          if [[ "$GITHUB_HEAD_REF" != "development" ]]; then
+            echo "Only PRs from development branch are allowed to merge into main."
+            exit 1
+          fi

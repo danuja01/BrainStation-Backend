@@ -9,6 +9,7 @@
   "rules": {
     "no-sparse-arrays": "off",
     "no-nested-ternary": "off",
-    "newline-per-chained-call": "off"
+    "newline-per-chained-call": "off",
+    "no-return-await": "off"
   }
 }

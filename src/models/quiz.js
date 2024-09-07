@@ -33,6 +33,18 @@ const quizSchema = new mongoose.Schema(
     next_review_date: {
       type: Date,
       required: true
+    },
+    attemptCount: {
+      type: Number,
+      default: 0
+    },
+    learningSteps: {
+      type: [Number],
+      default: [5, 10, 25]
+    },
+    current_step: {
+      type: Number,
+      default: 0
     }
   },
   { timestamps: true }
@@ -41,6 +53,8 @@ const quizSchema = new mongoose.Schema(
 quizSchema.plugin(aggregatePaginate);
 quizSchema.index({ createdAt: 1 });
 
-const Quiz = mongoose.model('Card', quizSchema);
+const Quiz = mongoose.model('Quiz', quizSchema);
+
+Quiz.syncIndexes();
 
 export default Quiz;
