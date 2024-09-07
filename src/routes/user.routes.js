@@ -1,7 +1,7 @@
 import express from 'express';
 import { tracedAsyncHandler } from '@sliit-foss/functions';
 import { Segments, celebrate } from 'celebrate';
-import { changeAdminPassword, createAdmin, getAll, getById, update } from '@/controllers/user';
+import { changeAdminPassword, createAdmin, getAll, getById, saveFcmToken, update } from '@/controllers/user';
 import { authorizer } from '@/middleware/auth';
 import { addUserSchema, changePasswordSchema, updateSchema, userIdSchema } from '@/validations/user';
 
@@ -20,6 +20,9 @@ userRouter.get(
   celebrate({ [Segments.PARAMS]: userIdSchema }),
   tracedAsyncHandler(getById)
 );
+
+userRouter.post('/fcm-token', authorizer(['STUDENT', 'LECTURER', 'ADMIN']), saveFcmToken);
+
 userRouter.patch(
   '/change_password',
   celebrate({ [Segments.BODY]: changePasswordSchema }),
