@@ -18,4 +18,5 @@ yarn-error.log
 .LSOverride
 
 # Config
-config/
+config/*.json
+config/*.yaml
