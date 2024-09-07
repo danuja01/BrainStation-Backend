@@ -5,7 +5,14 @@
  */
 import bcrypt from 'bcryptjs';
 import createError from 'http-errors';
-import { createUser, findOneAndRemoveUser, findOneAndUpdateUser, getAllUsers, getOneUser } from '@/repository/user';
+import {
+  createUser,
+  findOneAndRemoveUser,
+  findOneAndUpdateUser,
+  getAllUsers,
+  getOneUser,
+  updateUserFcmToken
+} from '@/repository/user';
 // eslint-disable-next-line import/order
 import { sendMail } from './email';
 
@@ -109,4 +116,17 @@ const sendAdminPassword = (email, password) => {
   };
   const subject = 'Welcome to the Code Coach';
   return sendMail(email, 'sendAdminPassword', replacements, subject);
+};
+
+export const saveFcmTokenService = async (userId, fcmToken) => {
+  if (!userId || !fcmToken) {
+    throw new createError(400, 'User ID and FCM token are required');
+  }
+
+  const user = await updateUserFcmToken(userId, fcmToken);
+  if (!user) {
+    throw new createError(404, 'User not found');
+  }
+
+  return user;
 };

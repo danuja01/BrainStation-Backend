@@ -9,7 +9,7 @@ export const createUser = async (user) => {
   return newUser;
 };
 
-export const getAllUsers = ({ sort = {}, filter = {}, page = 1, limit = 10 }) => {
+export const getAllUsers = async ({ sort = {}, filter = {}, page = 1, limit = 10 }) => {
   const options = {
     page,
     limit
@@ -29,10 +29,12 @@ export const getAllUsers = ({ sort = {}, filter = {}, page = 1, limit = 10 }) =>
       }
     ]);
 
-  return (page ? User.aggregatePaginate(aggregateQuery(), options) : aggregateQuery()).catch((err) => {
+  try {
+    return await (page ? User.aggregatePaginate(aggregateQuery(), options) : aggregateQuery());
+  } catch (err) {
     logger.error(`An error occurred when retrieving users - err: ${err.message}`);
     throw err;
-  });
+  }
 };
 
 export const getOneUser = async (filters, returnPassword = false) => {
@@ -53,4 +55,8 @@ export const findOneAndUpdateUser = async (filters, data) => {
 
 export const findOneAndRemoveUser = (filters) => {
   return User.findOneAndRemove(filters);
+};
+
+export const updateUserFcmToken = (userId, fcmToken) => {
+  return User.findByIdAndUpdate(userId, { fcmToken }, { new: true });
 };

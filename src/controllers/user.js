@@ -1,4 +1,12 @@
-import { addNewAdminUser, changeAdminPasswordService, getUserByID, getUsers, updateUserdetails } from '@/services/user';
+import createError from 'http-errors';
+import {
+  addNewAdminUser,
+  changeAdminPasswordService,
+  getUserByID,
+  getUsers,
+  saveFcmTokenService,
+  updateUserdetails
+} from '@/services/user';
 import { makeResponse } from '@/utils';
 
 export const createAdmin = async (req, res) => {
@@ -24,4 +32,19 @@ export const update = async (req, res) => {
 export const changeAdminPassword = async (req, res) => {
   await changeAdminPasswordService(req.user, req.body.old_password, req.body.new_password);
   return makeResponse({ res, message: 'Password changed successfully' });
+};
+
+export const saveFcmToken = async (req, res) => {
+  const { userId, fcmToken } = req.body;
+
+  if (!userId || !fcmToken) {
+    throw createError(400, 'User ID and FCM token are required');
+  }
+
+  try {
+    await saveFcmTokenService(userId, fcmToken);
+    return res.status(200).json({ message: 'FCM token updated successfully' });
+  } catch (error) {
+    throw createError(500, `Error saving FCM token: ${error.message}`);
+  }
 };
