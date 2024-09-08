@@ -32,7 +32,6 @@ export const getQuizzes = async ({ filter = {}, sort = { createdAt: -1 }, page =
         'questionDetails.question': 1,
         'questionDetails.answer': 1,
         'questionDetails.distractors': 1,
-        // Include any other fields from the Quiz model that you need
         'userId': 1,
         'lectureId': 1,
         'status': 1,
@@ -60,4 +59,69 @@ export const getQuizByQuestionIdAndUserId = async (userId, questionId) => {
   });
 
   return quiz;
+};
+
+export const getUserLectureQuizzes = async (userId, lectureId) => {
+  const quizzes = await Quiz.aggregate([
+    {
+      $match: {
+        userId: new mongoose.Types.ObjectId(userId),
+        lectureId: new mongoose.Types.ObjectId(lectureId)
+      }
+    },
+    {
+      $group: {
+        _id: null,
+        totalQuizzes: { $sum: 1 },
+        correctAnswers: { $sum: { $cond: [{ $gt: ['$current_step', 0] }, 1, 0] } }
+      }
+    }
+  ]);
+
+  // If no quizzes found, return default values
+  if (quizzes.length === 0) {
+    return { totalQuizzes: 20, correctAnswers: 0, averageScore: 0 }; // Default to 20 total quizzes
+  }
+
+  const quizData = quizzes[0];
+  const total = Math.max(quizData.totalQuizzes, 20); // If less than 20, use 20 as total
+  const averageScore = quizData.correctAnswers / total; // Calculate average
+
+  return {
+    totalQuizzes: total, // Always return 20 if actual is less
+    correctAnswers: quizData.correctAnswers,
+    averageScore: averageScore
+  };
+};
+
+// Analyzing Quiz Performance
+export const getQuizPerformanceData = async (userId) => {
+  const quizzes = await Quiz.aggregate([
+    { $match: { userId: userId } },
+    {
+      $group: {
+        _id: null,
+        totalQuizzes: { $sum: 1 },
+        successRate: {
+          $avg: {
+            $cond: [{ $eq: ['$status', 'review'] }, 1, 0]
+          }
+        },
+        newQuizzes: { $sum: { $cond: [{ $eq: ['$status', 'new'] }, 1, 0] } },
+        lapsedQuizzes: { $sum: { $cond: [{ $eq: ['$status', 'lapsed'] }, 1, 0] } },
+        reviewQuizzes: { $sum: { $cond: [{ $eq: ['$status', 'review'] }, 1, 0] } }
+      }
+    }
+  ]);
+
+  return (
+    quizzes[0] || {
+      totalQuizzes: 0,
+      averageScore: 0,
+      successRate: 0,
+      newQuizzes: 0,
+      lapsedQuizzes: 0,
+      reviewQuizzes: 0
+    }
+  );
 };
