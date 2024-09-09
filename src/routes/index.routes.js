@@ -1,6 +1,7 @@
 import express from 'express';
 import analyticsRouter from './analytics.routes';
 import authRouter from './auth.routes';
+import forcastRouter from './forcast.routes';
 import lectureRouter from './lecture.routes';
 import moduleRouter from './module.routes';
 import ontologyRouter from './ontology.routes';
@@ -16,6 +17,7 @@ router.use('/users', protect, userRouter);
 router.use('/questions', protect, questionRouter);
 router.use('/quizzes', protect, quizRouter);
 router.use('/analytics', protect, analyticsRouter);
+router.use('/forecast', protect, forcastRouter);
 router.use('/ontology', ontologyRouter);
 router.use('/lectures', lectureRouter);
 router.use('/modules', moduleRouter);

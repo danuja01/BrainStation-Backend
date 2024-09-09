@@ -39,6 +39,7 @@ questionRouter.post(
 questionRouter.get('/', tracedAsyncHandler(viewQuestions));
 
 // Flagged questions
+// REVOKED!
 questionRouter.get('/flagged', authorizer(['ADMIN']), tracedAsyncHandler(getFlaggedQuestions));
 
 // Individual question routes
