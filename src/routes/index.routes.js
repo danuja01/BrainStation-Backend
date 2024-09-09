@@ -1,6 +1,7 @@
 import express from 'express';
 import analyticsRouter from './analytics.routes';
 import authRouter from './auth.routes';
+import forcastRouter from './forcast.routes';
 import questionRouter from './question.routes';
 import quizRouter from './quiz.routes';
 import userRouter from './user.routes';
@@ -13,5 +14,6 @@ router.use('/users', protect, userRouter);
 router.use('/questions', protect, questionRouter);
 router.use('/quizzes', protect, quizRouter);
 router.use('/analytics', protect, analyticsRouter);
+router.use('/forecast', protect, forcastRouter);
 
 export default router;
