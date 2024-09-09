@@ -1,6 +1,7 @@
 import express from 'express';
 import { tracedAsyncHandler } from '@sliit-foss/functions';
 import { Segments, celebrate } from 'celebrate';
+import { generateQuestionsController } from '@/controllers/openai';
 import {
   bulkInsertQuestions,
   createQuestion,
@@ -12,7 +13,6 @@ import {
   updateQuestion,
   viewQuestions
 } from '@/controllers/question';
-import { generateQuestionsController } from '@/controllers/questionGenerator';
 import { authorizer } from '@/middleware/auth';
 import { bulkInsertQuestionsSchema, questionCreateSchema, questionIdSchema } from '@/validations/question';
 
