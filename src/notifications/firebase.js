@@ -5,7 +5,8 @@ import serviceAccount from '../../config/serviceAccountKey.json';
 const logger = moduleLogger('Firebase-Service');
 
 admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount)
+  credential: admin.credential.cert(serviceAccount),
+  storageBucket: 'gs://brainstation-ee7bb.appspot.com'
 });
 
 export const sendNotification = async (token, message) => {
@@ -22,3 +23,5 @@ export const sendNotification = async (token, message) => {
     logger.error(`Error sending notification: ${error.message}`);
   }
 };
+
+module.exports = admin;
