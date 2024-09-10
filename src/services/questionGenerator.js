@@ -27,7 +27,7 @@ export const generateQuestions = async (slides) => {
     {
       role: 'system',
       content:
-        'Please generate a questions array based on the slide content provided. Ensure that exactly 21 questions are generated.'
+        'Please generate a questions array based on the slide content provided. Ensure that exactly 22 questions are generated.'
     },
     {
       role: 'system',
@@ -51,6 +51,10 @@ export const generateQuestions = async (slides) => {
     {
       role: 'system',
       content: 'The questions should be of intermediate or advanced difficulty.'
+    },
+    {
+      role: 'user',
+      content: 'Number of questions should not be less than 21, and should not be more than 25.'
     }
   ];
 
