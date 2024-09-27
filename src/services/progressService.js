@@ -23,8 +23,19 @@ export const predictExamScore = async (studentData) => {
   // Calculate cumulative average of quiz scores
   const cumulativeAverage = calculateCumulativeAverage(studentData); 
 
+
+  let performer_type = "Low Performer";
+  if (cumulativeAverage > 80) {
+    performer_type = "Excellent Performer";
+  } else if (cumulativeAverage > 50) {
+    performer_type = "Medium Performer";
+  }
+  
+
   // Get the lowest two chapters based on quiz scores
   const lowestTwoChapters = getLowestTwoChapters(studentData);
+
+ 
 
   // Prepare input data for the Python service
   const inputData = {
@@ -34,6 +45,8 @@ export const predictExamScore = async (studentData) => {
     time_spent_studying: parseInt(studentData.Time_Spent_Studying, 10), // Convert to integer
   };
 
+  
+
   try {
     const response = await axios.post('http://localhost:8000/predict_exam_score/', inputData);
     const predicted_exam_score = response.data.predicted_exam_score;
@@ -41,7 +54,8 @@ export const predictExamScore = async (studentData) => {
     return {
       predicted_exam_score,
       lowest_two_chapters: lowestTwoChapters,
-      cumulativeAverage, 
+      performer_type: performer_type,
+     // cumulativeAverage, 
     };
   } catch (error) {
     console.error('Error calling Python service:', error);

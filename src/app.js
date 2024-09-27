@@ -19,6 +19,8 @@ const logger = moduleLogger('app');
 
 const app = express();
 
+
+
 const limiter = rateLimit({
   windowMs: 1 * 60 * 1000, // 1 minute
   max: 100, // limit each IP to 100 requests per windowMs
@@ -62,6 +64,12 @@ app.use('/api', routes);
 app.use(responseInterceptor);
 
 app.use(errorHandler);
+
+app.use(cors({
+  origin: 'http://192.168.174.1:5173',
+  credentials: true,
+}));
+
 
 connectDB().then(() => {
   initializeChangeStreams();
