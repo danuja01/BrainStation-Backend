@@ -1,4 +1,3 @@
-tracedAsyncHandler// src/routes/progress.routes.js
 
 import express from 'express';
 import { tracedAsyncHandler } from '@sliit-foss/functions';

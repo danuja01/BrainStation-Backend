@@ -64,42 +64,86 @@ export const predictExamScore = async (studentData) => {
 };
 
 
-// Recommend tasks based on weak chapters
+export const recommendTask = async (performerType, lowestTwoChapters) => {
+  // Log the incoming inputs for debugging
+  console.log('Received performerType:', performerType);
+  console.log('Received lowestTwoChapters:', lowestTwoChapters);
 
-export const recommendTask = async (studentData) => {
-    const lowestTwoChapters = getLowestTwoChapters(studentData); 
+  // Ensure that lowestTwoChapters is an array with at least 2 chapters
+  if (!lowestTwoChapters || lowestTwoChapters.length < 2) {
+    console.error('No quiz data found for task recommendation.');
+    return { message: 'No weak areas found for task recommendation.' };
+  }
 
-    
-    // Check if the chapters were successfully retrieved
-    if (!lowestTwoChapters || !lowestTwoChapters.length) {
-      console.error("No quiz data found for task recommendation.");
-      return { message: "No weak areas found for task recommendation." };
+  // Adjust handling based on whether lowestTwoChapters is an array of strings or objects
+  const mostLowestMarksChapter = lowestTwoChapters[0]?.chapter || lowestTwoChapters[0];
+  const secondLowestMarksChapter = lowestTwoChapters[1]?.chapter || lowestTwoChapters[1];
+
+  // Log the chapters for debugging
+  console.log('Lowest Two Chapters:', mostLowestMarksChapter, secondLowestMarksChapter);
+  // Define task list based on weakest chapters
+  const tasks = [
+    {
+      task: 'Start Doing Past Papers and Related Questions',
+      subTasks: [
+        `Focus on past papers from the last 3 years: ${('https://mysligit-my.sharepoint.com/.../Computing')}`,
+        `Specifically, practice the lowest scoring chapter: ${mostLowestMarksChapter}`,
+        `50 MCQ Questions for ${mostLowestMarksChapter}: https://mcqmate.com/search?term=${mostLowestMarksChapter} or Google search: https://google.com/search?q=${mostLowestMarksChapter}+MCQ`
+      ]
+    },
+    {
+      task: 'Watch Educational Videos on Chapters 5 and 4',
+      subTasks: [
+        `Video 1: Watch content on ${mostLowestMarksChapter}: https://www.youtube.com/results?search_query=${mostLowestMarksChapter}+lecture`,
+        `Video 2: Watch content on ${secondLowestMarksChapter}: https://www.youtube.com/results?search_query=${secondLowestMarksChapter}+lecture`,
+        `Video 3: Additional videos for ${mostLowestMarksChapter}: https://www.youtube.com/results?search_query=${mostLowestMarksChapter}+tutorial`
+      ],
+      timeEstimate: '120 minutes'
+    },
+    {
+      task: 'Follow this External Course',
+      subTasks: [
+        `Udemy Course on ${mostLowestMarksChapter}: https://www.udemy.com/courses/search/?q=${mostLowestMarksChapter}`,
+        `Udemy Course on ${secondLowestMarksChapter}: https://www.udemy.com/courses/search/?q=${secondLowestMarksChapter}`,
+        `Coursera Course on ${mostLowestMarksChapter}: https://www.coursera.org/search?query=${mostLowestMarksChapter}`,
+        `Coursera Course on ${secondLowestMarksChapter}: https://www.coursera.org/search?query=${secondLowestMarksChapter}`
+      ],
+      timeEstimate: '180 minutes'
+    },
+    {
+      task: 'Review Lecture Notes',
+      subTasks: [
+        `Focus on ${mostLowestMarksChapter}, particularly the key sections.`,
+        `Re-study mind maps for ${mostLowestMarksChapter}: (Link to the ontology diagram)`
+      ],
+      timeEstimate: '90 minutes'
+    },
+    {
+      task: 'Keep a Learning Journal',
+      subTasks: [
+        `Summarize the most important points from the ${mostLowestMarksChapter} lecture.`,
+        `Reflect on difficult topics like ${mostLowestMarksChapter} and ${secondLowestMarksChapter}, and write down key concepts.`
+      ],
+      timeEstimate: '45 minutes'
     }
-  
-    // Generate task recommendations
-    const taskRecommendations = [
-      {
-        task: 'Start Doing Past Papers',
-        description: `Focus on past papers for the weak chapters: ${lowestTwoChapters[0]?.chapter} and ${lowestTwoChapters[1]?.chapter}.`,
-      },
-      {
-        task: `Watch Educational Videos for ${lowestTwoChapters[0]?.chapter}`,
-        description: `Here are some recommended videos for ${lowestTwoChapters[0]?.chapter}.`,
-        videos: [
-          `https://www.youtube.com/results?search_query=${lowestTwoChapters[0]?.chapter}+lecture+1`,
-          `https://www.youtube.com/results?search_query=${lowestTwoChapters[0]?.chapter}+lecture+2`
-        ]
-      },
-      {
-        task: `Watch Educational Videos for ${lowestTwoChapters[1]?.chapter}`,
-        description: `Here are some recommended videos for ${lowestTwoChapters[1]?.chapter}.`,
-        videos: [
-          `https://www.youtube.com/results?search_query=${lowestTwoChapters[1]?.chapter}+lecture+1`,
-          `https://www.youtube.com/results?search_query=${lowestTwoChapters[1]?.chapter}+lecture+2`
-        ]
-      }
-    ];
-  
-    return taskRecommendations;
+  ];
+
+  // Use a case-insensitive approach for performerType
+  const formattedPerformerType = performerType.trim().toLowerCase();
+  const taskOrder = {
+    low: [4, 3, 0, 1, 2],
+    medium: [2, 0, 4, 1],
+    excellent: [0, 2, 3, 4]
   };
-  
+
+  // Ensure performerType is valid
+  if (!taskOrder[formattedPerformerType]) {
+    console.error(`Invalid performer type: ${performerType}`);
+    throw new Error('Invalid performer type');
+  }
+
+  // Determine which tasks to assign based on performer type
+  const selectedTasks = taskOrder[formattedPerformerType].map(index => tasks[index]);
+
+  return selectedTasks;
+};

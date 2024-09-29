@@ -60,18 +60,22 @@ export const getPredictionController = async (req, res) => {
 
 
 
+
 export const getTaskRecommendationController = async (req, res) => {
-    const { Student_id } = req.body;
-    console.log("POST Student ID for task recommendation:", Student_id); 
-  
-    const studentData = await fetchStudentData(Student_id);
-  
-    if (!studentData) {
-      console.log("Student not found for ID:", Student_id); 
-      return makeResponse({ res, status: 404, message: 'Student not found.' });
-    }
-  
-    const taskRecommendations = await recommendTask(studentData);
-    return makeResponse({ res, status: 200, data: taskRecommendations });
-  };
-  
+  const { performer_type, lowest_two_chapters } = req.body;
+
+  console.log('Received body:', req.body); // Log the entire request body
+
+  // Validate input
+  if (!performer_type || !lowest_two_chapters || lowest_two_chapters.length < 2) {
+    return res.status(400).json({ message: 'Performer type and two lowest chapters are required.' });
+  }
+
+  try {
+    const taskRecommendations = await recommendTask(performer_type, lowest_two_chapters);
+    return res.status(200).json({ tasks: taskRecommendations });
+  } catch (error) {
+    console.error('Error fetching tasks:', error); // Log the actual error
+    return res.status(500).json({ message: 'Failed to get task recommendations.', error: error.message });
+  }
+};
