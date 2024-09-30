@@ -81,12 +81,13 @@ export const recommendTask = async (performerType, lowestTwoChapters) => {
 
   // Log the chapters for debugging
   console.log('Lowest Two Chapters:', mostLowestMarksChapter, secondLowestMarksChapter);
-  // Define task list based on weakest chapters
-  const tasks = [
+
+  // Define weekly task list based on weakest chapters
+  const weeklyTasks = [
     {
       task: 'Start Doing Past Papers and Related Questions',
       subTasks: [
-        `Focus on past papers from the last 3 years: ${('https://mysligit-my.sharepoint.com/.../Computing')}`,
+        `Focus on past papers from the last 3 years: https://mysligit-my.sharepoint.com/.../Computing`,
         `Specifically, practice the lowest scoring chapter: ${mostLowestMarksChapter}`,
         `50 MCQ Questions for ${mostLowestMarksChapter}: https://mcqmate.com/search?term=${mostLowestMarksChapter} or Google search: https://google.com/search?q=${mostLowestMarksChapter}+MCQ`
       ]
@@ -128,6 +129,28 @@ export const recommendTask = async (performerType, lowestTwoChapters) => {
     }
   ];
 
+  // Define common daily tasks
+  const dailyTasks = [
+    {
+      task: 'Watch a 5-minute video in one weak area',
+      subTasks: [
+        `Watch this YouTube video on ${mostLowestMarksChapter}: https://www.youtube.com/results?search_query=${mostLowestMarksChapter}+5-minute+video`
+      ]
+    },
+    {
+      task: 'Use the Pomodoro Technique',
+      subTasks: [
+        'Work for 25 minutes, take a 5-minute break, and repeat. Try completing a task from your weakest chapters.'
+      ]
+    },
+    {
+      task: 'Write in your learning journal',
+      subTasks: [
+        'Summarize what you learned today, focusing on the weak areas identified: ' + mostLowestMarksChapter + ' and ' + secondLowestMarksChapter
+      ]
+    }
+  ];
+
   // Use a case-insensitive approach for performerType
   const formattedPerformerType = performerType.trim().toLowerCase();
   const taskOrder = {
@@ -142,8 +165,14 @@ export const recommendTask = async (performerType, lowestTwoChapters) => {
     throw new Error('Invalid performer type');
   }
 
-  // Determine which tasks to assign based on performer type
-  const selectedTasks = taskOrder[formattedPerformerType].map(index => tasks[index]);
+  // Determine which weekly tasks to assign based on performer type
+  const selectedWeeklyTasks = taskOrder[formattedPerformerType].map(index => weeklyTasks[index]);
 
-  return selectedTasks;
+  // Combine weekly tasks and daily tasks
+  const combinedTasks = {
+    weeklyTasks: selectedWeeklyTasks,
+    dailyTasks: dailyTasks
+  };
+
+  return combinedTasks;
 };
