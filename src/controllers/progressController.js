@@ -1,9 +1,7 @@
-
-import Task from '@/models/taskModel'; 
-import { fetchStudentData, predictExamScore, recommendTask } from '@/services/progressService';
 import CompletedTask from '@/models/completedTaskModel';
+import Task from '@/models/taskModel';
+import { fetchStudentData, predictExamScore, recommendTask } from '@/services/progressService';
 import { makeResponse } from '@/utils';
-
 
 // Controller to fetch student details by ID
 export const getStudentDetailsController = async (req, res) => {
@@ -19,22 +17,21 @@ export const getStudentDetailsController = async (req, res) => {
 
 // Controller to predict exam score by Student ID
 
-
 // export const getPredictionController = async (req, res) => {
 //     const { Student_id } = req.body;
-//     console.log("POST Student ID:", Student_id); 
-  
+//     console.log("POST Student ID:", Student_id);
+
 //     const studentData = await fetchStudentData(Student_id);
-  
+
 //     if (!studentData) {
-//       console.log("Student not found for ID:", Student_id); 
+//       console.log("Student not found for ID:", Student_id);
 //       return makeResponse({ res, status: 404, message: 'Student not found.' });
 //     }
-  
+
 //     const predictionResult = await predictExamScore(studentData);
 //     return makeResponse({ res, status: 200, data: predictionResult });
 //   };
-  
+
 export const getPredictionController = async (req, res) => {
   const { Student_id } = req.body;
 
@@ -60,7 +57,6 @@ export const getPredictionController = async (req, res) => {
   }
 };
 
-
 export const getTaskRecommendationController = async (req, res) => {
   const { performer_type, lowest_two_chapters } = req.body;
 
@@ -78,24 +74,23 @@ export const getTaskRecommendationController = async (req, res) => {
     const newTask = new Task({
       performer_type,
       lowest_two_chapters,
-      tasks: taskRecommendations,
+      tasks: taskRecommendations
     });
 
     // Save the task in the database and include the _id
     const savedTask = await newTask.save();
 
     // Return the saved task (including the MongoDB-generated _id)
-    return res.status(201).json({ data: savedTask });  // Ensure _id is included in the response
+    return res.status(201).json({ data: savedTask }); // Ensure _id is included in the response
   } catch (error) {
     console.error('Error saving tasks:', error);
     return res.status(500).json({ message: 'Failed to save task recommendations.', error: error.message });
   }
 };
 export const deleteSubtaskFromTaskController = async (req, res) => {
-  
   const { taskId, subtaskType, taskIndex, subtaskIndex } = req.body;
 
-  console.log("Received delete request with data:", req.body); // Log incoming request
+  console.log('Received delete request with data:', req.body); // Log incoming request
 
   if (!taskId || typeof taskIndex === 'undefined' || typeof subtaskIndex === 'undefined') {
     return res.status(400).json({ message: 'Missing required fields: taskId, taskIndex, or subtaskIndex' });
@@ -104,7 +99,7 @@ export const deleteSubtaskFromTaskController = async (req, res) => {
   try {
     const task = await Task.findById(taskId);
     if (!task) {
-      return res.status(404).json({ message: "Task not found" });
+      return res.status(404).json({ message: 'Task not found' });
     }
 
     const taskType = subtaskType === 'weekly' ? 'weeklyTasks' : 'dailyTasks';
@@ -133,15 +128,14 @@ export const deleteSubtaskFromTaskController = async (req, res) => {
     await completedTask.save();
 
     return res.status(200).json({
-      message: "Subtask deleted and saved to CompletedTask collection",
+      message: 'Subtask deleted and saved to CompletedTask collection',
       updatedTask: task,
       completedTask
     });
   } catch (error) {
-    return res.status(500).json({ message: "Server error", error: error.message });
+    return res.status(500).json({ message: 'Server error', error: error.message });
   }
 };
-
 
 // Fetch completed tasks by taskId
 export const getCompletedTasksByTaskIdController = async (req, res) => {
@@ -159,7 +153,7 @@ export const getCompletedTasksByTaskIdController = async (req, res) => {
     // Return the completed tasks with a 200 status
     res.status(200).json({ completedTasks });
   } catch (error) {
-    console.error("Error fetching completed tasks:", error);
-    res.status(500).json({ message: "Failed to fetch completed tasks", error: error.message });
+    console.error('Error fetching completed tasks:', error);
+    res.status(500).json({ message: 'Failed to fetch completed tasks', error: error.message });
   }
 };

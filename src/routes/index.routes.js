@@ -6,11 +6,11 @@ import forcastRouter from './forcast.routes';
 import lectureRouter from './lecture.routes';
 import moduleRouter from './module.routes';
 import ontologyRouter from './ontology.routes';
+import progressRouter from './progress.routes';
 import questionRouter from './question.routes';
 import quizRouter from './quiz.routes';
 import sessionRouter from './session.routes';
 import userRouter from './user.routes';
-import progressRouter from './progress.routes';
 import { protect } from '@/middleware';
 
 const router = express.Router();
@@ -26,6 +26,6 @@ router.use('/lectures', lectureRouter);
 router.use('/modules', moduleRouter);
 router.use('/assrs', assrsResultRouter);
 router.use('/sessions', sessionRouter);
-router.use('/progress',progressRouter);
+router.use('/progress', progressRouter);
 
 export default router;
