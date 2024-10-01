@@ -68,29 +68,22 @@ export const getTaskRecommendationController = async (req, res) => {
     const newTask = new Task({
       performer_type,
       lowest_two_chapters,
-      tasks: taskRecommendations,
+      tasks: taskRecommendations
     });
 
     // Save the task in the database
     const savedTask = await newTask.save();
 
     // Log the saved task to verify it includes _id
-    console.log("Saved task:", savedTask);
+    console.log('Saved task:', savedTask);
 
     // Return the saved task, including _id
-    return res.status(201).json({ data: 
-      
-     { _id: savedTask._id,
-      tasks: savedTask.tasks,}
-      
-       });
+    return res.status(201).json({ data: { _id: savedTask._id, tasks: savedTask.tasks } });
   } catch (error) {
-    console.error("Error saving tasks:", error);
-    return res.status(500).json({ message: "Failed to save task recommendations.", error: error.message });
+    console.error('Error saving tasks:', error);
+    return res.status(500).json({ message: 'Failed to save task recommendations.', error: error.message });
   }
 };
-
-
 
 export const deleteSubtaskFromTaskController = async (req, res) => {
   // Log the request body for debugging
@@ -100,7 +93,7 @@ export const deleteSubtaskFromTaskController = async (req, res) => {
 
   // Check if the required fields are missing
   if (!taskId || typeof taskIndex === 'undefined' || typeof subTaskIndex === 'undefined') {
-    console.log("Missing fields:", { taskId, taskIndex, subTaskIndex }); // Log missing fields for better debugging
+    console.log('Missing fields:', { taskId, taskIndex, subTaskIndex }); // Log missing fields for better debugging
     return res.status(400).json({ message: 'Missing required fields: taskId, taskIndex, or subtaskIndex' });
   }
 
