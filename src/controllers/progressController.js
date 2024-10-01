@@ -60,12 +60,6 @@ export const getPredictionController = async (req, res) => {
 export const getTaskRecommendationController = async (req, res) => {
   const { performer_type, lowest_two_chapters } = req.body;
 
-  console.log('Received body:', req.body);
-
-  if (!performer_type || !lowest_two_chapters || lowest_two_chapters.length < 2) {
-    return res.status(400).json({ message: 'Performer type and two lowest chapters are required.' });
-  }
-
   try {
     // Get task recommendations based on performer_type and chapters
     const taskRecommendations = await recommendTask(performer_type, lowest_two_chapters);
@@ -74,46 +68,66 @@ export const getTaskRecommendationController = async (req, res) => {
     const newTask = new Task({
       performer_type,
       lowest_two_chapters,
-      tasks: taskRecommendations
+      tasks: taskRecommendations,
     });
 
-    // Save the task in the database and include the _id
+    // Save the task in the database
     const savedTask = await newTask.save();
 
-    // Return the saved task (including the MongoDB-generated _id)
-    return res.status(201).json({ data: savedTask }); // Ensure _id is included in the response
+    // Log the saved task to verify it includes _id
+    console.log("Saved task:", savedTask);
+
+    // Return the saved task, including _id
+    return res.status(201).json({ data: 
+      
+     { _id: savedTask._id,
+      tasks: savedTask.tasks,}
+      
+       });
   } catch (error) {
-    console.error('Error saving tasks:', error);
-    return res.status(500).json({ message: 'Failed to save task recommendations.', error: error.message });
+    console.error("Error saving tasks:", error);
+    return res.status(500).json({ message: "Failed to save task recommendations.", error: error.message });
   }
 };
+
+
+
 export const deleteSubtaskFromTaskController = async (req, res) => {
-  const { taskId, subtaskType, taskIndex, subtaskIndex } = req.body;
+  // Log the request body for debugging
+  console.log('Received delete request with data:', req.body);
 
-  console.log('Received delete request with data:', req.body); // Log incoming request
+  const { taskId, subtaskType, taskIndex, subTaskIndex } = req.body;
 
-  if (!taskId || typeof taskIndex === 'undefined' || typeof subtaskIndex === 'undefined') {
+  // Check if the required fields are missing
+  if (!taskId || typeof taskIndex === 'undefined' || typeof subTaskIndex === 'undefined') {
+    console.log("Missing fields:", { taskId, taskIndex, subTaskIndex }); // Log missing fields for better debugging
     return res.status(400).json({ message: 'Missing required fields: taskId, taskIndex, or subtaskIndex' });
   }
 
   try {
+    // Find the task by its ID
     const task = await Task.findById(taskId);
     if (!task) {
       return res.status(404).json({ message: 'Task not found' });
     }
 
+    // Determine if it's a weekly or daily task
     const taskType = subtaskType === 'weekly' ? 'weeklyTasks' : 'dailyTasks';
     const targetTaskArray = task.tasks[taskType];
 
-    if (!targetTaskArray || !targetTaskArray[taskIndex] || !targetTaskArray[taskIndex].subTasks[subtaskIndex]) {
+    // Validate that taskIndex and subTaskIndex point to valid items
+    if (!targetTaskArray || !targetTaskArray[taskIndex] || !targetTaskArray[taskIndex].subTasks[subTaskIndex]) {
       return res.status(400).json({ message: 'Invalid taskIndex or subtaskIndex.' });
     }
 
-    const deletedSubtask = targetTaskArray[taskIndex].subTasks.splice(subtaskIndex, 1)[0];
+    // Remove the subtask
+    const deletedSubtask = targetTaskArray[taskIndex].subTasks.splice(subTaskIndex, 1)[0];
 
+    // Mark the task as modified and save
     task.markModified(`tasks.${taskType}`);
     await task.save();
 
+    // Save the deleted subtask to the CompletedTask collection
     const completedTask = new CompletedTask({
       task_id: task._id,
       performer_type: task.performer_type,
@@ -133,6 +147,7 @@ export const deleteSubtaskFromTaskController = async (req, res) => {
       completedTask
     });
   } catch (error) {
+    console.error('Error deleting subtask:', error);
     return res.status(500).json({ message: 'Server error', error: error.message });
   }
 };

@@ -74,7 +74,7 @@ export const recommendTask = async (performerType, lowestTwoChapters) => {
     {
       task: 'Start Doing Past Papers and Related Questions',
       subTasks: [
-        `Focus on past papers from the last 3 years: https://mysligit-my.sharepoint.com/.../Computing`,
+        `Focus on past papers from the last 3 years: https://mysligit-my.sharsepoint.com/.../Computing`,
         `Specifically, practice the lowest scoring chapter: ${mostLowestMarksChapter}`,
         `50 MCQ Questions for ${mostLowestMarksChapter}: https://mcqmate.com/search?term=${mostLowestMarksChapter} or Google search: https://google.com/search?q=${mostLowestMarksChapter}+MCQ`
       ]
