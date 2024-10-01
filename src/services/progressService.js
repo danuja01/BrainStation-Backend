@@ -133,10 +133,9 @@ export const recommendTask = async (performerType, lowestTwoChapters) => {
     {
       task: 'Write in your learning journal',
       subTasks: [
-        `Summarize what you learned today, focusing on the weak areas identified: ${ 
-          mostLowestMarksChapter 
-          } and ${ 
-          secondLowestMarksChapter}`
+        `Summarize what you learned today, focusing on the weak areas identified: ${mostLowestMarksChapter} and ${
+          secondLowestMarksChapter
+        }`
       ]
     }
   ];
