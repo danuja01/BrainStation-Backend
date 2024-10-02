@@ -1,10 +1,11 @@
+import moment from 'moment';
 import CompletedTask from '@/models/completedTaskModel';
+import Prediction from '@/models/predictionModel';
 import Task from '@/models/taskModel';
+import { fetchStudentDataFromDB } from '@/repository/studentProfile';
 import { fetchStudentData, predictExamScore, recommendTask } from '@/services/progressService';
 import { makeResponse } from '@/utils';
-import { fetchStudentDataFromDB } from '@/repository/studentProfile';
-import Prediction from '@/models/predictionModel';
-import moment from 'moment'; 
+
 // Controller to fetch student details by ID
 export const getStudentDetailsController = async (req, res) => {
   const { Student_id } = req.params;
@@ -181,20 +182,20 @@ export const getPredictionController = async (req, res) => {
 
   try {
     // Fetch student data using Student ID
-    console.log("Fetching student data for Student ID:", Student_id);
+    console.log('Fetching student data for Student ID:', Student_id);
     const studentData = await fetchStudentData(Student_id);
     if (!studentData) {
       return makeResponse({ res, status: 404, message: 'Student not found.' });
     }
 
     // Log student data
-    console.log("Student data fetched:", studentData);
+    console.log('Student data fetched:', studentData);
 
     // Call prediction service to get prediction
     const predictionResult = await predictExamScore(studentData);
 
     // Log the prediction result
-    console.log("Prediction result:", predictionResult);
+    console.log('Prediction result:', predictionResult);
 
     // Update the prediction if it exists or insert a new one (upsert)
     const updatedPrediction = await Prediction.findOneAndUpdate(

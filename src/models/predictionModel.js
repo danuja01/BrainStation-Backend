@@ -1,5 +1,4 @@
 // src/models/predictionModel.js
-
 import mongoose from 'mongoose';
 
 const predictionSchema = new mongoose.Schema({

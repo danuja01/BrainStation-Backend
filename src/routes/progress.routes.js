@@ -3,9 +3,9 @@ import { tracedAsyncHandler } from '@sliit-foss/functions';
 import {
   deleteSubtaskFromTaskController,
   getCompletedTasksByTaskIdController,
-  postPredictionController,
   getStudentDetailsController,
-  getTaskRecommendationController
+  getTaskRecommendationController,
+  postPredictionController
 } from '@/controllers/progressController';
 
 const progressRouter = express.Router();
@@ -32,6 +32,5 @@ progressRouter.post(
 );
 
 progressRouter.get('/completed-tasks/:taskId', getCompletedTasksByTaskIdController);
-
 
 export default progressRouter;
