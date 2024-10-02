@@ -2,7 +2,9 @@ import CompletedTask from '@/models/completedTaskModel';
 import Task from '@/models/taskModel';
 import { fetchStudentData, predictExamScore, recommendTask } from '@/services/progressService';
 import { makeResponse } from '@/utils';
-
+import { fetchStudentDataFromDB } from '@/repository/studentProfile';
+import Prediction from '@/models/predictionModel';
+import moment from 'moment'; 
 // Controller to fetch student details by ID
 export const getStudentDetailsController = async (req, res) => {
   const { Student_id } = req.params;
@@ -32,7 +34,7 @@ export const getStudentDetailsController = async (req, res) => {
 //     return makeResponse({ res, status: 200, data: predictionResult });
 //   };
 
-export const getPredictionController = async (req, res) => {
+export const postPredictionController = async (req, res) => {
   const { Student_id } = req.body;
 
   if (!Student_id) {
@@ -58,33 +60,37 @@ export const getPredictionController = async (req, res) => {
 };
 
 export const getTaskRecommendationController = async (req, res) => {
-  const { performer_type, lowest_two_chapters } = req.body;
+  const { performer_type, lowest_two_chapters, studentId } = req.body;
+
+  let studentObjectId = null;
+
+  if (studentId) {
+    // Use the fetchStudentDataFromDB function to get the student's data
+    const studentData = await fetchStudentDataFromDB(studentId);
+    if (!studentData) {
+      return makeResponse({ res, status: 404, message: 'Student not found.' });
+    }
+    studentObjectId = studentData._id; // Extract the student's object ID
+  }
 
   try {
-    // Get task recommendations based on performer_type and chapters
     const taskRecommendations = await recommendTask(performer_type, lowest_two_chapters);
 
-    // Create a new task document and save it to the MongoDB collection
     const newTask = new Task({
       performer_type,
       lowest_two_chapters,
+      student: studentObjectId, // Add student object ID to the task if available
       tasks: taskRecommendations
     });
 
-    // Save the task in the database
     const savedTask = await newTask.save();
 
-    // Log the saved task to verify it includes _id
-    console.log('Saved task:', savedTask);
-
-    // Return the saved task, including _id
     return res.status(201).json({ data: { _id: savedTask._id, tasks: savedTask.tasks } });
   } catch (error) {
     console.error('Error saving tasks:', error);
     return res.status(500).json({ message: 'Failed to save task recommendations.', error: error.message });
   }
 };
-
 export const deleteSubtaskFromTaskController = async (req, res) => {
   // Log the request body for debugging
   console.log('Received delete request with data:', req.body);
@@ -163,5 +169,52 @@ export const getCompletedTasksByTaskIdController = async (req, res) => {
   } catch (error) {
     console.error('Error fetching completed tasks:', error);
     res.status(500).json({ message: 'Failed to fetch completed tasks', error: error.message });
+  }
+};
+
+export const getPredictionController = async (req, res) => {
+  const { Student_id } = req.body;
+
+  if (!Student_id) {
+    return makeResponse({ res, status: 400, message: 'Student ID is required' });
+  }
+
+  try {
+    // Fetch student data using Student ID
+    console.log("Fetching student data for Student ID:", Student_id);
+    const studentData = await fetchStudentData(Student_id);
+    if (!studentData) {
+      return makeResponse({ res, status: 404, message: 'Student not found.' });
+    }
+
+    // Log student data
+    console.log("Student data fetched:", studentData);
+
+    // Call prediction service to get prediction
+    const predictionResult = await predictExamScore(studentData);
+
+    // Log the prediction result
+    console.log("Prediction result:", predictionResult);
+
+    // Update the prediction if it exists or insert a new one (upsert)
+    const updatedPrediction = await Prediction.findOneAndUpdate(
+      { student_id: studentData._id }, // Query based on student_id
+      {
+        student_id: studentData._id,
+        predicted_exam_score: predictionResult.predicted_exam_score,
+        performer_type: predictionResult.performer_type,
+        lowest_two_chapters: predictionResult.lowest_two_chapters
+      },
+      { new: true, upsert: true } // Upsert: create if not found, return the updated document
+    );
+
+    // Log after saving/updating
+    console.log('Prediction saved/updated:', updatedPrediction);
+
+    // Return the prediction result
+    return makeResponse({ res, status: 200, data: predictionResult });
+  } catch (error) {
+    console.error('Prediction Save/Update Error:', error);
+    return makeResponse({ res, status: 500, message: 'Failed to get or save prediction.' });
   }
 };

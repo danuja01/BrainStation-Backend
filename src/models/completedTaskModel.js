@@ -2,7 +2,8 @@
 import mongoose from 'mongoose';
 
 const completedTaskSchema = new mongoose.Schema({
-  task_id: { type: mongoose.Schema.Types.ObjectId, ref: 'Task', required: true }, // Reference to original task
+  task_id: { type: mongoose.Schema.Types.ObjectId, ref: 'Task', required: true }, // Reference to the original task
+  student: { type: mongoose.Schema.Types.ObjectId, ref: 'StudentProfile' }, // Store the student object ID here
   performer_type: { type: String, required: true },
   lowest_two_chapters: { type: Array, required: true },
   completedSubtask: {
