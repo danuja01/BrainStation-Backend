@@ -63,80 +63,74 @@ export const postPredictionController = async (req, res) => {
 export const getTaskRecommendationController = async (req, res) => {
   const { performer_type, lowest_two_chapters, studentId } = req.body;
 
-  let studentObjectId = null;
-
-  if (studentId) {
-    // Use the fetchStudentDataFromDB function to get the student's data
-    const studentData = await fetchStudentDataFromDB(studentId);
-    if (!studentData) {
-      return makeResponse({ res, status: 404, message: 'Student not found.' });
-    }
-    studentObjectId = studentData._id; // Extract the student's object ID
-  }
-
   try {
+    // Check if tasks already exist for the student this week
+    const existingTask = await Task.findOne({
+      student: studentId,
+      createdAt: {
+        $gte: moment().startOf('week').toDate(), // Fetch tasks created this week
+      },
+    });
+
+    if (existingTask) {
+      // If tasks already exist for this week, return them
+      return res.status(200).json({ data: { _id: existingTask._id, tasks: existingTask.tasks } });
+    }
+
+    // Generate new tasks because no tasks exist for this week
     const taskRecommendations = await recommendTask(performer_type, lowest_two_chapters);
 
     const newTask = new Task({
+      student: studentId,
       performer_type,
       lowest_two_chapters,
-      student: studentObjectId, // Add student object ID to the task if available
-      tasks: taskRecommendations
+      tasks: taskRecommendations,
     });
 
     const savedTask = await newTask.save();
-
     return res.status(201).json({ data: { _id: savedTask._id, tasks: savedTask.tasks } });
   } catch (error) {
     console.error('Error saving tasks:', error);
     return res.status(500).json({ message: 'Failed to save task recommendations.', error: error.message });
   }
 };
+
+
 export const deleteSubtaskFromTaskController = async (req, res) => {
-  // Log the request body for debugging
-  console.log('Received delete request with data:', req.body);
+  const { taskId, subtaskType, taskIndex, subTaskIndex, studentId } = req.body;
 
-  const { taskId, subtaskType, taskIndex, subTaskIndex } = req.body;
-
-  // Check if the required fields are missing
   if (!taskId || typeof taskIndex === 'undefined' || typeof subTaskIndex === 'undefined') {
-    console.log('Missing fields:', { taskId, taskIndex, subTaskIndex }); // Log missing fields for better debugging
     return res.status(400).json({ message: 'Missing required fields: taskId, taskIndex, or subtaskIndex' });
   }
 
   try {
-    // Find the task by its ID
     const task = await Task.findById(taskId);
     if (!task) {
       return res.status(404).json({ message: 'Task not found' });
     }
 
-    // Determine if it's a weekly or daily task
     const taskType = subtaskType === 'weekly' ? 'weeklyTasks' : 'dailyTasks';
     const targetTaskArray = task.tasks[taskType];
 
-    // Validate that taskIndex and subTaskIndex point to valid items
     if (!targetTaskArray || !targetTaskArray[taskIndex] || !targetTaskArray[taskIndex].subTasks[subTaskIndex]) {
       return res.status(400).json({ message: 'Invalid taskIndex or subtaskIndex.' });
     }
 
-    // Remove the subtask
     const deletedSubtask = targetTaskArray[taskIndex].subTasks.splice(subTaskIndex, 1)[0];
 
-    // Mark the task as modified and save
     task.markModified(`tasks.${taskType}`);
     await task.save();
 
-    // Save the deleted subtask to the CompletedTask collection
     const completedTask = new CompletedTask({
       task_id: task._id,
       performer_type: task.performer_type,
       lowest_two_chapters: task.lowest_two_chapters,
       completedSubtask: {
         task: targetTaskArray[taskIndex].task,
-        subTask: deletedSubtask
+        subTask: deletedSubtask,
       },
-      completedAt: new Date()
+      studentId, // Save the student ID for reference
+      completedAt: new Date(),
     });
 
     await completedTask.save();
@@ -144,13 +138,14 @@ export const deleteSubtaskFromTaskController = async (req, res) => {
     return res.status(200).json({
       message: 'Subtask deleted and saved to CompletedTask collection',
       updatedTask: task,
-      completedTask
+      completedTask,
     });
   } catch (error) {
     console.error('Error deleting subtask:', error);
     return res.status(500).json({ message: 'Server error', error: error.message });
   }
 };
+
 
 // Fetch completed tasks by taskId
 export const getCompletedTasksByTaskIdController = async (req, res) => {
