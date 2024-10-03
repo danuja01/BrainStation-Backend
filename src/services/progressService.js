@@ -2,6 +2,7 @@ import axios from 'axios';
 import { fetchStudentDataFromDB } from '@/repository/studentProfile';
 import { calculateCumulativeAverage, getLowestTwoChapters } from '@/utils/progressUtils';
 
+
 // Fetch student data from MongoDB
 export const fetchStudentData = async (Student_id) => {
   try {

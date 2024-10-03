@@ -1,8 +1,6 @@
-import moment from 'moment';
 import CompletedTask from '@/models/completedTaskModel';
-import Prediction from '@/models/predictionModel';
 import Task from '@/models/taskModel';
-import { fetchStudentDataFromDB } from '@/repository/studentProfile';
+import Prediction from '@/models/predictionModel';
 import { fetchStudentData, predictExamScore, recommendTask } from '@/services/progressService';
 import { makeResponse } from '@/utils';
 
@@ -61,74 +59,86 @@ export const postPredictionController = async (req, res) => {
 };
 
 export const getTaskRecommendationController = async (req, res) => {
-  const { performer_type, lowest_two_chapters, studentId } = req.body;
+  const { performer_type, lowest_two_chapters, Student_id } = req.body; // Get Student_id from the request body
 
   try {
-    // Check if tasks already exist for the student this week
-    const existingTask = await Task.findOne({
-      student: studentId,
-      createdAt: {
-        $gte: moment().startOf('week').toDate() // Fetch tasks created this week
-      }
-    });
+    let studentObjectId = null;
 
-    if (existingTask) {
-      // If tasks already exist for this week, return them
-      return res.status(200).json({ data: { _id: existingTask._id, tasks: existingTask.tasks } });
+    // If Student_id is provided, fetch the student data
+    if (Student_id) {
+      const studentData = await fetchStudentData(Student_id);
+      
+      if (!studentData) {
+        return res.status(404).json({ message: 'Student not found with the provided ID' });
+      }
+
+      // If student data is found, retrieve the ObjectId
+      studentObjectId = studentData._id;
+      console.log("Student Object ID:", studentObjectId); // Log the student Object ID
     }
 
-    // Generate new tasks because no tasks exist for this week
+    // Generate task recommendations based on performer_type and lowest_two_chapters
     const taskRecommendations = await recommendTask(performer_type, lowest_two_chapters);
 
+    // Create a new task and store studentObjectId (if available)
     const newTask = new Task({
-      student: studentId,
       performer_type,
       lowest_two_chapters,
-      tasks: taskRecommendations
+      tasks: taskRecommendations,
+      student: studentObjectId || undefined // Only store the ObjectId if it exists
     });
 
     const savedTask = await newTask.save();
-    return res.status(201).json({ data: { _id: savedTask._id, tasks: savedTask.tasks } });
+
+    // Return the saved task with the generated ID
+    return res.status(201).json({ data: { _id: savedTask._id, tasks: savedTask.tasks, student: savedTask.student } });
   } catch (error) {
-    console.error('Error saving tasks:', error);
-    return res.status(500).json({ message: 'Failed to save task recommendations.', error: error.message });
+    console.error('Error generating task:', error);
+    return res.status(500).json({ message: 'Failed to generate task.', error: error.message });
   }
 };
 
+
 export const deleteSubtaskFromTaskController = async (req, res) => {
-  const { taskId, subtaskType, taskIndex, subTaskIndex, studentId } = req.body;
+  const { taskId, subtaskType, taskIndex, subTaskIndex } = req.body;
 
   if (!taskId || typeof taskIndex === 'undefined' || typeof subTaskIndex === 'undefined') {
     return res.status(400).json({ message: 'Missing required fields: taskId, taskIndex, or subtaskIndex' });
   }
 
   try {
+    // Find the task by its ID
     const task = await Task.findById(taskId);
     if (!task) {
       return res.status(404).json({ message: 'Task not found' });
     }
 
+    // Determine if it's a weekly or daily task
     const taskType = subtaskType === 'weekly' ? 'weeklyTasks' : 'dailyTasks';
     const targetTaskArray = task.tasks[taskType];
 
+    // Validate taskIndex and subTaskIndex
     if (!targetTaskArray || !targetTaskArray[taskIndex] || !targetTaskArray[taskIndex].subTasks[subTaskIndex]) {
       return res.status(400).json({ message: 'Invalid taskIndex or subtaskIndex.' });
     }
 
+    // Remove the subtask
     const deletedSubtask = targetTaskArray[taskIndex].subTasks.splice(subTaskIndex, 1)[0];
 
+    // Mark task as modified and save
     task.markModified(`tasks.${taskType}`);
     await task.save();
 
+    // Save the deleted subtask to the CompletedTask collection
     const completedTask = new CompletedTask({
       task_id: task._id,
+      student: task.student, // Add student object ID to the completed task
       performer_type: task.performer_type,
       lowest_two_chapters: task.lowest_two_chapters,
       completedSubtask: {
         task: targetTaskArray[taskIndex].task,
         subTask: deletedSubtask
       },
-      studentId, // Save the student ID for reference
       completedAt: new Date()
     });
 
@@ -163,52 +173,5 @@ export const getCompletedTasksByTaskIdController = async (req, res) => {
   } catch (error) {
     console.error('Error fetching completed tasks:', error);
     res.status(500).json({ message: 'Failed to fetch completed tasks', error: error.message });
-  }
-};
-
-export const getPredictionController = async (req, res) => {
-  const { Student_id } = req.body;
-
-  if (!Student_id) {
-    return makeResponse({ res, status: 400, message: 'Student ID is required' });
-  }
-
-  try {
-    // Fetch student data using Student ID
-    console.log('Fetching student data for Student ID:', Student_id);
-    const studentData = await fetchStudentData(Student_id);
-    if (!studentData) {
-      return makeResponse({ res, status: 404, message: 'Student not found.' });
-    }
-
-    // Log student data
-    console.log('Student data fetched:', studentData);
-
-    // Call prediction service to get prediction
-    const predictionResult = await predictExamScore(studentData);
-
-    // Log the prediction result
-    console.log('Prediction result:', predictionResult);
-
-    // Update the prediction if it exists or insert a new one (upsert)
-    const updatedPrediction = await Prediction.findOneAndUpdate(
-      { student_id: studentData._id }, // Query based on student_id
-      {
-        student_id: studentData._id,
-        predicted_exam_score: predictionResult.predicted_exam_score,
-        performer_type: predictionResult.performer_type,
-        lowest_two_chapters: predictionResult.lowest_two_chapters
-      },
-      { new: true, upsert: true } // Upsert: create if not found, return the updated document
-    );
-
-    // Log after saving/updating
-    console.log('Prediction saved/updated:', updatedPrediction);
-
-    // Return the prediction result
-    return makeResponse({ res, status: 200, data: predictionResult });
-  } catch (error) {
-    console.error('Prediction Save/Update Error:', error);
-    return makeResponse({ res, status: 500, message: 'Failed to get or save prediction.' });
   }
 };
