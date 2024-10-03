@@ -1,6 +1,6 @@
 import CompletedTask from '@/models/completedTaskModel';
-import Task from '@/models/taskModel';
 import Prediction from '@/models/predictionModel';
+import Task from '@/models/taskModel';
 import { fetchStudentData, predictExamScore, recommendTask } from '@/services/progressService';
 import { makeResponse } from '@/utils';
 
@@ -67,14 +67,14 @@ export const getTaskRecommendationController = async (req, res) => {
     // If Student_id is provided, fetch the student data
     if (Student_id) {
       const studentData = await fetchStudentData(Student_id);
-      
+
       if (!studentData) {
         return res.status(404).json({ message: 'Student not found with the provided ID' });
       }
 
       // If student data is found, retrieve the ObjectId
       studentObjectId = studentData._id;
-      console.log("Student Object ID:", studentObjectId); // Log the student Object ID
+      console.log('Student Object ID:', studentObjectId); // Log the student Object ID
     }
 
     // Generate task recommendations based on performer_type and lowest_two_chapters
@@ -97,7 +97,6 @@ export const getTaskRecommendationController = async (req, res) => {
     return res.status(500).json({ message: 'Failed to generate task.', error: error.message });
   }
 };
-
 
 export const deleteSubtaskFromTaskController = async (req, res) => {
   const { taskId, subtaskType, taskIndex, subTaskIndex } = req.body;
