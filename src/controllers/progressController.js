@@ -68,8 +68,8 @@ export const getTaskRecommendationController = async (req, res) => {
     const existingTask = await Task.findOne({
       student: studentId,
       createdAt: {
-        $gte: moment().startOf('week').toDate(), // Fetch tasks created this week
-      },
+        $gte: moment().startOf('week').toDate() // Fetch tasks created this week
+      }
     });
 
     if (existingTask) {
@@ -84,7 +84,7 @@ export const getTaskRecommendationController = async (req, res) => {
       student: studentId,
       performer_type,
       lowest_two_chapters,
-      tasks: taskRecommendations,
+      tasks: taskRecommendations
     });
 
     const savedTask = await newTask.save();
@@ -94,7 +94,6 @@ export const getTaskRecommendationController = async (req, res) => {
     return res.status(500).json({ message: 'Failed to save task recommendations.', error: error.message });
   }
 };
-
 
 export const deleteSubtaskFromTaskController = async (req, res) => {
   const { taskId, subtaskType, taskIndex, subTaskIndex, studentId } = req.body;
@@ -127,10 +126,10 @@ export const deleteSubtaskFromTaskController = async (req, res) => {
       lowest_two_chapters: task.lowest_two_chapters,
       completedSubtask: {
         task: targetTaskArray[taskIndex].task,
-        subTask: deletedSubtask,
+        subTask: deletedSubtask
       },
       studentId, // Save the student ID for reference
-      completedAt: new Date(),
+      completedAt: new Date()
     });
 
     await completedTask.save();
@@ -138,14 +137,13 @@ export const deleteSubtaskFromTaskController = async (req, res) => {
     return res.status(200).json({
       message: 'Subtask deleted and saved to CompletedTask collection',
       updatedTask: task,
-      completedTask,
+      completedTask
     });
   } catch (error) {
     console.error('Error deleting subtask:', error);
     return res.status(500).json({ message: 'Server error', error: error.message });
   }
 };
-
 
 // Fetch completed tasks by taskId
 export const getCompletedTasksByTaskIdController = async (req, res) => {
