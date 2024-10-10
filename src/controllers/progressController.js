@@ -3,6 +3,8 @@ import Prediction from '@/models/predictionModel';
 import Task from '@/models/taskModel';
 import { fetchStudentData, predictExamScore, recommendTask } from '@/services/progressService';
 import { makeResponse } from '@/utils';
+import mongoose from 'mongoose';
+
 
 // Controller to fetch student details by ID
 export const getStudentDetailsController = async (req, res) => {
@@ -59,12 +61,12 @@ export const postPredictionController = async (req, res) => {
 };
 
 export const getTaskRecommendationController = async (req, res) => {
-  const { performer_type, lowest_two_chapters, Student_id } = req.body; // Get Student_id from the request body
+  const { performer_type, lowest_two_chapters, Student_id } = req.body;
 
   try {
     let studentObjectId = null;
 
-    // If Student_id is provided, fetch the student data
+    // Check if Student_id is provided
     if (Student_id) {
       const studentData = await fetchStudentData(Student_id);
 
@@ -72,12 +74,29 @@ export const getTaskRecommendationController = async (req, res) => {
         return res.status(404).json({ message: 'Student not found with the provided ID' });
       }
 
-      // If student data is found, retrieve the ObjectId
       studentObjectId = studentData._id;
-      console.log('Student Object ID:', studentObjectId); // Log the student Object ID
     }
 
-    // Generate task recommendations based on performer_type and lowest_two_chapters
+    // Check if the student already has an active task set
+    const existingTaskSet = await Task.findOne({ student: studentObjectId });
+
+    if (existingTaskSet) {
+      // Compare performer type and lowest mark areas
+      const isSamePerformerType = existingTaskSet.performer_type === performer_type;
+      const isSameLowestChapters = JSON.stringify(existingTaskSet.lowest_two_chapters) === JSON.stringify(lowest_two_chapters);
+
+      if (isSamePerformerType && isSameLowestChapters) {
+        // If performance and lowest chapters are the same, return the current task set excluding completed tasks
+        const tasksWithoutCompleted = await excludeCompletedTasks(existingTaskSet);
+        return res.status(200).json({ data: tasksWithoutCompleted });
+      }
+
+      // If performance or lowest chapters are different, move the old task set to `notcompleted` collection
+      await moveTaskToNotCompletedCollection(existingTaskSet);
+      await Task.deleteOne({ _id: existingTaskSet._id });
+    }
+
+    // Generate new task recommendations
     const taskRecommendations = await recommendTask(performer_type, lowest_two_chapters);
 
     // Create a new task and store studentObjectId (if available)
@@ -85,12 +104,12 @@ export const getTaskRecommendationController = async (req, res) => {
       performer_type,
       lowest_two_chapters,
       tasks: taskRecommendations,
-      student: studentObjectId || undefined // Only store the ObjectId if it exists
+      student: studentObjectId || undefined,
     });
 
     const savedTask = await newTask.save();
 
-    // Return the saved task with the generated ID
+    // Return the new task set
     return res.status(201).json({ data: { _id: savedTask._id, tasks: savedTask.tasks, student: savedTask.student } });
   } catch (error) {
     console.error('Error generating task:', error);
@@ -98,51 +117,86 @@ export const getTaskRecommendationController = async (req, res) => {
   }
 };
 
-export const deleteSubtaskFromTaskController = async (req, res) => {
-  const { taskId, subtaskType, taskIndex, subTaskIndex } = req.body;
+// Function to exclude completed tasks from the task set
+const excludeCompletedTasks = async (taskSet) => {
+  const completedTasks = await CompletedTask.find({ task_id: taskSet._id });
+  const completedSubTasks = completedTasks.map(ct => ct.completedSubtask.subTask);
 
-  if (!taskId || typeof taskIndex === 'undefined' || typeof subTaskIndex === 'undefined') {
-    return res.status(400).json({ message: 'Missing required fields: taskId, taskIndex, or subtaskIndex' });
+  // Filter out completed subtasks from the task set
+  taskSet.tasks.weeklyTasks.forEach(weeklyTask => {
+    weeklyTask.subTasks = weeklyTask.subTasks.filter(subTask => !completedSubTasks.includes(subTask));
+  });
+
+  taskSet.tasks.dailyTasks.forEach(dailyTask => {
+    dailyTask.subTasks = dailyTask.subTasks.filter(subTask => !completedSubTasks.includes(subTask));
+  });
+
+  return taskSet;
+};
+
+// Function to move old task set to the 'notcompleted' collection
+const moveTaskToNotCompletedCollection = async (taskSet) => {
+  // Define the NotCompletedTask model using the same schema as Task
+  const NotCompletedTask = mongoose.model('NotCompletedTask', taskSet.schema);  // Reuse the schema
+
+  // Convert the taskSet object to a plain object and create a new instance of NotCompletedTask
+  const notCompletedTask = new NotCompletedTask(taskSet.toObject());
+  
+  // Save the moved task set into the NotCompletedTask collection
+  await notCompletedTask.save();
+};
+
+export const deleteSubtaskFromTaskController = async (req, res) => {
+  const { taskId, taskType, taskIndex, subTaskIndex } = req.body;
+
+  // Validate input
+  if (!taskId || typeof taskIndex === 'undefined' || typeof subTaskIndex === 'undefined' || !taskType) {
+    return res.status(400).json({ message: 'Missing required fields: taskId, taskIndex, subTaskIndex, or taskType' });
   }
 
   try {
-    // Find the task by its ID
+    // Fetch the task by its ID
     const task = await Task.findById(taskId);
     if (!task) {
       return res.status(404).json({ message: 'Task not found' });
     }
 
-    // Determine if it's a weekly or daily task
-    const taskType = subtaskType === 'weekly' ? 'weeklyTasks' : 'dailyTasks';
-    const targetTaskArray = task.tasks[taskType];
-
-    // Validate taskIndex and subTaskIndex
-    if (!targetTaskArray || !targetTaskArray[taskIndex] || !targetTaskArray[taskIndex].subTasks[subTaskIndex]) {
-      return res.status(400).json({ message: 'Invalid taskIndex or subtaskIndex.' });
+    // Ensure the taskType is either weeklyTasks or dailyTasks
+    if (taskType !== 'weeklyTasks' && taskType !== 'dailyTasks') {
+      return res.status(400).json({ message: 'Invalid task type. Use "weeklyTasks" or "dailyTasks".' });
     }
 
-    // Remove the subtask
-    const deletedSubtask = targetTaskArray[taskIndex].subTasks.splice(subTaskIndex, 1)[0];
+    // Access the appropriate task array (either weeklyTasks or dailyTasks)
+    const taskTypeArray = task.tasks[taskType];
 
-    // Mark task as modified and save
+    // Validate that the task array and indices exist
+    if (!taskTypeArray || !taskTypeArray[taskIndex] || !taskTypeArray[taskIndex].subTasks[subTaskIndex]) {
+      return res.status(400).json({ message: 'Invalid taskIndex or subTaskIndex.' });
+    }
+
+    // Remove the subtask from the task array
+    const deletedSubtask = taskTypeArray[taskIndex].subTasks.splice(subTaskIndex, 1)[0];
+
+    // Mark the task as modified and save the updated task
     task.markModified(`tasks.${taskType}`);
     await task.save();
 
     // Save the deleted subtask to the CompletedTask collection
     const completedTask = new CompletedTask({
       task_id: task._id,
-      student: task.student, // Add student object ID to the completed task
+      student: task.student, // Store the student object ID
       performer_type: task.performer_type,
       lowest_two_chapters: task.lowest_two_chapters,
       completedSubtask: {
-        task: targetTaskArray[taskIndex].task,
-        subTask: deletedSubtask
+        task: taskTypeArray[taskIndex].task, // The main task
+        subTask: deletedSubtask // The deleted subtask
       },
       completedAt: new Date()
     });
 
-    await completedTask.save();
+    await completedTask.save(); // Save the completed task
 
+    // Return success response
     return res.status(200).json({
       message: 'Subtask deleted and saved to CompletedTask collection',
       updatedTask: task,
@@ -153,6 +207,9 @@ export const deleteSubtaskFromTaskController = async (req, res) => {
     return res.status(500).json({ message: 'Server error', error: error.message });
   }
 };
+
+
+
 
 // Fetch completed tasks by taskId
 export const getCompletedTasksByTaskIdController = async (req, res) => {
