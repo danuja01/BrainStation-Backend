@@ -4,6 +4,7 @@ import Prediction from '@/models/predictionModel';
 import Task from '@/models/taskModel';
 import { fetchStudentData, predictExamScore, recommendTask } from '@/services/progressService';
 import { makeResponse } from '@/utils';
+import { fetchStudentDataFromDB } from '@/repository/studentProfile'; 
 
 // Controller to fetch student details by ID
 export const getStudentDetailsController = async (req, res) => {
@@ -226,5 +227,34 @@ export const getCompletedTasksByTaskIdController = async (req, res) => {
   } catch (error) {
     console.error('Error fetching completed tasks:', error);
     res.status(500).json({ message: 'Failed to fetch completed tasks', error: error.message });
+  }
+};
+
+// Controller to fetch completed tasks count based on student ID
+export const getCompletedTasksCount = async (req, res) => {
+  const { studentId } = req.params; // Get the student ID from the request params
+
+  try {
+    // Fetch student data from the database to get the student object ID
+    const studentData = await fetchStudentDataFromDB(studentId);
+
+    if (!studentData || !studentData._id) {
+      return res.status(404).json({ message: "Student not found." });
+    }
+
+    const studentObjectId = studentData._id; // Extract the student object ID
+
+    // Count the completed tasks for the student using their ObjectId
+    const completedTasksCount = await CompletedTask.countDocuments({ student: studentObjectId });
+
+    if (!completedTasksCount) {
+      return res.status(404).json({ message: "No completed tasks found for this student." });
+    }
+
+    // Return the count of completed tasks
+    res.status(200).json({ completedTasksCount });
+  } catch (error) {
+    console.error("Error fetching completed tasks count:", error);
+    res.status(500).json({ message: "Failed to fetch completed tasks count." });
   }
 };
