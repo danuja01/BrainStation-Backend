@@ -2,9 +2,9 @@ import mongoose from 'mongoose';
 import CompletedTask from '@/models/completedTaskModel';
 import Prediction from '@/models/predictionModel';
 import Task from '@/models/taskModel';
+import { fetchStudentDataFromDB } from '@/repository/studentProfile';
 import { fetchStudentData, predictExamScore, recommendTask } from '@/services/progressService';
 import { makeResponse } from '@/utils';
-import { fetchStudentDataFromDB } from '@/repository/studentProfile'; 
 
 // Controller to fetch student details by ID
 export const getStudentDetailsController = async (req, res) => {
@@ -239,7 +239,7 @@ export const getCompletedTasksCount = async (req, res) => {
     const studentData = await fetchStudentDataFromDB(studentId);
 
     if (!studentData || !studentData._id) {
-      return res.status(404).json({ message: "Student not found." });
+      return res.status(404).json({ message: 'Student not found.' });
     }
 
     const studentObjectId = studentData._id; // Extract the student object ID
@@ -248,13 +248,13 @@ export const getCompletedTasksCount = async (req, res) => {
     const completedTasksCount = await CompletedTask.countDocuments({ student: studentObjectId });
 
     if (!completedTasksCount) {
-      return res.status(404).json({ message: "No completed tasks found for this student." });
+      return res.status(404).json({ message: 'No completed tasks found for this student.' });
     }
 
     // Return the count of completed tasks
     res.status(200).json({ completedTasksCount });
   } catch (error) {
-    console.error("Error fetching completed tasks count:", error);
-    res.status(500).json({ message: "Failed to fetch completed tasks count." });
+    console.error('Error fetching completed tasks count:', error);
+    res.status(500).json({ message: 'Failed to fetch completed tasks count.' });
   }
 };
