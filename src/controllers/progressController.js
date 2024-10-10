@@ -1,10 +1,9 @@
+import mongoose from 'mongoose';
 import CompletedTask from '@/models/completedTaskModel';
 import Prediction from '@/models/predictionModel';
 import Task from '@/models/taskModel';
 import { fetchStudentData, predictExamScore, recommendTask } from '@/services/progressService';
 import { makeResponse } from '@/utils';
-import mongoose from 'mongoose';
-
 
 // Controller to fetch student details by ID
 export const getStudentDetailsController = async (req, res) => {
@@ -83,7 +82,8 @@ export const getTaskRecommendationController = async (req, res) => {
     if (existingTaskSet) {
       // Compare performer type and lowest mark areas
       const isSamePerformerType = existingTaskSet.performer_type === performer_type;
-      const isSameLowestChapters = JSON.stringify(existingTaskSet.lowest_two_chapters) === JSON.stringify(lowest_two_chapters);
+      const isSameLowestChapters =
+        JSON.stringify(existingTaskSet.lowest_two_chapters) === JSON.stringify(lowest_two_chapters);
 
       if (isSamePerformerType && isSameLowestChapters) {
         // If performance and lowest chapters are the same, return the current task set excluding completed tasks
@@ -104,7 +104,7 @@ export const getTaskRecommendationController = async (req, res) => {
       performer_type,
       lowest_two_chapters,
       tasks: taskRecommendations,
-      student: studentObjectId || undefined,
+      student: studentObjectId || undefined
     });
 
     const savedTask = await newTask.save();
@@ -120,15 +120,15 @@ export const getTaskRecommendationController = async (req, res) => {
 // Function to exclude completed tasks from the task set
 const excludeCompletedTasks = async (taskSet) => {
   const completedTasks = await CompletedTask.find({ task_id: taskSet._id });
-  const completedSubTasks = completedTasks.map(ct => ct.completedSubtask.subTask);
+  const completedSubTasks = completedTasks.map((ct) => ct.completedSubtask.subTask);
 
   // Filter out completed subtasks from the task set
-  taskSet.tasks.weeklyTasks.forEach(weeklyTask => {
-    weeklyTask.subTasks = weeklyTask.subTasks.filter(subTask => !completedSubTasks.includes(subTask));
+  taskSet.tasks.weeklyTasks.forEach((weeklyTask) => {
+    weeklyTask.subTasks = weeklyTask.subTasks.filter((subTask) => !completedSubTasks.includes(subTask));
   });
 
-  taskSet.tasks.dailyTasks.forEach(dailyTask => {
-    dailyTask.subTasks = dailyTask.subTasks.filter(subTask => !completedSubTasks.includes(subTask));
+  taskSet.tasks.dailyTasks.forEach((dailyTask) => {
+    dailyTask.subTasks = dailyTask.subTasks.filter((subTask) => !completedSubTasks.includes(subTask));
   });
 
   return taskSet;
@@ -137,11 +137,11 @@ const excludeCompletedTasks = async (taskSet) => {
 // Function to move old task set to the 'notcompleted' collection
 const moveTaskToNotCompletedCollection = async (taskSet) => {
   // Define the NotCompletedTask model using the same schema as Task
-  const NotCompletedTask = mongoose.model('NotCompletedTask', taskSet.schema);  // Reuse the schema
+  const NotCompletedTask = mongoose.model('NotCompletedTask', taskSet.schema); // Reuse the schema
 
   // Convert the taskSet object to a plain object and create a new instance of NotCompletedTask
   const notCompletedTask = new NotCompletedTask(taskSet.toObject());
-  
+
   // Save the moved task set into the NotCompletedTask collection
   await notCompletedTask.save();
 };
@@ -207,9 +207,6 @@ export const deleteSubtaskFromTaskController = async (req, res) => {
     return res.status(500).json({ message: 'Server error', error: error.message });
   }
 };
-
-
-
 
 // Fetch completed tasks by taskId
 export const getCompletedTasksByTaskIdController = async (req, res) => {

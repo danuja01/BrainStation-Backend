@@ -30,7 +30,7 @@ export const predictExamScore = async (studentData) => {
   // Prepare input data for the Python service
   const inputData = {
     focus_level: studentData.Focus_Level,
-   // emotional_state: studentData.Emotional_State,
+    // emotional_state: studentData.Emotional_State,
     cumulative_average: cumulativeAverage,
     time_spent_studying: parseInt(studentData.Time_Spent_Studying, 10) // Convert to integer
   };
