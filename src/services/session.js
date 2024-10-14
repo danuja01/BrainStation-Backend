@@ -1,5 +1,5 @@
 import createError from 'http-errors';
-import { createSession, getAllSessionsByUserId, getSessionById } from '@/repository/session';
+import { createSession, getAllSessionsByUserId, getSessionById, getSessionsOfUserByModule } from '@/repository/session';
 
 export const addSession = async (data) => {
   try {
@@ -23,4 +23,8 @@ export const findAllSessionsByUserId = async (userId, query) => {
   } catch (error) {
     throw new createError(500, `Error when retrieving sessions - ${error}`);
   }
+};
+
+export const findSessionsOfUserByModule = async (userId, moduleId, query) => {
+  return await getSessionsOfUserByModule(userId, moduleId, query);
 };

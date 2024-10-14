@@ -8,6 +8,11 @@ const sessionSchema = new mongoose.Schema(
       ref: 'User',
       required: true
     },
+    moduleId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Module',
+      required: true
+    },
     startTime: {
       type: Date,
       required: true

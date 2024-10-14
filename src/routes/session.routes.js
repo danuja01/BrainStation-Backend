@@ -13,4 +13,7 @@ sessionRouter.get('/:id', tracedAsyncHandler(getSessionByIdController));
 // Route to get all sessions by user ID
 sessionRouter.get('/user/:userId', tracedAsyncHandler(getSessionByUserController));
 
+// Route to get all sessions by user ID
+sessionRouter.get('/userByModule/:userId', tracedAsyncHandler(getSessionByUserController));
+
 export default sessionRouter;

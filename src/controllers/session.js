@@ -1,4 +1,5 @@
-import { addSession, findAllSessionsByUserId, findSessionById } from '@/services/session';
+import mongoose from 'mongoose';
+import { addSession, findAllSessionsByUserId, findSessionById, findSessionsOfUserByModule } from '@/services/session';
 import { makeResponse } from '@/utils/response';
 
 export const addSessionController = async (req, res) => {
@@ -16,9 +17,29 @@ export const getSessionByIdController = async (req, res) => {
 };
 
 export const getSessionByUserController = async (req, res) => {
-  const userId = req.params.userId; // Assuming you pass userId in the route params
+  const userId = req.params.userId;
 
   const data = await findAllSessionsByUserId(userId, req.query);
 
   return makeResponse({ res, data, message: 'Sessions retrieved successfully' });
+};
+
+export const getSessionsOfUserByModuleController = async (req, res) => {
+  try {
+    // Validate userId and moduleId
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+      throw new Error('Invalid userId');
+    }
+    if (!mongoose.Types.ObjectId.isValid(moduleId)) {
+      throw new Error('Invalid moduleId');
+    }
+
+    const userId = req.params;
+    const moduleId = req.body.moduleId;
+    const data = await findSessionsOfUserByModule(userId, moduleId, req.query);
+
+    return makeResponse({ res, data, message: 'Sessions retrieved successfully' });
+  } catch (error) {
+    return res.status(500).json({ message: 'Internal Server Error' });
+  }
 };
