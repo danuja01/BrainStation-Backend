@@ -1,28 +1,29 @@
 import createError from 'http-errors';
-import { createSession, getAllSessionsByUserId, getSessionById, getSessionsOfUserByModule } from '@/repository/session';
+import {
+  createSession,
+  getAllSessionsByUserId,
+  getSessionById,
+  getSessionsOfUserByModule
+} from '@/repository/focus-record';
 
 export const addSession = async (data) => {
   try {
-    return await createSession(data);
+    await createSession(data);
   } catch (error) {
     throw new createError(500, 'Error when saving session');
   }
 };
 
 export const findSessionById = async (id) => {
-  try {
-    return await getSessionById(id);
-  } catch (error) {
-    throw new createError(500, 'Error when retrieving session');
+  const record = await getSessionById(id);
+  if (!record) {
+    throw new createError(404, 'Session not found');
   }
+  return record;
 };
 
 export const findAllSessionsByUserId = async (userId, query) => {
-  try {
-    return await getAllSessionsByUserId(userId, query);
-  } catch (error) {
-    throw new createError(500, `Error when retrieving sessions - ${error}`);
-  }
+  return await getAllSessionsByUserId(userId, query);
 };
 
 export const findSessionsOfUserByModule = async (userId, moduleId, query) => {

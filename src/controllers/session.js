@@ -1,5 +1,10 @@
 import mongoose from 'mongoose';
-import { addSession, findAllSessionsByUserId, findSessionById, findSessionsOfUserByModule } from '@/services/session';
+import {
+  addSession,
+  findAllSessionsByUserId,
+  findSessionById,
+  findSessionsOfUserByModule
+} from '@/services/focus-record';
 import { makeResponse } from '@/utils/response';
 
 export const addSessionController = async (req, res) => {
@@ -9,6 +14,7 @@ export const addSessionController = async (req, res) => {
 
 export const getSessionByIdController = async (req, res) => {
   const record = await findSessionById(req.params.id);
+
   if (!record) {
     return makeResponse({ res, status: 404, message: 'Session not found' });
   }

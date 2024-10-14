@@ -1,22 +1,22 @@
 import mongoose from 'mongoose';
-import Session from '@/models/session';
+import FocusRecord from '@/models/focus-record';
 
 export const createSession = async (data) => {
-  const newRecord = new Session(data);
+  const newRecord = new FocusRecord(data);
   return await newRecord.save();
 };
 
 export const getSessionById = async (id) => {
-  return await Session.findById(id);
+  const record = await FocusRecord.findById(id).lean();
+  return record;
 };
 
-export const getAllSessionsByUserId = async (userId, { sort = { createdAt: -1 }, page = 1, limit = 20 }) => {
+export const getAllSessionsByUserId = (userId, { sort = { createdAt: -1 }, page = 1, limit = 20 }) => {
   const objectId = new mongoose.Types.ObjectId(userId);
 
-  const aggregate = Session.aggregate([{ $match: { userId: objectId } }, { $sort: sort }]);
+  const aggregate = FocusRecord.aggregate([{ $match: { userId: objectId } }, { $sort: sort }]);
 
-  const result = await Session.aggregatePaginate(aggregate, { page, limit });
-  return result;
+  return FocusRecord.aggregatePaginate(aggregate, { page, limit });
 };
 
 export const getSessionsOfUserByModule = async (
@@ -28,11 +28,11 @@ export const getSessionsOfUserByModule = async (
     const userObjectId = new mongoose.Types.ObjectId(userId);
     const moduleObjectId = new mongoose.Types.ObjectId(moduleId);
 
-    const aggregate = Session.aggregate([
+    const aggregate = FocusRecord.aggregate([
       { $match: { userId: userObjectId, moduleId: moduleObjectId } },
       { $sort: sort }
     ]);
-    const result = await Session.aggregatePaginate(aggregate, { page, limit });
+    const result = await FocusRecord.aggregatePaginate(aggregate, { page, limit });
 
     return result;
   } catch (error) {

@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 import aggregatePaginate from 'mongoose-aggregate-paginate-v2';
 
-const sessionSchema = new mongoose.Schema(
+const focusRecordsSchema = new mongoose.Schema(
   {
     userId: {
       type: mongoose.Schema.Types.ObjectId,
@@ -56,11 +56,11 @@ const sessionSchema = new mongoose.Schema(
   }
 );
 
-sessionSchema.plugin(aggregatePaginate);
-sessionSchema.index({ createdAt: 1 });
+focusRecordsSchema.plugin(aggregatePaginate);
+focusRecordsSchema.index({ createdAt: 1 });
 
-const Session = mongoose.model('FocusRecord', sessionSchema);
+const FocusRecord = mongoose.model('FocusRecord', focusRecordsSchema);
 
-Session.syncIndexes();
+FocusRecord.syncIndexes();
 
-export default Session;
+export default FocusRecord;
