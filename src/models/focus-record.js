@@ -26,29 +26,23 @@ const focusRecordsSchema = new mongoose.Schema(
       required: true
     },
     final_classification: {
-      type: String,
-      required: true
+      type: String
     },
     focus_time: {
-      type: Number,
-      required: true
+      type: Number
     },
     total_movements: {
-      type: Number,
-      required: true
+      type: Number
     },
     erratic_movements: {
-      type: Number,
-      required: true
+      type: Number
     },
     erratic_percentage: {
-      type: Number,
-      required: true
+      type: Number
     },
     emotion_distribution: {
       type: Map,
-      of: Number,
-      required: true
+      of: Number
     }
   },
   {
