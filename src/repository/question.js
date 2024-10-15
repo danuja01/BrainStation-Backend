@@ -11,7 +11,7 @@ export const insertBulkQuestions = async (dataArray) => {
   await Question.insertMany(questions);
 };
 
-export const getQuestions = async ({ filter = {}, sort = { createdAt: -1 }, page = 1, limit = 20 }) => {
+export const getQuestions = async ({ filter = {}, sort = { createdAt: -1 }, page = 1, limit = 100 }) => {
   if (filter.lectureId) {
     filter.lectureId = new mongoose.Types.ObjectId(filter.lectureId);
   }
