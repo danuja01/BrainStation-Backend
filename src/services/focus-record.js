@@ -2,8 +2,11 @@ import createError from 'http-errors';
 import {
   createSession,
   getAllSessionsByUserId,
+  getAverageFocusTime,
   getSessionById,
-  getSessionsOfUserByModule
+  getSessionsOfUserByModule,
+  getStartAndEndTimes,
+  getTotalFocusTime
 } from '@/repository/focus-record';
 
 export const addSession = async (data) => {
@@ -28,4 +31,16 @@ export const findAllSessionsByUserId = async (userId, query) => {
 
 export const findSessionsOfUserByModule = async (userId, moduleId, query) => {
   return await getSessionsOfUserByModule(userId, moduleId, query);
+};
+
+export const findStartAndEndTimesOfUsersModule = async (userId, moduleId) => {
+  return await getStartAndEndTimes(userId, moduleId);
+};
+
+export const findTotalFocusTimeOfUsersModule = async (userId, moduleId) => {
+  return await getTotalFocusTime(userId, moduleId);
+};
+
+export const findAverageFocusTimeofUsersModule = async (userId, moduleId) => {
+  return await getAverageFocusTime(userId, moduleId);
 };
