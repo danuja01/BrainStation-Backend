@@ -16,8 +16,6 @@ export const errorHandler = (err, req, res, _) => {
     res.errorLogged = true;
   }
 
-  console.log('>>>>>>>>', err);
-
   // Call the response interceptor (if applicable)
   responseInterceptor({}, res);
 
