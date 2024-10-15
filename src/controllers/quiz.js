@@ -36,6 +36,7 @@ export const getUserLectureScore = async (req, res) => {
 export const getQuizPerformanceController = async (req, res) => {
   try {
     const userId = req.user._id;
+
     const performanceData = await getQuizPerformance(userId);
 
     return makeResponse({

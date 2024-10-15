@@ -6,7 +6,9 @@ const logger = moduleLogger('Database-Connection');
 const connectDB = () => {
   return new Promise((resolve, reject) => {
     mongoose
-      .connect(process.env.MONGO_URI)
+      .connect(process.env.MONGO_URI, {
+        serverSelectionTimeoutMS: 30000
+      })
       .then(() => {
         logger.info('Database connection established successfully');
         resolve();

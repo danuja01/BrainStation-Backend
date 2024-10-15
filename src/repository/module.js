@@ -1,4 +1,4 @@
-import { Module } from '@/models/Module';
+import Module from '@/models/module';
 
 export const createModule = async (moduleData) => {
   const module = new Module(moduleData);
