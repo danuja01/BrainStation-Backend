@@ -27,7 +27,7 @@ export const generateQuestions = async (slides) => {
     {
       role: 'system',
       content:
-        'Please generate a questions array based on the slide content provided. Ensure that exactly 22 questions are generated.'
+        'Please generate a questions array based on the slide content provided. Ensure that between 21 and 25 questions are generated.'
     },
     {
       role: 'system',
@@ -37,7 +37,7 @@ export const generateQuestions = async (slides) => {
     {
       role: 'system',
       content:
-        'Format your output as valid JSON. For example: [{"context": "...", "question": "...", "answer": "...", "distractors": ["...", "...", "..."]}]. Ensure that exactly 3 distractors are provided for each question.'
+        'Format your output as valid JSON. For example: [{"context": "...", "question": "...", "alternative_questions": ["...", "...", "..."], "answer": "...", "distractors": ["...", "...", "..."]}]. Ensure that exactly 3 distractors are provided for each question.'
     },
     {
       role: 'system',
