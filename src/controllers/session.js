@@ -3,7 +3,10 @@ import {
   addSession,
   findAllSessionsByUserId,
   findSessionById,
-  findSessionsOfUserByModule
+  findSessionsOfUserByModule,
+  findStartAndEndTimesOfUsersModule,
+  findTotalFocusTimeOfUsersModule,
+  findAverageFocusTimeofUsersModule
 } from '@/services/focus-record';
 import { makeResponse } from '@/utils/response';
 
@@ -32,17 +35,49 @@ export const getSessionByUserController = async (req, res) => {
 
 export const getSessionsOfUserByModuleController = async (req, res) => {
   try {
-    // Validate userId and moduleId
-    if (!mongoose.Types.ObjectId.isValid(userId)) {
-      throw new Error('Invalid userId');
-    }
-    if (!mongoose.Types.ObjectId.isValid(moduleId)) {
-      throw new Error('Invalid moduleId');
-    }
+    const userId = req.params.userId;
+    const moduleId = req.query.filter.moduleId;
 
-    const userId = req.params;
-    const moduleId = req.body.moduleId;
     const data = await findSessionsOfUserByModule(userId, moduleId, req.query);
+
+    return makeResponse({ res, data, message: 'Sessions retrieved successfully' });
+  } catch (error) {
+    return res.status(500).json({ message: 'Internal Server Error' });
+  }
+};
+
+export const getStartAndEndTimesOfUsersModuleController = async (req, res) => {
+  try {
+    const userId = req.params.userId;
+    const moduleId = req.query.filter.moduleId;
+
+    const data = await findStartAndEndTimesOfUsersModule(userId, moduleId);
+
+    return makeResponse({ res, data, message: 'Sessions retrieved successfully' });
+  } catch (error) {
+    return res.status(500).json({ message: 'Internal Server Error' });
+  }
+};
+
+export const getTotalFocusTimeOfUsersModuleController = async (req, res) => {
+  try {
+    const userId = req.params.userId;
+    const moduleId = req.query.filter.moduleId;
+
+    const data = await findTotalFocusTimeOfUsersModule(userId, moduleId);
+
+    return makeResponse({ res, data, message: 'Sessions retrieved successfully' });
+  } catch (error) {
+    return res.status(500).json({ message: 'Internal Server Error' });
+  }
+};
+
+export const getAverageFocusTimeofUsersModuleController = async (req, res) => {
+  try {
+    const userId = req.params.userId;
+    const moduleId = req.query.filter.moduleId;
+
+    const data = await findAverageFocusTimeofUsersModule(userId, moduleId);
 
     return makeResponse({ res, data, message: 'Sessions retrieved successfully' });
   } catch (error) {
