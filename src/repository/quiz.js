@@ -23,6 +23,10 @@ export const getQuizzes = async ({ filter = {}, sort = { createdAt: -1 }, page =
     filter.userId = new mongoose.Types.ObjectId(filter.userId);
   }
 
+  if (filter.lectureId) {
+    filter.lectureId = new mongoose.Types.ObjectId(filter.lectureId);
+  }
+
   const aggregate = Quiz.aggregate([
     { $match: filter },
     { $lookup: { from: 'questions', localField: 'questionId', foreignField: '_id', as: 'questionDetails' } },
