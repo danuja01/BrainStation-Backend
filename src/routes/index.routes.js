@@ -9,7 +9,7 @@ import ontologyRouter from './ontology.routes';
 import progressRouter from './progress.routes';
 import questionRouter from './question.routes';
 import quizRouter from './quiz.routes';
-import sessionRouter from './session.routes';
+import sessionRouter from './record.routes';
 import userRouter from './user.routes';
 import { protect } from '@/middleware';
 
