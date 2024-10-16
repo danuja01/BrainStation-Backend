@@ -34,7 +34,7 @@ export const createAssrResultController = async (req, res) => {
 
   await addAssrResult(data);
 
-  return makeResponse({ res, status: 201, message: 'assrs added successfully' });
+  return makeResponse({ res, status: 201, data: assrsResult, message: 'assrs added successfully' });
 };
 
 // Function to check if an ASRS result exists for a specific user
