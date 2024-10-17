@@ -3,10 +3,11 @@ import { handleQuizResponse } from '@/services/spacedRepetition';
 import { makeResponse } from '@/utils/response';
 
 export const respondToQuiz = async (req, res) => {
-  const { userId, lectureId, questionId, response } = req.body;
+  const { lectureId, questionId, moduleId, response } = req.body;
+  const userId = req.user._id;
 
   try {
-    await handleQuizResponse(userId, lectureId, questionId, response);
+    await handleQuizResponse(userId, lectureId, questionId, moduleId, response);
     return res.status(200).json({ message: 'Quiz response processed successfully' });
   } catch (error) {
     return res.status(500).json({ message: error.message });
