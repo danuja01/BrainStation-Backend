@@ -111,7 +111,7 @@ export const getUserLectureQuizzes = async (userId, lectureId) => {
 // Analyzing Quiz Performance
 export const getQuizPerformanceData = async (userId) => {
   const quizzes = await Quiz.aggregate([
-    { $match: { userId: userId } },
+    { $match: { userId: new mongoose.Types.ObjectId(userId) } },
     {
       $group: {
         _id: null,
