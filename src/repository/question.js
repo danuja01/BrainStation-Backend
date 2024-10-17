@@ -15,11 +15,8 @@ export const getQuestions = async ({ filter = {}, sort = { createdAt: -1 }, page
   if (filter.lectureId) {
     filter.lectureId = new mongoose.Types.ObjectId(filter.lectureId);
   }
-
   const aggregate = Question.aggregate([{ $match: filter }, { $sort: sort }]);
-
   const result = await Question.aggregatePaginate(aggregate, { page, limit });
-
   return result;
 };
 

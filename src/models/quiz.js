@@ -12,6 +12,10 @@ const quizSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       required: true
     },
+    moduleId: {
+      type: mongoose.Schema.Types.ObjectId,
+      required: true
+    },
     questionId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Question',

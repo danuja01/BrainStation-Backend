@@ -23,7 +23,7 @@ export const feedbackController = async (req, res) => {
     const userResponses = req.body;
     const feedback = await provideFeedback(userResponses);
 
-    return res.status(200).json({ message: 'Feedback retrieved successfully', data: feedback });
+    return res.status(200).json({ data: feedback, message: 'Feedback retrieved successfully' });
   } catch (error) {
     return res.status(500).json({ message: 'Error retrieving feedback', error: error.message });
   }

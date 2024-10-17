@@ -19,21 +19,35 @@ export const saveQuiz = async (quizData) => {
 };
 
 export const getQuizzes = async ({ filter = {}, sort = { createdAt: -1 }, page = 1, limit = 20 }) => {
-  if (filter.userId) {
-    filter.userId = new mongoose.Types.ObjectId(filter.userId);
-  }
+  const objectIdFields = ['userId', 'lectureId', 'moduleId'];
+
+  filter = Object.keys(filter).reduce((acc, key) => {
+    if (objectIdFields.includes(key) && mongoose.Types.ObjectId.isValid(filter[key])) {
+      acc[key] = new mongoose.Types.ObjectId(filter[key]);
+    } else {
+      acc[key] = filter[key];
+    }
+    return acc;
+  }, {});
 
   const aggregate = Quiz.aggregate([
     { $match: filter },
     { $lookup: { from: 'questions', localField: 'questionId', foreignField: '_id', as: 'questionDetails' } },
+    { $lookup: { from: 'lectures', localField: 'lectureId', foreignField: '_id', as: 'lectureDetails' } },
+    { $lookup: { from: 'modules', localField: 'moduleId', foreignField: '_id', as: 'moduleDetails' } },
     { $unwind: '$questionDetails' },
+    { $unwind: { path: '$lectureDetails', preserveNullAndEmptyArrays: true } },
+    { $unwind: { path: '$moduleDetails', preserveNullAndEmptyArrays: true } },
     {
       $project: {
         'questionDetails.question': 1,
         'questionDetails.answer': 1,
         'questionDetails.distractors': 1,
+        'lectureDetails.title': 1,
+        'moduleDetails.name': 1,
         'userId': 1,
         'lectureId': 1,
+        'moduleId': 1,
         'status': 1,
         'interval': 1,
         'ease_factor': 1,
@@ -97,7 +111,7 @@ export const getUserLectureQuizzes = async (userId, lectureId) => {
 // Analyzing Quiz Performance
 export const getQuizPerformanceData = async (userId) => {
   const quizzes = await Quiz.aggregate([
-    { $match: { userId: userId } },
+    { $match: { userId: new mongoose.Types.ObjectId(userId) } },
     {
       $group: {
         _id: null,
