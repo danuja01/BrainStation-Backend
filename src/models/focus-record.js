@@ -1,11 +1,16 @@
 import mongoose from 'mongoose';
 import aggregatePaginate from 'mongoose-aggregate-paginate-v2';
 
-const sessionSchema = new mongoose.Schema(
+const focusRecordsSchema = new mongoose.Schema(
   {
     userId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
+      required: true
+    },
+    moduleId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Module',
       required: true
     },
     startTime: {
@@ -21,29 +26,23 @@ const sessionSchema = new mongoose.Schema(
       required: true
     },
     final_classification: {
-      type: String,
-      required: true
+      type: String
     },
     focus_time: {
-      type: Number,
-      required: true
+      type: Number
     },
     total_movements: {
-      type: Number,
-      required: true
+      type: Number
     },
     erratic_movements: {
-      type: Number,
-      required: true
+      type: Number
     },
     erratic_percentage: {
-      type: Number,
-      required: true
+      type: Number
     },
     emotion_distribution: {
       type: Map,
-      of: Number,
-      required: true
+      of: Number
     }
   },
   {
@@ -51,11 +50,11 @@ const sessionSchema = new mongoose.Schema(
   }
 );
 
-sessionSchema.plugin(aggregatePaginate);
-sessionSchema.index({ createdAt: 1 });
+focusRecordsSchema.plugin(aggregatePaginate);
+focusRecordsSchema.index({ createdAt: 1 });
 
-const Session = mongoose.model('FocusRecord', sessionSchema);
+const FocusRecord = mongoose.model('FocusRecord', focusRecordsSchema);
 
-Session.syncIndexes();
+FocusRecord.syncIndexes();
 
-export default Session;
+export default FocusRecord;
