@@ -52,6 +52,9 @@ export const postPredictionController = async (req, res) => {
     // Call prediction service
     const predictionResult = await predictExamScore(studentData);
 
+    // Log the final result for debugging
+    console.log('Final Prediction Result:', predictionResult);
+
     // Return prediction result
     return makeResponse({ res, status: 200, data: predictionResult });
   } catch (error) {
@@ -59,6 +62,8 @@ export const postPredictionController = async (req, res) => {
     return makeResponse({ res, status: 500, message: 'Failed to get prediction.' });
   }
 };
+
+
 
 export const getTaskRecommendationController = async (req, res) => {
   const { performer_type, lowest_two_chapters, Student_id } = req.body;

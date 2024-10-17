@@ -13,6 +13,20 @@ export const fetchStudentData = async (Student_id) => {
   }
 };
 
+const getChapterDescription = async (chapterName) => {
+  try {
+    const response = await axios.get(`http://127.0.0.1:5000/get_description?chapter=${encodeURIComponent(chapterName)}`);
+    
+    // Log the response from the Python API
+    console.log(`Description for ${chapterName}:`, response.data);
+
+    return response.data.description;
+  } catch (error) {
+    console.error(`Error fetching description for ${chapterName}:`, error);
+    return `No description available for ${chapterName}`;
+  }
+};
+
 export const predictExamScore = async (studentData) => {
   // Calculate cumulative average of quiz scores
   const cumulativeAverage = calculateCumulativeAverage(studentData);
@@ -27,10 +41,25 @@ export const predictExamScore = async (studentData) => {
   // Get the lowest two chapters based on quiz scores
   const lowestTwoChapters = getLowestTwoChapters(studentData);
 
+  // Fetch descriptions for the lowest two chapters
+  const lowestTwoChaptersWithDescriptions = await Promise.all(
+    lowestTwoChapters.map(async (chapter) => {
+      const description = await getChapterDescription(chapter.chapter); // Call Python API for each chapter
+      
+      // Log the description for debugging
+      console.log(`Chapter: ${chapter.chapter}, Description: ${description}`);
+
+      return {
+        chapter: chapter.chapter,
+        description,
+        score: chapter.score
+      };
+    })
+  );
+
   // Prepare input data for the Python service
   const inputData = {
     focus_level: studentData.Focus_Level,
-    // emotional_state: studentData.Emotional_State,
     cumulative_average: cumulativeAverage,
     time_spent_studying: parseInt(studentData.Time_Spent_Studying, 10) // Convert to integer
   };
@@ -41,9 +70,8 @@ export const predictExamScore = async (studentData) => {
 
     return {
       predicted_exam_score,
-      lowest_two_chapters: lowestTwoChapters,
+      lowest_two_chapters_with_descriptions: lowestTwoChaptersWithDescriptions,
       performer_type: performer_type
-      // cumulativeAverage,
     };
   } catch (error) {
     console.error('Error calling Python service:', error);
