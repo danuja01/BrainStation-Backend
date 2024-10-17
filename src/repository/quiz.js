@@ -19,13 +19,16 @@ export const saveQuiz = async (quizData) => {
 };
 
 export const getQuizzes = async ({ filter = {}, sort = { createdAt: -1 }, page = 1, limit = 20 }) => {
-  if (filter.userId) {
-    filter.userId = new mongoose.Types.ObjectId(filter.userId);
-  }
+  const objectIdFields = ['userId', 'lectureId', 'moduleId'];
 
-  if (filter.lectureId) {
-    filter.lectureId = new mongoose.Types.ObjectId(filter.lectureId);
-  }
+  filter = Object.keys(filter).reduce((acc, key) => {
+    if (objectIdFields.includes(key) && mongoose.Types.ObjectId.isValid(filter[key])) {
+      acc[key] = new mongoose.Types.ObjectId(filter[key]);
+    } else {
+      acc[key] = filter[key];
+    }
+    return acc;
+  }, {});
 
   const aggregate = Quiz.aggregate([
     { $match: filter },
@@ -38,6 +41,7 @@ export const getQuizzes = async ({ filter = {}, sort = { createdAt: -1 }, page =
         'questionDetails.distractors': 1,
         'userId': 1,
         'lectureId': 1,
+        'moduleId': 1,
         'status': 1,
         'interval': 1,
         'ease_factor': 1,

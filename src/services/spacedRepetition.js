@@ -94,7 +94,7 @@ class ReviewPhase {
   }
 }
 
-export const handleQuizResponse = async (userId, lectureId, questionId, response) => {
+export const handleQuizResponse = async (userId, lectureId, questionId, moduleId, response) => {
   const quiz = await getQuizByQuestionIdAndUserId(userId, questionId);
 
   const today = new Date();
@@ -106,6 +106,7 @@ export const handleQuizResponse = async (userId, lectureId, questionId, response
       userId,
       lectureId,
       questionId,
+      moduleId,
       status: 'new',
       interval: 1,
       ease_factor: 2,
