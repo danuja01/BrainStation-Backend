@@ -36,6 +36,10 @@ export const provideFeedback = async (userResponses) => {
     },
     {
       role: 'system',
+      content: 'Mention if an answer is wrong in the output.'
+    },
+    {
+      role: 'system',
       content: 'Format the feedback in JSON as follows: [{"strength": [], "weakness": []}].'
     },
     {
