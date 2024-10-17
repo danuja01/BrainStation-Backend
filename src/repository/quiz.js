@@ -108,7 +108,6 @@ export const getUserLectureQuizzes = async (userId, lectureId) => {
   };
 };
 
-// Analyzing Quiz Performance
 export const getQuizPerformanceData = async (userId) => {
   const quizzes = await Quiz.aggregate([
     { $match: { userId: new mongoose.Types.ObjectId(userId) } },
@@ -138,4 +137,70 @@ export const getQuizPerformanceData = async (userId) => {
       reviewQuizzes: 0
     }
   );
+};
+
+export const getUserQuizzesDueByToday = async ({
+  userId,
+  filter = {},
+  sort = { createdAt: -1 },
+  page = 1,
+  limit = 20
+}) => {
+  const endOfToday = new Date();
+  endOfToday.setHours(23, 59, 59, 999); // Set time to the very end of today
+
+  const objectIdFields = ['userId', 'lectureId', 'moduleId'];
+
+  // Ensure correct types for ObjectId fields
+  filter = Object.keys(filter).reduce((acc, key) => {
+    if (objectIdFields.includes(key) && mongoose.Types.ObjectId.isValid(filter[key])) {
+      acc[key] = new mongoose.Types.ObjectId(filter[key]);
+    } else {
+      acc[key] = filter[key];
+    }
+    return acc;
+  }, {});
+
+  // Add filter for quizzes due today or earlier
+  filter.userId = new mongoose.Types.ObjectId(userId);
+  filter.next_review_date = { $lte: endOfToday };
+
+  // Aggregate query
+  const aggregate = Quiz.aggregate([
+    { $match: filter },
+    {
+      $lookup: { from: 'questions', localField: 'questionId', foreignField: '_id', as: 'questionDetails' }
+    },
+    {
+      $lookup: { from: 'lectures', localField: 'lectureId', foreignField: '_id', as: 'lectureDetails' }
+    },
+    {
+      $lookup: { from: 'modules', localField: 'moduleId', foreignField: '_id', as: 'moduleDetails' }
+    },
+    { $unwind: '$questionDetails' },
+    { $unwind: { path: '$lectureDetails', preserveNullAndEmptyArrays: true } },
+    { $unwind: { path: '$moduleDetails', preserveNullAndEmptyArrays: true } },
+    {
+      $project: {
+        '_id': 1,
+        'userId': 1,
+        'lectureId': 1,
+        'moduleId': 1,
+        'status': 1,
+        'interval': 1,
+        'ease_factor': 1,
+        'next_review_date': 1,
+        'attemptCount': 1,
+        'questionDetails.question': 1,
+        'questionDetails.answer': 1,
+        'questionDetails.distractors': 1,
+        'lectureDetails.title': 1,
+        'moduleDetails.name': 1
+      }
+    },
+    { $sort: sort }
+  ]);
+
+  const result = await Quiz.aggregatePaginate(aggregate, { page, limit });
+  return result;
 };
