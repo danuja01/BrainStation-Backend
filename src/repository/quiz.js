@@ -146,12 +146,14 @@ export const getUserQuizzesDueByToday = async ({
   page = 1,
   limit = 20
 }) => {
-  const endOfToday = new Date();
-  endOfToday.setHours(23, 59, 59, 999); // Set time to the very end of today
+  const now = new Date();
+
+  const endOfTodayUTC = new Date(
+    Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + 1, 23, 59, 59, 999)
+  );
 
   const objectIdFields = ['userId', 'lectureId', 'moduleId'];
 
-  // Ensure correct types for ObjectId fields
   filter = Object.keys(filter).reduce((acc, key) => {
     if (objectIdFields.includes(key) && mongoose.Types.ObjectId.isValid(filter[key])) {
       acc[key] = new mongoose.Types.ObjectId(filter[key]);
@@ -161,11 +163,9 @@ export const getUserQuizzesDueByToday = async ({
     return acc;
   }, {});
 
-  // Add filter for quizzes due today or earlier
   filter.userId = new mongoose.Types.ObjectId(userId);
-  filter.next_review_date = { $lte: endOfToday };
+  filter.next_review_date = { $lte: endOfTodayUTC };
 
-  // Aggregate query
   const aggregate = Quiz.aggregate([
     { $match: filter },
     {
