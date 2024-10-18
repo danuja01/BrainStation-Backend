@@ -44,6 +44,8 @@ export const buildQuizAggregation = (filter, sort) => {
         'interval': 1,
         'ease_factor': 1,
         'next_review_date': 1,
+        'current_step': 1,
+        'learningSteps': 1,
         'attemptCount': 1
       }
     },
