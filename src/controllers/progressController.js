@@ -63,8 +63,6 @@ export const postPredictionController = async (req, res) => {
   }
 };
 
-
-
 export const getTaskRecommendationController = async (req, res) => {
   const { performer_type, lowest_two_chapters, Student_id } = req.body;
 

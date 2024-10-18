@@ -15,8 +15,10 @@ export const fetchStudentData = async (Student_id) => {
 
 const getChapterDescription = async (chapterName) => {
   try {
-    const response = await axios.get(`http://127.0.0.1:5000/get_description?chapter=${encodeURIComponent(chapterName)}`);
-    
+    const response = await axios.get(
+      `http://127.0.0.1:5000/get_description?chapter=${encodeURIComponent(chapterName)}`
+    );
+
     // Log the response from the Python API
     console.log(`Description for ${chapterName}:`, response.data);
 
@@ -45,7 +47,7 @@ export const predictExamScore = async (studentData) => {
   const lowestTwoChaptersWithDescriptions = await Promise.all(
     lowestTwoChapters.map(async (chapter) => {
       const description = await getChapterDescription(chapter.chapter); // Call Python API for each chapter
-      
+
       // Log the description for debugging
       console.log(`Chapter: ${chapter.chapter}, Description: ${description}`);
 

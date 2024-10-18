@@ -3,11 +3,11 @@ import {
   createSession,
   getAllSessionsByUserId,
   getAverageFocusTime,
+  getAverageFocusTimeByUser,
   getSessionById,
   getSessionsOfUserByModule,
   getStartAndEndTimes,
   getTotalFocusTime,
-  getAverageFocusTimeByUser,
   getTotalSessionDurationByUser
 } from '@/repository/focus-record';
 
@@ -47,8 +47,6 @@ export const findAverageFocusTimeofUsersModule = async (userId, moduleId) => {
   return await getAverageFocusTime(userId, moduleId);
 };
 
-
-
 // Service to get average focus time by userId (without moduleId)
 export const findAverageFocusTimeByUser = async (userId) => {
   return await getAverageFocusTimeByUser(userId);
@@ -57,4 +55,3 @@ export const findAverageFocusTimeByUser = async (userId) => {
 export const findTotalSessionDurationByUser = async (userId) => {
   return await getTotalSessionDurationByUser(userId);
 };
-

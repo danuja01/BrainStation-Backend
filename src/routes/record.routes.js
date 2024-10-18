@@ -3,13 +3,13 @@ import { tracedAsyncHandler } from '@sliit-foss/functions';
 import { Segments, celebrate } from 'celebrate';
 import {
   addSessionController,
+  getAverageFocusTimeByUserController,
   getAverageFocusTimeofUsersModuleController,
   getSessionByIdController,
   getSessionByUserController,
   getSessionsOfUserByModuleController,
   getStartAndEndTimesOfUsersModuleController,
   getTotalFocusTimeOfUsersModuleController,
-  getAverageFocusTimeByUserController,
   getTotalSessionDurationByUserController
 } from '@/controllers/session';
 import { focusRecordIdSchema } from '@/validations/focusRecords';
@@ -80,9 +80,6 @@ sessionRouter.get(
   tracedAsyncHandler(getAverageFocusTimeofUsersModuleController)
 );
 
-
-
-
 // Route to get user average focus time (without moduleId)
 sessionRouter.get(
   '/average-focus-time-by-user/:userId',
@@ -96,6 +93,5 @@ sessionRouter.get(
   celebrate({ [Segments.PARAMS]: focusRecordIdSchema }),
   tracedAsyncHandler(getTotalSessionDurationByUserController)
 );
-
 
 export default sessionRouter;
