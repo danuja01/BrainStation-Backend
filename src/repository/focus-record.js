@@ -113,3 +113,59 @@ export const getAverageFocusTime = async (userId, moduleId) => {
     throw new Error(`Database query failed: ${error.message}`);
   }
 };
+
+
+export const getAverageFocusTimeByUser = async (userId) => {
+  try {
+    console.log(`Received userId: ${userId}`);
+
+    const userObjectId = new mongoose.Types.ObjectId(userId);
+    console.log(`Converted userId to ObjectId: ${userObjectId}`);
+
+    const result = await FocusRecord.aggregate([
+      { $match: { userId: userObjectId } },
+      {
+        $group: {
+          _id: null,
+          averageFocusTime: { $avg: '$focus_time' }
+        }
+      }
+    ]);
+
+    if (result.length === 0) {
+      console.log(`No focus time records found for userId ${userId}`);
+      return 0;  // Return 0 if no records found
+    }
+
+    console.log(`Average focus time result: ${result[0].averageFocusTime}`);
+    return result[0].averageFocusTime;
+  } catch (error) {
+    console.error(`Error in getAverageFocusTimeByUser: ${error.message}`);
+    throw new Error(`Database query failed: ${error.message}`);
+  }
+};
+
+
+export const getTotalSessionDurationByUser = async (userId) => {
+  try {
+    const userObjectId = new mongoose.Types.ObjectId(userId);
+
+    // Find all focus records for the user
+    const records = await FocusRecord.find({ userId: userObjectId })
+      .select('startTime stopTime')
+      .exec();
+
+    // Calculate the total session duration by summing the difference between stopTime and startTime
+    const totalDurationMilliseconds = records.reduce((total, record) => {
+      const sessionDuration = new Date(record.stopTime) - new Date(record.startTime);
+      return total + sessionDuration;
+    }, 0);
+
+    // Convert total duration to hours (or use another unit of time if needed)
+    const totalDurationInHours = totalDurationMilliseconds / (1000 * 60 * 60);
+
+    return totalDurationInHours;
+  } catch (error) {
+    throw new Error(`Database query failed: ${error.message}`);
+  }
+};

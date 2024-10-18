@@ -8,7 +8,9 @@ import {
   getSessionByUserController,
   getSessionsOfUserByModuleController,
   getStartAndEndTimesOfUsersModuleController,
-  getTotalFocusTimeOfUsersModuleController
+  getTotalFocusTimeOfUsersModuleController,
+  getAverageFocusTimeByUserController,
+  getTotalSessionDurationByUserController
 } from '@/controllers/session';
 import { focusRecordIdSchema } from '@/validations/focusRecords';
 
@@ -77,5 +79,23 @@ sessionRouter.get(
   celebrate({ [Segments.PARAMS]: focusRecordIdSchema }),
   tracedAsyncHandler(getAverageFocusTimeofUsersModuleController)
 );
+
+
+
+
+// Route to get user average focus time (without moduleId)
+sessionRouter.get(
+  '/average-focus-time-by-user/:userId',
+  celebrate({ [Segments.PARAMS]: focusRecordIdSchema }),
+  tracedAsyncHandler(getAverageFocusTimeByUserController)
+);
+
+// Route to get user total session duration by userId (sum of all session durations)
+sessionRouter.get(
+  '/total-session-duration-by-user/:userId',
+  celebrate({ [Segments.PARAMS]: focusRecordIdSchema }),
+  tracedAsyncHandler(getTotalSessionDurationByUserController)
+);
+
 
 export default sessionRouter;
