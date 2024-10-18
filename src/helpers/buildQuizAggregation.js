@@ -46,7 +46,8 @@ export const buildQuizAggregation = (filter, sort) => {
         'next_review_date': 1,
         'current_step': 1,
         'learningSteps': 1,
-        'attemptCount': 1
+        'attemptCount': 1,
+        'updatedAt': 1
       }
     },
     { $sort: sort }
