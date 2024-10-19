@@ -1,16 +1,15 @@
 import mongoose from 'mongoose';
+import { buildQuizAggregation } from '@/helpers/buildQuizAggregation';
+import { convertToObjectId } from '@/helpers/convertToObjectId';
 import Quiz from '@/models/quiz';
 
 export const saveQuiz = async (quizData) => {
-  const questionId = quizData.questionId;
-  const userId = quizData.userId;
+  const { questionId, userId } = quizData;
 
   if (questionId) {
     const existingQuiz = await getQuizByQuestionIdAndUserId(userId, questionId);
-
     if (existingQuiz) {
-      const updatedQuize = await updateQuiz(existingQuiz._id, quizData);
-      return updatedQuize;
+      return await updateQuiz(existingQuiz._id, quizData);
     }
   }
 
@@ -19,33 +18,9 @@ export const saveQuiz = async (quizData) => {
 };
 
 export const getQuizzes = async ({ filter = {}, sort = { createdAt: -1 }, page = 1, limit = 20 }) => {
-  if (filter.userId) {
-    filter.userId = new mongoose.Types.ObjectId(filter.userId);
-  }
-
-  const aggregate = Quiz.aggregate([
-    { $match: filter },
-    { $lookup: { from: 'questions', localField: 'questionId', foreignField: '_id', as: 'questionDetails' } },
-    { $unwind: '$questionDetails' },
-    {
-      $project: {
-        'questionDetails.question': 1,
-        'questionDetails.answer': 1,
-        'questionDetails.distractors': 1,
-        'userId': 1,
-        'lectureId': 1,
-        'status': 1,
-        'interval': 1,
-        'ease_factor': 1,
-        'next_review_date': 1,
-        'attemptCount': 1
-      }
-    },
-    { $sort: sort }
-  ]);
-
-  const result = await Quiz.aggregatePaginate(aggregate, { page, limit });
-  return result;
+  filter = convertToObjectId(filter);
+  const aggregate = buildQuizAggregation(filter, sort);
+  return await Quiz.aggregatePaginate(aggregate, { page, limit });
 };
 
 export const updateQuiz = async (quizId, updateData) => {
@@ -53,22 +28,12 @@ export const updateQuiz = async (quizId, updateData) => {
 };
 
 export const getQuizByQuestionIdAndUserId = async (userId, questionId) => {
-  const quiz = await Quiz.findOne({
-    questionId: questionId,
-    userId: userId
-  });
-
-  return quiz;
+  return await Quiz.findOne({ questionId, userId });
 };
 
 export const getUserLectureQuizzes = async (userId, lectureId) => {
   const quizzes = await Quiz.aggregate([
-    {
-      $match: {
-        userId: new mongoose.Types.ObjectId(userId),
-        lectureId: new mongoose.Types.ObjectId(lectureId)
-      }
-    },
+    { $match: { userId: new mongoose.Types.ObjectId(userId), lectureId: new mongoose.Types.ObjectId(lectureId) } },
     {
       $group: {
         _id: null,
@@ -78,35 +43,22 @@ export const getUserLectureQuizzes = async (userId, lectureId) => {
     }
   ]);
 
-  // If no quizzes found, return default values
-  if (quizzes.length === 0) {
-    return { totalQuizzes: 20, correctAnswers: 0, averageScore: 0 }; // Default to 20 total quizzes
-  }
+  const quizData = quizzes[0] || { totalQuizzes: 20, correctAnswers: 0 }; // Default values
+  // const total = Math.max(quizData.totalQuizzes, 20);
+  const total = quizData.totalQuizzes;
+  const averageScore = quizData.correctAnswers / total;
 
-  const quizData = quizzes[0];
-  const total = Math.max(quizData.totalQuizzes, 20); // If less than 20, use 20 as total
-  const averageScore = quizData.correctAnswers / total; // Calculate average
-
-  return {
-    totalQuizzes: total, // Always return 20 if actual is less
-    correctAnswers: quizData.correctAnswers,
-    averageScore: averageScore
-  };
+  return { totalQuizzes: total, correctAnswers: quizData.correctAnswers, averageScore };
 };
 
-// Analyzing Quiz Performance
 export const getQuizPerformanceData = async (userId) => {
   const quizzes = await Quiz.aggregate([
-    { $match: { userId: userId } },
+    { $match: { userId: new mongoose.Types.ObjectId(userId) } },
     {
       $group: {
         _id: null,
         totalQuizzes: { $sum: 1 },
-        successRate: {
-          $avg: {
-            $cond: [{ $eq: ['$status', 'review'] }, 1, 0]
-          }
-        },
+        successRate: { $avg: { $cond: [{ $eq: ['$status', 'review'] }, 1, 0] } },
         newQuizzes: { $sum: { $cond: [{ $eq: ['$status', 'new'] }, 1, 0] } },
         lapsedQuizzes: { $sum: { $cond: [{ $eq: ['$status', 'lapsed'] }, 1, 0] } },
         reviewQuizzes: { $sum: { $cond: [{ $eq: ['$status', 'review'] }, 1, 0] } }
@@ -124,4 +76,31 @@ export const getQuizPerformanceData = async (userId) => {
       reviewQuizzes: 0
     }
   );
+};
+
+export const getUserQuizzesDueByToday = async ({
+  userId,
+  filter = {},
+  sort = { createdAt: -1 },
+  page = 1,
+  limit = 20
+}) => {
+  const now = new Date();
+
+  // Calculate the end of today in UTC (including +1 to account for today and past dates)
+  const endOfTodayUTC = new Date(
+    Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + 1, 23, 59, 59, 999)
+  );
+
+  filter = convertToObjectId(filter);
+  filter.userId = new mongoose.Types.ObjectId(userId);
+
+  // Apply date filtering only for quizzes that are not "lapsed"
+  filter.$or = [
+    { next_review_date: { $lte: endOfTodayUTC }, status: { $ne: 'lapsed' } },
+    { status: 'lapsed' } // Always include "lapsed" quizzes regardless of the date
+  ];
+
+  const aggregate = buildQuizAggregation(filter, sort);
+  return await Quiz.aggregatePaginate(aggregate, { page, limit });
 };

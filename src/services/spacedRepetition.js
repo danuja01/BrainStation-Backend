@@ -24,6 +24,7 @@ class LearningPhase {
         this.moveToReviewPhase();
       }
     }
+    console.log('toda date>>>>>>>>>>>', new Date(Date.now() + this.learning_steps[this.current_step] * 60 * 1000));
 
     // Update next review date based on learning steps in minutes
     this.quiz.next_review_date = new Date(Date.now() + this.learning_steps[this.current_step] * 60 * 1000);
@@ -71,6 +72,7 @@ class ReviewPhase {
     const original_interval = this.quiz.interval;
 
     if (response === 'wrong') {
+      this.quiz.next_review_date = new Date(Date.now());
       this.quiz.interval = Math.max(Math.round(original_interval * 0.75), 1);
       this.quiz.ease_factor = Math.max(this.quiz.ease_factor - 0.25, 1.1);
       this.quiz.status = 'lapsed';
@@ -92,7 +94,7 @@ class ReviewPhase {
   }
 }
 
-export const handleQuizResponse = async (userId, lectureId, questionId, response) => {
+export const handleQuizResponse = async (userId, lectureId, questionId, moduleId, response) => {
   const quiz = await getQuizByQuestionIdAndUserId(userId, questionId);
 
   const today = new Date();
@@ -104,6 +106,7 @@ export const handleQuizResponse = async (userId, lectureId, questionId, response
       userId,
       lectureId,
       questionId,
+      moduleId,
       status: 'new',
       interval: 1,
       ease_factor: 2,
