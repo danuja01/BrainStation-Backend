@@ -2,6 +2,16 @@ import mongoose from 'mongoose';
 import aggregatePaginate from 'mongoose-aggregate-paginate-v2';
 
 const ontologyFileSchema = new mongoose.Schema({
+  userId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: true
+  },
+  lectureId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Lecture',
+    required: true
+  },
   filename: {
     type: String,
     required: true

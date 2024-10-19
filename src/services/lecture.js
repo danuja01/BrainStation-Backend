@@ -12,6 +12,7 @@ export const insertLectureService = async (data) => {
 
 export const getLectureByIdService = async (id) => {
   const lecture = await getLectureById(id);
+
   if (!lecture) throw new createError(422, 'Invalid lecture Id');
   return lecture;
 };

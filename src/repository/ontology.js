@@ -1,4 +1,5 @@
 import { OntologyFile } from '@/models/ontologyFile';
+import mongoose from 'mongoose';
 
 export const saveOntologyFilePath = async (data) => {
   const newOntologyFile = new OntologyFile(data);
@@ -8,4 +9,18 @@ export const saveOntologyFilePath = async (data) => {
 export const getOntologyFile = async (filename) => {
   const file = await OntologyFile.findOne({ filename });
   return file;
+};
+
+export const findOntology = async (userId, lectureId) => {
+  try{
+    const userObjectId = new mongoose.Types.ObjectId(userId);
+    const lectureObjectId = new mongoose.Types.ObjectId(lectureId);
+  
+    const aggregate = OntologyFile.aggregate([{ $match: { userId: userObjectId, lectureId: lectureObjectId } }]);
+    const result = await OntologyFile.aggregatePaginate(aggregate);
+  
+    return result;
+  } catch(error) {
+    throw new Error(`Database query failed: ${error.message}`);
+  }
 };
