@@ -50,7 +50,7 @@ export const checkOntologyExistsController = async (req, res) => {
 
   if (result.totalDocs > 0) {
     return makeResponse({ res, status: 200, data: true, message: 'ontology exists' });
-  } else {
+  } 
     return makeResponse({ res, status: 200, message: 'ontology does not exists' });
-  }
+  
 };

@@ -133,7 +133,6 @@ export const updateOntologyFileService = async (userId, lectureId) => {
 
     const result = await findOntology(userId, lectureId);
     const filename = result.docs[0].filename;
-    console.log(filename);
 
     const file = bucket.file(`markdown-files/${filename}`);
 

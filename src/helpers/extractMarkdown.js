@@ -5,11 +5,9 @@ const extractMarkdownContent = (responseMessage) => {
 
     if (markdownMatch && markdownMatch[1]) {
       return markdownMatch[1].trim(); // Return trimmed markdown content
-    } else {
-      return responseMessage; // Return raw response if no match
     }
+    return responseMessage; // Return raw response if no match
   } catch (error) {
-    console.error(`Error extracting markdown content: ${error}`);
     throw new Error('Error processing markdown content');
   }
 };

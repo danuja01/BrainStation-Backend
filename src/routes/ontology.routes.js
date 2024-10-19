@@ -1,6 +1,11 @@
 import express from 'express';
 import { tracedAsyncHandler } from '@sliit-foss/functions';
-import { generateOntologyController, getOntologyFileController, updateOntologyFileController, checkOntologyExistsController } from '@/controllers/ontologyGenerator';
+import {
+  checkOntologyExistsController,
+  generateOntologyController,
+  getOntologyFileController,
+  updateOntologyFileController
+} from '@/controllers/ontologyGenerator';
 
 const ontologyRouter = express.Router();
 
