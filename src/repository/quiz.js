@@ -87,14 +87,19 @@ export const getUserQuizzesDueByToday = async ({
 }) => {
   const now = new Date();
 
-  // Use +1 to account for today and past dates
+  // Calculate the end of today in UTC (including +1 to account for today and past dates)
   const endOfTodayUTC = new Date(
     Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + 1, 23, 59, 59, 999)
   );
 
   filter = convertToObjectId(filter);
   filter.userId = new mongoose.Types.ObjectId(userId);
-  filter.next_review_date = { $lte: endOfTodayUTC };
+
+  // Apply date filtering only for quizzes that are not "lapsed"
+  filter.$or = [
+    { next_review_date: { $lte: endOfTodayUTC }, status: { $ne: 'lapsed' } },
+    { status: 'lapsed' } // Always include "lapsed" quizzes regardless of the date
+  ];
 
   const aggregate = buildQuizAggregation(filter, sort);
   return await Quiz.aggregatePaginate(aggregate, { page, limit });
