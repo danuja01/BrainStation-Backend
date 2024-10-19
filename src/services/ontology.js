@@ -1,8 +1,8 @@
 import createError from 'http-errors';
+import { getLectureByIdService } from './lecture';
 import extractMarkdownContent from '@/helpers/extractMarkdown';
 import { removeHTML } from '@/helpers/removeHTML';
 import { findOntology, saveOntologyFilePath } from '@/repository/ontology';
-import { getLectureByIdService } from './lecture';
 
 const { v4: uuidv4 } = require('uuid');
 const axios = require('axios');
