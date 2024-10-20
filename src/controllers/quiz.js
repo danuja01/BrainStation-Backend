@@ -1,6 +1,6 @@
 import {
-  calculateUserLectureScore,
   getQuizPerformance,
+  getQuizzesScoreService,
   getQuizzesService,
   getUserQuizzesDueService
 } from '@/services/quiz';
@@ -28,14 +28,15 @@ export const getQuizzesController = async (req, res) => {
   }
 };
 
-export const getUserLectureScore = async (req, res) => {
-  const { userId, lectureId } = req.params;
+export const getQuizzesScoreController = async (req, res) => {
+  const { filter, sort, page, limit } = req.query;
+  const userId = req.user._id;
 
   try {
-    const scoreData = await calculateUserLectureScore(userId, lectureId);
-    return res.status(200).json({ data: scoreData, message: 'Score data retrieved successfully' });
+    const scoreData = await getQuizzesScoreService(userId, filter, sort, page, limit);
+    return makeResponse({ res, data: scoreData, message: 'Quiz scores retrieved successfully' });
   } catch (error) {
-    return res.status(500).json({ message: error.message });
+    return res.status(500).json({ message: 'Internal Server Error' });
   }
 };
 
