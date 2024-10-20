@@ -1,5 +1,4 @@
 import {
-  calculateUserLectureScore,
   getQuizPerformance,
   getQuizzesScoreService,
   getQuizzesService,
