@@ -100,12 +100,12 @@ export const getAverageFocusTimeByUserController = async (req, res) => {
 };
 
 export const getTotalSessionDurationByUserController = async (req, res) => {
-    const userId = req.params.userId;
+  const userId = req.params.userId;
 
-    // Call the service function to get the total session duration
-    const totalDuration = await findTotalSessionDurationByUser(userId);
+  // Call the service function to get the total session duration
+  const totalDuration = await findTotalSessionDurationByUser(userId);
 
-    return makeResponse({ res, data: { totalDuration }, message: 'Total session duration retrieved successfully' });
+  return makeResponse({ res, data: { totalDuration }, message: 'Total session duration retrieved successfully' });
 };
 
 export const getSessionDataController = async (req, res) => {
