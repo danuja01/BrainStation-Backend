@@ -4,14 +4,14 @@ import {
   getAllSessionsByUserId,
   getAverageFocusTime,
   getAverageFocusTimeByUser,
-  getTotalSessionDurationByUser,
   getErraticMovementsByUser,
   getMostFrequentFinalClassification,
   getSessionById,
   getSessionsOfUserByModule,
   getStartAndEndTimes,
   getStartAndEndTimesByUser,
-  getTotalFocusTime
+  getTotalFocusTime,
+  getTotalSessionDurationByUser
 } from '@/repository/focus-record';
 
 export const addSession = async (data) => {
