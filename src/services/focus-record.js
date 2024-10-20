@@ -3,6 +3,8 @@ import {
   createSession,
   getAllSessionsByUserId,
   getAverageFocusTime,
+  getAverageFocusTimeByUser,
+  getTotalSessionDurationByUser,
   getErraticMovementsByUser,
   getMostFrequentFinalClassification,
   getSessionById,
@@ -46,6 +48,15 @@ export const findTotalFocusTimeOfUsersModule = async (userId, moduleId) => {
 
 export const findAverageFocusTimeofUsersModule = async (userId, moduleId) => {
   return await getAverageFocusTime(userId, moduleId);
+};
+
+// Service to get average focus time by userId (without moduleId)
+export const findAverageFocusTimeByUser = async (userId) => {
+  return await getAverageFocusTimeByUser(userId);
+};
+
+export const findTotalSessionDurationByUser = async (userId) => {
+  return await getTotalSessionDurationByUser(userId);
 };
 
 export const getSessionData = async (userId) => {

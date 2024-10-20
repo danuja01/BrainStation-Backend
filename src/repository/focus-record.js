@@ -144,7 +144,7 @@ export const getAverageFocusTime = async (userId, moduleId) => {
 export const getErraticMovementsByUser = async (userId) => {
   try {
     const userObjectId = new mongoose.Types.ObjectId(userId);
-
+ 
     const result = await FocusRecord.aggregate([
       { $match: { userId: userObjectId } },
       {
@@ -156,17 +156,17 @@ export const getErraticMovementsByUser = async (userId) => {
         }
       }
     ]);
-
+ 
     return result;
   } catch (error) {
     throw new Error(`Database query failed: ${error.message}`);
   }
 };
-
+ 
 export const getMostFrequentFinalClassification = async (userId) => {
   try {
     const userObjectId = new mongoose.Types.ObjectId(userId);
-
+ 
     const result = await FocusRecord.aggregate([
       { $match: { userId: userObjectId } },
       {
@@ -182,14 +182,59 @@ export const getMostFrequentFinalClassification = async (userId) => {
         $limit: 1
       }
     ]);
-
+ 
     if (result.length > 0) {
       return {
         mostFrequentClassification: result[0]._id
       };
     } 
       return null;
-    
+  } catch (error) {
+    throw new Error(`Database query failed: ${error.message}`);
+  }
+};
+
+export const getAverageFocusTimeByUser = async (userId) => {
+  try {
+    const userObjectId = new mongoose.Types.ObjectId(userId);
+
+    const result = await FocusRecord.aggregate([
+      { $match: { userId: userObjectId } },
+      {
+        $group: {
+          _id: null,
+          averageFocusTime: { $avg: '$focus_time' }
+        }
+      }
+    ]);
+
+    if (result.length === 0) {
+      return 0; // Return 0 if no records found
+    }
+
+    return result[0].averageFocusTime;
+  } catch (error) {
+    throw new Error(`Database query failed: ${error.message}`);
+  }
+};
+
+export const getTotalSessionDurationByUser = async (userId) => {
+  try {
+    const userObjectId = new mongoose.Types.ObjectId(userId);
+
+    // Find all focus records for the user
+    const records = await FocusRecord.find({ userId: userObjectId }).select('startTime stopTime').exec();
+
+    // Calculate the total session duration by summing the difference between stopTime and startTime
+    const totalDurationMilliseconds = records.reduce((total, record) => {
+      const sessionDuration = new Date(record.stopTime) - new Date(record.startTime);
+      return total + sessionDuration;
+    }, 0);
+
+    // Convert total duration to hours (or use another unit of time if needed)
+    const totalDurationInHours = totalDurationMilliseconds / (1000 * 60 * 60);
+
+    return totalDurationInHours;
   } catch (error) {
     throw new Error(`Database query failed: ${error.message}`);
   }
