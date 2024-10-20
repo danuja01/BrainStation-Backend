@@ -33,6 +33,8 @@ class LearningPhase {
   moveToReviewPhase() {
     logger.info(`Quiz ${this.quiz.id} has completed the learning phase. Moving to regular review cycles.`);
 
+    this.quiz.current_step = 0;
+
     // Check if the card is new or lapsed
     if (this.quiz.status === 'new') {
       this.quiz.ease_factor = 2;

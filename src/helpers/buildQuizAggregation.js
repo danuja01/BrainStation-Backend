@@ -39,6 +39,7 @@ export const buildQuizAggregation = (filter, sort) => {
         'moduleDetails.name': 1,
         'userId': 1,
         'lectureId': 1,
+        'questionId': 1,
         'moduleId': 1,
         'status': 1,
         'interval': 1,

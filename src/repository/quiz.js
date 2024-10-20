@@ -31,24 +31,56 @@ export const getQuizByQuestionIdAndUserId = async (userId, questionId) => {
   return await Quiz.findOne({ questionId, userId });
 };
 
-export const getUserLectureQuizzes = async (userId, lectureId) => {
-  const quizzes = await Quiz.aggregate([
-    { $match: { userId: new mongoose.Types.ObjectId(userId), lectureId: new mongoose.Types.ObjectId(lectureId) } },
+export const getQuizzesScore = async ({ userId, filter = {}, sort = { createdAt: -1 }, page = 1, limit = 20 }) => {
+  const userObjectId = new mongoose.Types.ObjectId(userId);
+  filter = convertToObjectId(filter);
+
+  if (filter.moduleId) {
+    const quizzes = await Quiz.find({ moduleId: filter.moduleId }, { lectureId: 1 });
+    const lectureIds = quizzes.map((quiz) => quiz.lectureId);
+    filter.lectureId = { $in: lectureIds };
+  }
+
+  filter.userId = userObjectId;
+
+  const aggregate = [
+    { $match: filter },
     {
       $group: {
-        _id: null,
+        _id: '$lectureId',
         totalQuizzes: { $sum: 1 },
         correctAnswers: { $sum: { $cond: [{ $gt: ['$current_step', 0] }, 1, 0] } }
       }
-    }
-  ]);
+    },
+    {
+      $addFields: {
+        averageScore: {
+          $cond: [{ $gt: ['$totalQuizzes', 0] }, { $divide: ['$correctAnswers', '$totalQuizzes'] }, 0]
+        }
+      }
+    },
+    {
+      $lookup: {
+        from: 'lectures',
+        localField: '_id',
+        foreignField: '_id',
+        as: 'lectureDetails'
+      }
+    },
+    {
+      $project: {
+        _id: 1,
+        totalQuizzes: 1,
+        correctAnswers: 1,
+        averageScore: 1,
+        lectureTitle: { $arrayElemAt: ['$lectureDetails.title', 0] }
+      }
+    },
+    { $sort: sort }
+  ];
 
-  const quizData = quizzes[0] || { totalQuizzes: 20, correctAnswers: 0 }; // Default values
-  // const total = Math.max(quizData.totalQuizzes, 20);
-  const total = quizData.totalQuizzes;
-  const averageScore = quizData.correctAnswers / total;
-
-  return { totalQuizzes: total, correctAnswers: quizData.correctAnswers, averageScore };
+  const options = { page, limit };
+  return await Quiz.aggregatePaginate(aggregate, options);
 };
 
 export const getQuizPerformanceData = async (userId) => {
