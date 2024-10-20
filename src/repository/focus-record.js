@@ -187,9 +187,9 @@ export const getMostFrequentFinalClassification = async (userId) => {
       return {
         mostFrequentClassification: result[0]._id
       };
-    } else {
+    } 
       return null;
-    }
+    
   } catch (error) {
     throw new Error(`Database query failed: ${error.message}`);
   }
