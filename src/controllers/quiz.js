@@ -57,22 +57,6 @@ export const getUserQuizzesDueController = async (req, res) => {
   }
 };
 
-export const getUserQuizzesDueController = async (req, res) => {
-  const userId = req.user._id;
-  const query = req.query;
-
-  try {
-    const quizzes = await getUserQuizzesDueService(query, userId);
-    return makeResponse({
-      res,
-      data: quizzes,
-      message: 'Quizzes due today or earlier retrieved successfully'
-    });
-  } catch (error) {
-    return res.status(500).json({ message: 'Internal Server Error' });
-  }
-};
-
 export const getQuizPerformanceController = async (req, res) => {
   try {
     const userId = req.user._id;
