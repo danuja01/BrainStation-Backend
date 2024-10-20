@@ -1,4 +1,9 @@
-import { calculateUserLectureScore, getQuizPerformance, getQuizzesService } from '@/services/quiz';
+ import {
+  calculateUserLectureScore,
+  getQuizPerformance,
+  getQuizzesService,
+  getUserQuizzesDueService
+} from '@/services/quiz';
 import { handleQuizResponse } from '@/services/spacedRepetition';
 import { makeResponse } from '@/utils/response';
 
@@ -16,29 +21,8 @@ export const respondToQuiz = async (req, res) => {
 
 export const getQuizzesController = async (req, res) => {
   try {
-    // Fetch the quizzes using the service
     const quizzes = await getQuizzesService(req.query);
-
-    // Map over the quizzes and fetch the score for each lecture
-    const quizzesWithScores = await Promise.all(
-      quizzes.docs.map(async (quiz) => {
-        // Fetch score for this quiz based on userId and lectureId
-        const scoreData = await calculateUserLectureScore(quiz.userId, quiz.lectureId);
-
-        // Add the score to the quiz object
-        return {
-          ...quiz,
-          score: scoreData.averageScore // Add the average score from the score data
-        };
-      })
-    );
-
-    // Return the modified quizzes with the scores included
-    return makeResponse({
-      res,
-      data: { ...quizzes, docs: quizzesWithScores },
-      message: 'Quizzes retrieved successfully with scores'
-    });
+    return makeResponse({ res, data: quizzes, message: 'Quizzes retrieved successfully' });
   } catch (error) {
     return res.status(500).json({ message: 'Internal Server Error' });
   }
@@ -52,6 +36,22 @@ export const getUserLectureScore = async (req, res) => {
     return res.status(200).json({ data: scoreData, message: 'Score data retrieved successfully' });
   } catch (error) {
     return res.status(500).json({ message: error.message });
+  }
+};
+
+export const getUserQuizzesDueController = async (req, res) => {
+  const userId = req.user._id;
+  const query = req.query;
+
+  try {
+    const quizzes = await getUserQuizzesDueService(query, userId);
+    return makeResponse({
+      res,
+      data: quizzes,
+      message: 'Quizzes due today or earlier retrieved successfully'
+    });
+  } catch (error) {
+    return res.status(500).json({ message: 'Internal Server Error' });
   }
 };
 
