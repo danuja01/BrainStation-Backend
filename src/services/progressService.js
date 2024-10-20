@@ -37,7 +37,7 @@ export const predictExamScore = async (studentData) => {
 
   // Get the lowest two chapters based on quiz scores
   const lowestTwoChapters = getLowestTwoChapters(studentData);
- 
+
   // Fetch descriptions for the lowest two chapters
   const lowestTwoChaptersWithDescriptions = await Promise.all(
     lowestTwoChapters.map(async (chapter) => {
@@ -57,10 +57,10 @@ export const predictExamScore = async (studentData) => {
     cumulative_average: cumulativeAverage,
     time_spent_studying: parseInt(studentData.timeSpentStudying, 10) // Convert to integer
   };
-  
+
   try {
     const response = await axios.post('http://localhost:8000/predict_exam_score/', inputData);
-  
+
     const predicted_exam_score = response.data.predicted_exam_score;
 
     return {
