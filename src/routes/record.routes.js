@@ -7,6 +7,7 @@ import {
   getAverageFocusTimeofUsersModuleController,
   getSessionByIdController,
   getSessionByUserController,
+  getSessionDataController,
   getSessionsOfUserByModuleController,
   getStartAndEndTimesOfUsersModuleController,
   getTotalFocusTimeOfUsersModuleController,
@@ -59,25 +60,10 @@ sessionRouter.get(
   tracedAsyncHandler(getSessionsOfUserByModuleController)
 );
 
-// Route to get user start end times per module
 sessionRouter.get(
-  '/start-end-times/:userId',
+  '/sessionData/:userId',
   celebrate({ [Segments.PARAMS]: focusRecordIdSchema }),
-  tracedAsyncHandler(getStartAndEndTimesOfUsersModuleController)
-);
-
-// Route to get user total focus time per module
-sessionRouter.get(
-  '/total-focus-time/:userId',
-  celebrate({ [Segments.PARAMS]: focusRecordIdSchema }),
-  tracedAsyncHandler(getTotalFocusTimeOfUsersModuleController)
-);
-
-// Route to get user avarage focus time per module
-sessionRouter.get(
-  '/average-focus-time/:userId',
-  celebrate({ [Segments.PARAMS]: focusRecordIdSchema }),
-  tracedAsyncHandler(getAverageFocusTimeofUsersModuleController)
+  tracedAsyncHandler(getSessionDataController)
 );
 
 // Route to get user average focus time (without moduleId)

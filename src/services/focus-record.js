@@ -4,11 +4,14 @@ import {
   getAllSessionsByUserId,
   getAverageFocusTime,
   getAverageFocusTimeByUser,
+  getTotalSessionDurationByUser,
+  getErraticMovementsByUser,
+  getMostFrequentFinalClassification,
   getSessionById,
   getSessionsOfUserByModule,
   getStartAndEndTimes,
-  getTotalFocusTime,
-  getTotalSessionDurationByUser
+  getStartAndEndTimesByUser,
+  getTotalFocusTime
 } from '@/repository/focus-record';
 
 export const addSession = async (data) => {
@@ -54,4 +57,20 @@ export const findAverageFocusTimeByUser = async (userId) => {
 
 export const findTotalSessionDurationByUser = async (userId) => {
   return await getTotalSessionDurationByUser(userId);
+};
+
+export const getSessionData = async (userId) => {
+  const data = await getErraticMovementsByUser(userId);
+  const studyTime = await getStartAndEndTimesByUser(userId);
+  const classification = await getMostFrequentFinalClassification(userId);
+
+  const sessionData = {
+    totalStudyTime: studyTime,
+    totalFocusTime: data[0].totalFocusTime,
+    totalMovements: data[0].totalMovements,
+    totalErraticMovements: data[0].totalErraticMovements,
+    adhdClassification: classification.mostFrequentClassification
+  };
+
+  return sessionData;
 };

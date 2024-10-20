@@ -1,22 +1,55 @@
-import { generateOntologyService, getOntologyFileService } from '@/services/ontology';
+import {
+  checkOntologyExists,
+  createOntologyService,
+  getOntologyFileService,
+  updateOntologyFileService
+} from '@/services/ontology';
 import { makeResponse } from '@/utils/response';
 
 export const generateOntologyController = async (req, res) => {
-  await generateOntologyService(req.body);
+  const userId = req.body.userId;
+  const lectureId = req.body.lectureId;
+
+  const result = await checkOntologyExists(userId, lectureId);
+  if (result.totalDocs > 0) {
+    return makeResponse({ res, status: 500, message: 'ontology already exists for this lecture' });
+  }
+
+  await createOntologyService(userId, lectureId);
   return makeResponse({ res, status: 201, message: 'Ontology generated succesfully' });
 };
 
+export const updateOntologyFileController = async (req, res) => {
+  const userId = req.body.userId;
+  const lectureId = req.body.lectureId;
+
+  // Call the service to update the file with new content
+  const updatedFileUrl = await updateOntologyFileService(userId, lectureId);
+
+  // Send success response
+  res.status(200).json({
+    message: 'Ontology file updated successfully',
+    fileUrl: updatedFileUrl
+  });
+};
+
 export const getOntologyFileController = async (req, res) => {
-  try {
-    const { fileContent, filename } = await getOntologyFileService(req.params.filename);
+  const { fileContent, filename } = await getOntologyFileService(req.query.userId, req.query.lectureId);
 
-    // Set the headers for downloading the file
-    res.setHeader('Content-Type', 'text/markdown');
-    res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+  // Ensure fileContent is plain text (not a buffer or object)
+  const markdownContent = Buffer.isBuffer(fileContent) ? fileContent.toString('utf-8') : fileContent;
 
-    // Send the file content in the response
-    return res.send(fileContent);
-  } catch (error) {
-    return res.status(500).json({ message: 'Failed to retrieve the file', error: error.message });
+  res.setHeader('Content-Type', 'text/plain'); // Ensure it's plain text
+  res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+
+  return res.send(markdownContent);
+};
+
+export const checkOntologyExistsController = async (req, res) => {
+  const result = await checkOntologyExists(req.query.userId, req.query.lectureId);
+
+  if (result.totalDocs > 0) {
+    return makeResponse({ res, status: 200, data: true, message: 'ontology exists' });
   }
+  return makeResponse({ res, status: 200, message: 'ontology does not exists' });
 };
