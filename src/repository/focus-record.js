@@ -116,10 +116,7 @@ export const getAverageFocusTime = async (userId, moduleId) => {
 
 export const getAverageFocusTimeByUser = async (userId) => {
   try {
-    console.log(`Received userId: ${userId}`);
-
     const userObjectId = new mongoose.Types.ObjectId(userId);
-    console.log(`Converted userId to ObjectId: ${userObjectId}`);
 
     const result = await FocusRecord.aggregate([
       { $match: { userId: userObjectId } },
@@ -132,14 +129,11 @@ export const getAverageFocusTimeByUser = async (userId) => {
     ]);
 
     if (result.length === 0) {
-      console.log(`No focus time records found for userId ${userId}`);
       return 0; // Return 0 if no records found
     }
 
-    console.log(`Average focus time result: ${result[0].averageFocusTime}`);
     return result[0].averageFocusTime;
   } catch (error) {
-    console.error(`Error in getAverageFocusTimeByUser: ${error.message}`);
     throw new Error(`Database query failed: ${error.message}`);
   }
 };

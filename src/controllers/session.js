@@ -6,6 +6,7 @@ import {
   findSessionById,
   findSessionsOfUserByModule,
   findStartAndEndTimesOfUsersModule,
+  findTotalFocusTimeOfUsersModule,
   findTotalSessionDurationByUser
 } from '@/services/focus-record';
 import { makeResponse } from '@/utils/response';

@@ -8,7 +8,6 @@ export const fetchStudentData = async (Student_id) => {
     const studentData = await fetchStudentDataFromDB(Student_id);
     return studentData;
   } catch (error) {
-    console.error('Error fetching student data:', error);
     throw new Error('Error fetching student data');
   }
 };
@@ -19,13 +18,9 @@ const getChapterDescription = async (chapterName) => {
       `http://127.0.0.1:5000/get_description?chapter=${encodeURIComponent(chapterName)}`
     );
 
-    // Log the response from the Python API
-    console.log(`Description for ${chapterName}:`, response.data);
-
     return response.data.description;
   } catch (error) {
-    console.error(`Error fetching description for ${chapterName}:`, error);
-    return `No description available for ${chapterName}`;
+    throw new Error(`No description available for ${chapterName}`);
   }
 };
 
@@ -47,9 +42,6 @@ export const predictExamScore = async (studentData) => {
   const lowestTwoChaptersWithDescriptions = await Promise.all(
     lowestTwoChapters.map(async (chapter) => {
       const description = await getChapterDescription(chapter.chapter); // Call Python API for each chapter
-
-      // Log the description for debugging
-      console.log(`Chapter: ${chapter.chapter}, Description: ${description}`);
 
       return {
         chapter: chapter.chapter,
@@ -76,28 +68,19 @@ export const predictExamScore = async (studentData) => {
       performer_type: performer_type
     };
   } catch (error) {
-    console.error('Error calling Python service:', error);
     throw new Error('Failed to get prediction from Python service');
   }
 };
 
-export const recommendTask = async (performerType, lowestTwoChapters) => {
-  // Log the incoming inputs for debugging
-  console.log('Received performerType:', performerType);
-  console.log('Received lowestTwoChapters:', lowestTwoChapters);
-
+export const recommendTask = (performerType, lowestTwoChapters) => {
   // Ensure that lowestTwoChapters is an array with at least 2 chapters
   if (!lowestTwoChapters || lowestTwoChapters.length < 2) {
-    console.error('No quiz data found for task recommendation.');
     return { message: 'No weak areas found for task recommendation.' };
   }
 
   // Adjust handling based on whether lowestTwoChapters is an array of strings or objects
   const mostLowestMarksChapter = lowestTwoChapters[0]?.chapter || lowestTwoChapters[0];
   const secondLowestMarksChapter = lowestTwoChapters[1]?.chapter || lowestTwoChapters[1];
-
-  // Log the chapters for debugging
-  console.log('Lowest Two Chapters:', mostLowestMarksChapter, secondLowestMarksChapter);
 
   // Define weekly task list based on weakest chapters
   const weeklyTasks = [
@@ -180,7 +163,6 @@ export const recommendTask = async (performerType, lowestTwoChapters) => {
 
   // Ensure performerType is valid
   if (!taskOrder[formattedPerformerType]) {
-    console.error(`Invalid performer type: ${performerType}`);
     throw new Error('Invalid performer type');
   }
 

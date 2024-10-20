@@ -26,8 +26,6 @@ progressRouter.post('/task-recommendation', tracedAsyncHandler(getTaskRecommenda
 progressRouter.post(
   '/delete-subtask',
   (req, res, next) => {
-    console.log('Request received at /delete-subtask'); // Ensure the route is hit
-    console.log('Request body:', req.body); // Log the body to ensure it's not empty
     next(); // Pass the request to the actual controller
   },
   deleteSubtaskFromTaskController

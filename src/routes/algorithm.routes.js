@@ -1,7 +1,7 @@
 import express from 'express';
 import { tracedAsyncHandler } from '@sliit-foss/functions';
 // Ensure this is a valid import
-import { getUserData, getUserPrediction } from '@/controllers/algorithm';
+import { getUserData } from '@/controllers/algorithm';
 
 // Ensure the path to the controller is correct
 

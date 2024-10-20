@@ -50,7 +50,5 @@ export const provideFeedback = async (userResponses) => {
   });
 
   const responseMessage = response.choices[0].message.content;
-  // console.log('responseMessage', responseMessage);
-
   return extractJsonArray(responseMessage);
 };

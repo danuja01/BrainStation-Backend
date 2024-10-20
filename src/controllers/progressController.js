@@ -1,10 +1,12 @@
+import { moduleLogger } from '@sliit-foss/module-logger';
 import mongoose from 'mongoose';
 import CompletedTask from '@/models/completedTaskModel';
-import Prediction from '@/models/predictionModel';
 import Task from '@/models/taskModel';
 import { fetchStudentDataFromDB } from '@/repository/studentProfile';
 import { fetchStudentData, predictExamScore, recommendTask } from '@/services/progressService';
 import { makeResponse } from '@/utils';
+
+const logger = moduleLogger('progress-controller');
 
 // Controller to fetch student details by ID
 export const getStudentDetailsController = async (req, res) => {
@@ -17,23 +19,6 @@ export const getStudentDetailsController = async (req, res) => {
 
   return makeResponse({ res, status: 200, data: studentData });
 };
-
-// Controller to predict exam score by Student ID
-
-// export const getPredictionController = async (req, res) => {
-//     const { Student_id } = req.body;
-//     console.log("POST Student ID:", Student_id);
-
-//     const studentData = await fetchStudentData(Student_id);
-
-//     if (!studentData) {
-//       console.log("Student not found for ID:", Student_id);
-//       return makeResponse({ res, status: 404, message: 'Student not found.' });
-//     }
-
-//     const predictionResult = await predictExamScore(studentData);
-//     return makeResponse({ res, status: 200, data: predictionResult });
-//   };
 
 export const postPredictionController = async (req, res) => {
   const { Student_id } = req.body;
@@ -53,12 +38,12 @@ export const postPredictionController = async (req, res) => {
     const predictionResult = await predictExamScore(studentData);
 
     // Log the final result for debugging
-    console.log('Final Prediction Result:', predictionResult);
+    logger.info('Final Prediction Result:', predictionResult);
 
     // Return prediction result
     return makeResponse({ res, status: 200, data: predictionResult });
   } catch (error) {
-    console.error('Prediction Error:', error);
+    logger.error('Prediction Error:', error);
     return makeResponse({ res, status: 500, message: 'Failed to get prediction.' });
   }
 };
@@ -116,7 +101,7 @@ export const getTaskRecommendationController = async (req, res) => {
     // Return the new task set
     return res.status(201).json({ data: { _id: savedTask._id, tasks: savedTask.tasks, student: savedTask.student } });
   } catch (error) {
-    console.error('Error generating task:', error);
+    logger.error('Error generating task:', error);
     return res.status(500).json({ message: 'Failed to generate task.', error: error.message });
   }
 };
@@ -207,7 +192,7 @@ export const deleteSubtaskFromTaskController = async (req, res) => {
       completedTask
     });
   } catch (error) {
-    console.error('Error deleting subtask:', error);
+    logger.error('Error deleting subtask:', error);
     return res.status(500).json({ message: 'Server error', error: error.message });
   }
 };
@@ -228,7 +213,7 @@ export const getCompletedTasksByTaskIdController = async (req, res) => {
     // Return the completed tasks with a 200 status
     res.status(200).json({ completedTasks });
   } catch (error) {
-    console.error('Error fetching completed tasks:', error);
+    logger.error('Error fetching completed tasks:', error);
     res.status(500).json({ message: 'Failed to fetch completed tasks', error: error.message });
   }
 };
@@ -257,7 +242,7 @@ export const getCompletedTasksCount = async (req, res) => {
     // Return the count of completed tasks
     res.status(200).json({ completedTasksCount });
   } catch (error) {
-    console.error('Error fetching completed tasks count:', error);
+    logger.error('Error fetching completed tasks count:', error);
     res.status(500).json({ message: 'Failed to fetch completed tasks count.' });
   }
 };

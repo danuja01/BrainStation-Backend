@@ -1,6 +1,11 @@
+import { moduleLogger } from '@sliit-foss/module-logger';
 import axios from 'axios';
+import { findAverageFocusTimeByUser, findTotalSessionDurationByUser } from '@/services/focus-record';
+import { calculateUserLectureScore, getQuizzesService } from '@/services/quiz';
 
 // import { fetchDataFromAPI, calculateTotalScore, fetchLowestTwoChaptersWithDescriptions, predictExamScoreService } from '@/services/algorithmService';
+
+const logger = moduleLogger('algorithm controller');
 
 // Helper function to make API requests
 export const fetchData = async (url, token = null) => {
@@ -9,15 +14,15 @@ export const fetchData = async (url, token = null) => {
     const response = await axios.get(url, { headers });
     return response.data;
   } catch (error) {
-    console.error(`Error fetching data from ${url}`, error);
+    logger.error(`Error fetching data from ${url}`, error);
     return null;
   }
 };
 
 // Helper function to fetch scores for each lecture
-export const fetchScoresForLectures = async (userId, lectureId, token = null) => {
-  const scoreApiUrl = `http://localhost:3000/api/quizzes/score/${userId}/${lectureId}`;
-  return await fetchData(scoreApiUrl, token);
+export const fetchScoresForLectures = async (userId, lectureId) => {
+  const result = await calculateUserLectureScore(userId, lectureId);
+  return await result;
 };
 
 // Controller to get user data
@@ -26,17 +31,15 @@ export const getUserData = async (req, res) => {
 
   try {
     // Focus and Study Time APIs
-    const focusApiUrl = `http://localhost:3000/api/sessions/average-focus-time-by-user/${userId}`;
-    const focusData = await fetchData(focusApiUrl);
+    const focusData = await findAverageFocusTimeByUser(userId);
 
-    const studyTimeApiUrl = `http://localhost:3000/api/sessions/total-session-duration-by-user/${userId}`;
-    const studyTimeData = await fetchData(studyTimeApiUrl);
+    const studyTimeData = await findTotalSessionDurationByUser(userId);
 
     // Quiz API to get lecture details (initial quiz data)
     const token = req.headers['authorization']; // Get the token from headers
     const formattedToken = token.startsWith('Bearer') ? token : `Bearer ${token}`;
-    const quizApiUrl = `http://localhost:3000/api/quizzes?filter[userId]=${userId}`;
-    const quizData = await fetchData(quizApiUrl, formattedToken);
+    const quizData = await getQuizzesService(userId);
+    logger.info(quizData);
 
     // Create a set to store unique module names and a variable to store scores
     const moduleNames = new Set();
@@ -47,8 +50,9 @@ export const getUserData = async (req, res) => {
     const formattedQuizzes = [];
 
     // Loop through each quiz and fetch the score for each lecture
-    for (const quiz of quizData?.data?.docs || []) {
+    for (const quiz of quizData?.docs || []) {
       // Add module name to the set
+      logger.info('quiz: ', quiz);
       moduleNames.add(quiz.moduleDetails.name);
 
       // Fetch the score for this lecture and user
@@ -74,8 +78,8 @@ export const getUserData = async (req, res) => {
     // Combine the data
     const combinedData = {
       userId,
-      focusTime: focusData?.data || null,
-      totalStudyTime: studyTimeData?.data?.totalDuration || null,
+      focusTime: focusData || null,
+      totalStudyTime: studyTimeData || null,
       quizzes: formattedQuizzes, // Include the formatted quizzes
       moduleNames: uniqueModules, // Include unique module names
       //   totalScore: totalScore.toFixed(2), // Sum of scores, rounded to 2 decimals
