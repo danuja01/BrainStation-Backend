@@ -28,7 +28,7 @@ export const sendRefreshTokenResponse = (res, user, message) => {
 };
 
 export const generateRefreshToken = (user) => {
-  return jwt.sign({ data: user }, process.env.JWT_SECRET, {
+  return jwt.sign({ data: user }, process.env.JWT_REFRESH_SECRET, {
     expiresIn: `${process.env.JWT_REFRESH_EXPIRE}d`
   });
 };

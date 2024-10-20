@@ -53,9 +53,9 @@ export const predictExamScore = async (studentData) => {
 
   // Prepare input data for the Python service
   const inputData = {
-    focus_level: studentData.Focus_Level,
+    focus_level: studentData.focusLevel,
     cumulative_average: cumulativeAverage,
-    time_spent_studying: parseInt(studentData.Time_Spent_Studying, 10) // Convert to integer
+    time_spent_studying: parseInt(studentData.timeSpentStudying, 10) // Convert to integer
   };
 
   try {

@@ -1,5 +1,6 @@
 import { moduleLogger } from '@sliit-foss/module-logger';
 import mongoose from 'mongoose';
+import { getUserData } from '@/controllers/algorithm';
 import CompletedTask from '@/models/completedTaskModel';
 import Task from '@/models/taskModel';
 import { fetchStudentDataFromDB } from '@/repository/studentProfile';
@@ -10,8 +11,8 @@ const logger = moduleLogger('progress-controller');
 
 // Controller to fetch student details by ID
 export const getStudentDetailsController = async (req, res) => {
-  const { Student_id } = req.params;
-  const studentData = await fetchStudentData(Student_id);
+  const { userId } = req.params;
+  const studentData = await fetchStudentData(userId);
 
   if (!studentData) {
     return makeResponse({ res, status: 404, message: 'Student not found.' });
@@ -21,15 +22,15 @@ export const getStudentDetailsController = async (req, res) => {
 };
 
 export const postPredictionController = async (req, res) => {
-  const { Student_id } = req.body;
+  const { userId, moduleId } = req.body;
 
-  if (!Student_id) {
+  if (!userId) {
     return makeResponse({ res, status: 400, message: 'Student ID is required' });
   }
 
   try {
     // Fetch student data using Student ID
-    const studentData = await fetchStudentData(Student_id);
+    const studentData = await getUserData(userId, moduleId);
     if (!studentData) {
       return makeResponse({ res, status: 404, message: 'Student not found.' });
     }
@@ -49,14 +50,14 @@ export const postPredictionController = async (req, res) => {
 };
 
 export const getTaskRecommendationController = async (req, res) => {
-  const { performer_type, lowest_two_chapters, Student_id } = req.body;
+  const { performer_type, lowest_two_chapters, userId, moduleId } = req.body;
 
   try {
     let studentObjectId = null;
 
-    // Check if Student_id is provided
-    if (Student_id) {
-      const studentData = await fetchStudentData(Student_id);
+    // Check if userId is provided
+    if (userId) {
+      const studentData = await getUserData(userId, moduleId);
 
       if (!studentData) {
         return res.status(404).json({ message: 'Student not found with the provided ID' });

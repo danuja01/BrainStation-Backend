@@ -83,6 +83,8 @@ export const refresh = async (req, res) => {
 };
 
 export const logout = (req, res) => {
+  blacklistToken(req.body.refresh_token);
   blacklistToken(req.user_token);
+
   return makeResponse({ res, message: 'Logout successfull' });
 };

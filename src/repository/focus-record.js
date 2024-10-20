@@ -144,7 +144,7 @@ export const getAverageFocusTime = async (userId, moduleId) => {
 export const getErraticMovementsByUser = async (userId) => {
   try {
     const userObjectId = new mongoose.Types.ObjectId(userId);
- 
+
     const result = await FocusRecord.aggregate([
       { $match: { userId: userObjectId } },
       {
@@ -156,17 +156,17 @@ export const getErraticMovementsByUser = async (userId) => {
         }
       }
     ]);
- 
+
     return result;
   } catch (error) {
     throw new Error(`Database query failed: ${error.message}`);
   }
 };
- 
+
 export const getMostFrequentFinalClassification = async (userId) => {
   try {
     const userObjectId = new mongoose.Types.ObjectId(userId);
- 
+
     const result = await FocusRecord.aggregate([
       { $match: { userId: userObjectId } },
       {
@@ -182,13 +182,13 @@ export const getMostFrequentFinalClassification = async (userId) => {
         $limit: 1
       }
     ]);
- 
+
     if (result.length > 0) {
       return {
         mostFrequentClassification: result[0]._id
       };
-    } 
-      return null;
+    }
+    return null;
   } catch (error) {
     throw new Error(`Database query failed: ${error.message}`);
   }
