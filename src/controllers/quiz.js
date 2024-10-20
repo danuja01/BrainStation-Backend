@@ -1,4 +1,4 @@
- import {
+import {
   calculateUserLectureScore,
   getQuizPerformance,
   getQuizzesService,

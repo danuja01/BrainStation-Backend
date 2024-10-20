@@ -6,9 +6,8 @@ import {
   getCompletedTasksCount,
   getStudentDetailsController,
   getTaskRecommendationController,
-  postPredictionController,
-  getUserData,
-  //getStudentDetailsController
+  getUserData, // getStudentDetailsController
+  postPredictionController
 } from '@/controllers/progressController';
 
 const progressRouter = express.Router();
@@ -38,9 +37,5 @@ progressRouter.get('/completed-tasks/:taskId', getCompletedTasksByTaskIdControll
 // Add this in your progress.routes.js
 progressRouter.get('/completed-tasks-count/:studentId', tracedAsyncHandler(getCompletedTasksCount));
 progressRouter.get('/user-data/:userId', tracedAsyncHandler(getUserData));
-
-
-
-
 
 export default progressRouter;

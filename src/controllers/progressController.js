@@ -6,8 +6,6 @@ import { fetchStudentDataFromDB } from '@/repository/studentProfile';
 import { fetchStudentData, predictExamScore, recommendTask } from '@/services/progressService';
 import { makeResponse } from '@/utils';
 
-
-
 // Controller to fetch student details by ID
 export const getStudentDetailsController = async (req, res) => {
   const { Student_id } = req.params;
