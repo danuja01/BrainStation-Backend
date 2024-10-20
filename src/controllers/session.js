@@ -5,7 +5,8 @@ import {
   findSessionById,
   findSessionsOfUserByModule,
   findStartAndEndTimesOfUsersModule,
-  findTotalFocusTimeOfUsersModule
+  findTotalFocusTimeOfUsersModule,
+  getSessionData
 } from '@/services/focus-record';
 import { makeResponse } from '@/utils/response';
 
@@ -77,6 +78,18 @@ export const getAverageFocusTimeofUsersModuleController = async (req, res) => {
     const moduleId = req.query.filter.moduleId;
 
     const data = await findAverageFocusTimeofUsersModule(userId, moduleId);
+
+    return makeResponse({ res, data, message: 'Sessions retrieved successfully' });
+  } catch (error) {
+    return res.status(500).json({ message: 'Internal Server Error' });
+  }
+};
+
+export const getSessionDataController = async (req, res) => {
+  try {
+    const userId = req.params.userId;
+
+    const data = await getSessionData(userId);
 
     return makeResponse({ res, data, message: 'Sessions retrieved successfully' });
   } catch (error) {
