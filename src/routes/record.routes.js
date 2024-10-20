@@ -6,6 +6,7 @@ import {
   getAverageFocusTimeofUsersModuleController,
   getSessionByIdController,
   getSessionByUserController,
+  getSessionDataController,
   getSessionsOfUserByModuleController,
   getStartAndEndTimesOfUsersModuleController,
   getTotalFocusTimeOfUsersModuleController
@@ -55,6 +56,12 @@ sessionRouter.get(
   '/userByModule/:userId',
   celebrate({ [Segments.PARAMS]: focusRecordIdSchema }),
   tracedAsyncHandler(getSessionsOfUserByModuleController)
+);
+
+sessionRouter.get(
+  '/sessionData/:userId',
+  celebrate({ [Segments.PARAMS]: focusRecordIdSchema }),
+  tracedAsyncHandler(getSessionDataController)
 );
 
 export default sessionRouter;

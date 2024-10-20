@@ -24,7 +24,6 @@ class LearningPhase {
         this.moveToReviewPhase();
       }
     }
-    console.log('toda date>>>>>>>>>>>', new Date(Date.now() + this.learning_steps[this.current_step] * 60 * 1000));
 
     // Update next review date based on learning steps in minutes
     this.quiz.next_review_date = new Date(Date.now() + this.learning_steps[this.current_step] * 60 * 1000);
