@@ -1,10 +1,10 @@
 import { moduleLogger } from '@sliit-foss/module-logger';
 import mongoose from 'mongoose';
-import { getUserData,getAllModulesByUser   } from '@/controllers/algorithm';
+import { getUserData } from '@/controllers/algorithm';
 import CompletedTask from '@/models/completedTaskModel';
 import Task from '@/models/taskModel';
 import { fetchStudentDataFromDB } from '@/repository/studentProfile';
-import { fetchStudentData, predictExamScore, recommendTask  } from '@/services/progressService';
+import { fetchStudentData, predictExamScore, recommendTask } from '@/services/progressService';
 import { makeResponse } from '@/utils';
 
 const logger = moduleLogger('progress-controller');
@@ -39,19 +39,16 @@ export const postPredictionController = async (req, res) => {
     const predictionResult = await predictExamScore(studentData);
 
     // Log the final result for debugging
-    logger.info('Final Prediction Result:', predictionResult );
+    logger.info('Final Prediction Result:', predictionResult);
 
     const moduleName = studentData.moduleName || 'Module Name Not Found';
     // Return prediction result
-    return makeResponse({ res, status: 200, data:{...predictionResult,moduleName}});
+    return makeResponse({ res, status: 200, data: { ...predictionResult, moduleName } });
   } catch (error) {
     logger.error('Prediction Error:', error);
     return makeResponse({ res, status: 500, message: 'Failed to get prediction.' });
   }
 };
-
-
-
 
 export const getTaskRecommendationController = async (req, res) => {
   const { performer_type, lowest_two_chapters, userId, moduleId } = req.body;
@@ -249,37 +246,5 @@ export const getCompletedTasksCount = async (req, res) => {
   } catch (error) {
     logger.error('Error fetching completed tasks count:', error);
     res.status(500).json({ message: 'Failed to fetch completed tasks count.' });
-  }
-};
-
-export const getModulesAndScoresByUser = async (userId) => {
-  try {
-    const modules = await getAllModulesByUser(userId);
-
-    const modulesWithScores = [];
-
-    for (const module of modules || []) {
-      const moduleId = module._id;
-      const moduleName = module.name;
-
-      const quizDataFilter = { moduleId: moduleId };
-      const quizData = await getQuizzesScoreService(userId, quizDataFilter);
-
-      const lecturesWithScores = quizData?.docs?.map(quiz => ({
-        lectureTitle: quiz.lectureTitle,
-        score: quiz.averageScore * 100 || 0
-      })) || [];
-
-      modulesWithScores.push({
-        moduleName: moduleName,
-        moduleId: moduleId,
-        lectures: lecturesWithScores
-      });
-    }
-
-    return modulesWithScores;
-  } catch (error) {
-    console.error('Error when retrieving modules and scores:', error.message);
-    throw new Error('Error when retrieving modules and scores');
   }
 };

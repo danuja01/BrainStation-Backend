@@ -50,7 +50,7 @@ export const predictExamScore = async (studentData) => {
       };
     })
   );
-  
+
   // Prepare input data for the Python service
   const inputData = {
     focus_level: Math.round(studentData.focusLevel),
@@ -66,15 +66,12 @@ export const predictExamScore = async (studentData) => {
     return {
       predicted_exam_score,
       lowest_two_chapters_with_descriptions: lowestTwoChaptersWithDescriptions,
-      performer_type: performer_type,
-    
+      performer_type: performer_type
     };
   } catch (error) {
     throw new Error(`Failed to get prediction from Python service- ${error}`);
   }
 };
-
-
 
 export const recommendTask = (performerType, lowestTwoChapters) => {
   // Ensure that lowestTwoChapters is an array with at least 2 chapters
@@ -181,4 +178,3 @@ export const recommendTask = (performerType, lowestTwoChapters) => {
 
   return combinedTasks;
 };
-
