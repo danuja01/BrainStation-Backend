@@ -2,9 +2,11 @@ import createError from 'http-errors';
 import {
   addNewAdminUser,
   changeAdminPasswordService,
+  enrollModuleService,
   getUserByID,
   getUsers,
   saveFcmTokenService,
+  unenrollModuleService,
   updateUserdetails
 } from '@/services/user';
 import { makeResponse } from '@/utils';
@@ -47,4 +49,20 @@ export const saveFcmToken = async (req, res) => {
   } catch (error) {
     throw createError(500, `Error saving FCM token: ${error.message}`);
   }
+};
+
+export const enrollModuleController = async (req, res) => {
+  const userId = req.user._id;
+  const moduleId = req.body.moduleId;
+
+  const user = await enrollModuleService(userId, moduleId);
+  return makeResponse({ res, data: user, message: 'User enrolled in module succesfully' });
+};
+
+export const unenrollModuleController = async (req, res) => {
+  const userId = req.user._id;
+  const moduleId = req.body.moduleId;
+
+  const user = await unenrollModuleService(userId, moduleId);
+  return makeResponse({ res, data: user, message: 'User unenrolled from module succesfully' });
 };
