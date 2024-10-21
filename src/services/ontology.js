@@ -1,8 +1,8 @@
 import createError from 'http-errors';
-import { getLectureByIdService } from './lecture';
 import extractMarkdownContent from '@/helpers/extractMarkdown';
 import { removeHTML } from '@/helpers/removeHTML';
 import { findOntology, saveOntologyFilePath } from '@/repository/ontology';
+import { getLectureByIdService } from './lecture';
 
 const { v4: uuidv4 } = require('uuid');
 const axios = require('axios');
@@ -25,7 +25,7 @@ export const generateOntologyService = async (slides) => {
       }
     };
 
-    const response = await axios.post('http://localhost:8000/generate-mindmap/', slides, config);
+    const response = await axios.post('http://34.30.64.175:9004/generate-mindmap/', slides, config);
     const markdown = extractMarkdownContent(response.data.mindmap);
 
     return markdown;
