@@ -15,7 +15,10 @@ export const generateToken = (user) => {
   });
 };
 
-export const decodeToken = (token) => {
+export const decodeToken = (token, isFromRefresh = false) => {
+  if (isFromRefresh) {
+    return jwt.verify(token, process.env.JWT_REFRESH_SECRET);
+  }
   return jwt.verify(token, process.env.JWT_SECRET);
 };
 

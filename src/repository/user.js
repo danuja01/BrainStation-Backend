@@ -60,3 +60,46 @@ export const findOneAndRemoveUser = (filters) => {
 export const updateUserFcmToken = (userId, fcmToken) => {
   return User.findByIdAndUpdate(userId, { fcmToken }, { new: true });
 };
+
+export const enrollModule = async (userId, moduleId) => {
+  try {
+    const user = await User.findById(userId);
+    if (!user.enrolledModules.includes(moduleId)) {
+      user.enrolledModules.push(moduleId);
+      await user.save();
+      return user;
+    }
+    throw new Error('Module already enrolled.');
+  } catch (error) {
+    throw new Error(`Error enrolling module: ${  error.message}`);
+  }
+};
+
+export const unenrollModule = async (userId, moduleId) => {
+  try {
+    const user = await User.findById(userId);
+    user.enrolledModules = user.enrolledModules.filter((id) => id.toString() !== moduleId.toString());
+    await user.save();
+    return user;
+  } catch (error) {
+    throw new Error(`Error unenrolling module: ${  error.message}`);
+  }
+};
+
+export const getUserModules = async (userId) => {
+  try {
+    const user = await User.findById(userId).populate('enrolledModules');
+    return user.enrolledModules;
+  } catch (error) {
+    throw new Error(`Error retrieving user modules: ${  error.message}`);
+  }
+};
+
+export const isUserEnrolledInModule = async (userId, moduleId) => {
+  try {
+    const user = await User.findById(userId).populate('enrolledModules');
+    return user.enrolledModules.some((module) => module._id.toString() === moduleId.toString());
+  } catch (error) {
+    throw new Error(`Error checking module enrollment: ${  error.message}`);
+  }
+};

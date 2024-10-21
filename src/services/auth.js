@@ -99,7 +99,7 @@ export const resetPasswordFromEmail = async (password, verificationCode) => {
 };
 
 export const getUserByToken = async (token) => {
-  const decodedUser = decodeToken(token).data;
+  const decodedUser = decodeToken(token, true).data;
   const user = decodedUser ? await getOneUser({ _id: decodedUser._id }, false) : null;
   return user;
 };
