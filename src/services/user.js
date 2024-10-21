@@ -7,10 +7,14 @@ import bcrypt from 'bcryptjs';
 import createError from 'http-errors';
 import {
   createUser,
+  enrollModule,
   findOneAndRemoveUser,
   findOneAndUpdateUser,
   getAllUsers,
   getOneUser,
+  getUserModules,
+  isUserEnrolledInModule,
+  unenrollModule,
   updateUserFcmToken
 } from '@/repository/user';
 // eslint-disable-next-line import/order
@@ -129,4 +133,20 @@ export const saveFcmTokenService = async (userId, fcmToken) => {
   }
 
   return user;
+};
+
+export const enrollModuleService = async (userId, moduleId) => {
+  return await enrollModule(userId, moduleId);
+};
+
+export const unenrollModuleService = async (userId, moduleId) => {
+  return await unenrollModule(userId, moduleId);
+};
+
+export const getUserModulesService = async (userId) => {
+  return await getUserModules(userId);
+};
+
+export const checkUserEnrolledService = async (userId, moduleId) => {
+  return await isUserEnrolledInModule(userId, moduleId);
 };

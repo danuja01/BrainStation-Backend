@@ -48,6 +48,10 @@ const UserSchema = new mongoose.Schema(
     fcmToken: {
       type: String,
       default: null
+    },
+    enrolledModules: {
+      type: [mongoose.Schema.Types.ObjectId],
+      ref: 'Module'
     }
   },
   {
