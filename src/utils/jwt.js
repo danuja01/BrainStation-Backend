@@ -15,7 +15,10 @@ export const generateToken = (user) => {
   });
 };
 
-export const decodeToken = (token) => {
+export const decodeToken = (token, isFromRefresh = false) => {
+  if (isFromRefresh) {
+    return jwt.verify(token, process.env.JWT_REFRESH_SECRET);
+  }
   return jwt.verify(token, process.env.JWT_SECRET);
 };
 
@@ -28,7 +31,7 @@ export const sendRefreshTokenResponse = (res, user, message) => {
 };
 
 export const generateRefreshToken = (user) => {
-  return jwt.sign({ data: user }, process.env.JWT_SECRET, {
+  return jwt.sign({ data: user }, process.env.JWT_REFRESH_SECRET, {
     expiresIn: `${process.env.JWT_REFRESH_EXPIRE}d`
   });
 };
