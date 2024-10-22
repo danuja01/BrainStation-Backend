@@ -190,60 +190,54 @@ export const recommendTask = (performerType, lowestTwoChapters) => {
 
 export const predictScoresForAllModules = async (userId) => {
   try {
-    const enrolledModules = await getEnrolledModules(userId);
+      // Fetch enrolled modules for the user
+      const enrolledModules = await getEnrolledModules(userId);
 
-    if (!enrolledModules || enrolledModules.length === 0) {
-      throw new Error('No modules found for this user.');
-    }
+      if (!enrolledModules || enrolledModules.length === 0) {
+          throw new Error('No modules found for this user.');
+      }
 
-    const modulePredictions = await Promise.all(
-      enrolledModules.map(async (module) => {
-        const studentData = await getUserData(userId, module._id);
+      const modulePredictions = await Promise.all(
+          enrolledModules.map(async (module) => {
+              const studentData = await getUserData(userId, module._id);
 
-        const averageScore = calculateCumulativeAverage(studentData);
-        const lowestTwoChapters = getLowestTwoChapters(studentData); // This returns the 2 lowest chapters
+              // Calculate cumulative average and lowest chapters
+              const averageScore = parseFloat(studentData.averageScore);
+              const lowestTwoChapters = getLowestTwoChapters(studentData);
 
-        const predictedExamScoreResponse = await axios.post('http://localhost:8000/predict_exam_score/', {
-          focus_level: Math.round(studentData.focusLevel),
-          cumulative_average: averageScore,
-          time_spent_studying: parseInt(studentData.timeSpentStudying, 10)
-        });
+              // Predict exam score using external service
+              const response = await axios.post('http://localhost:8000/predict_exam_score/', {
+                  focus_level: Math.round(studentData.focusLevel),
+                  cumulative_average: averageScore,
+                  time_spent_studying: parseInt(studentData.timeSpentStudying, 10)
+              });
 
-        const predictedExamScore = parseFloat(predictedExamScoreResponse.data.predicted_exam_score) * 100;
+              // Ensure the predicted score is scaled properly
+              const predictedExamScore = Math.min(response.data.predicted_exam_score, 100);  // Keep within 100
 
-        return {
-          moduleId: module._id,
-          moduleName: module.name,
-          predictedExamScore,
-          lowestChapters: lowestTwoChapters // This should have lecture IDs and scores
-        };
-      })
-    );
+              return {
+                  moduleId: module._id,
+                  moduleName: module.name,
+                  predictedExamScore: predictedExamScore.toFixed(2), // Keep as percentage
+                  lowestChapters: lowestTwoChapters
+              };
+          })
+      );
 
-    // Determine the module with the lowest score
-    const lowestScoreModule = modulePredictions.reduce((prev, curr) =>
-      (prev.predictedExamScore < curr.predictedExamScore ? prev : curr)
-    );
+      // Identify the lowest and highest score modules
+      const lowestScoreModule = modulePredictions.reduce((prev, curr) =>
+          prev.predictedExamScore < curr.predictedExamScore ? prev : curr
+      );
+      const highestScoreModule = modulePredictions.reduce((prev, curr) =>
+          prev.predictedExamScore > curr.predictedExamScore ? prev : curr
+      );
 
-    // Determine the module with the highest score
-    const highestScoreModule = modulePredictions.reduce((prev, curr) =>
-      (prev.predictedExamScore > curr.predictedExamScore ? prev : curr)
-    );
-
-    // Get the two lowest score lectures (across all modules)
-    const lowestScoreLectures = [];
-    modulePredictions.forEach((module) => {
-      const sortedChapters = module.lowestChapters.sort((a, b) => a.score - b.score);
-      lowestScoreLectures.push(...sortedChapters.slice(0, 2)); // Push the 2 lowest score lectures
-    });
-
-    return {
-      modulePredictions,
-      lowestScoreLectures, // Return the 2 lowest lectures
-      lowestScoreModuleName: lowestScoreModule.moduleName,
-      highestScoreModuleName: highestScoreModule.moduleName
-    };
+      return {
+          modulePredictions,
+          lowestScoreModule,
+          highestScoreModule
+      };
   } catch (error) {
-    throw new Error(`Failed to predict scores for all modules: ${error.message}`);
+      throw new Error(`Failed to predict scores for all modules: ${error.message}`);
   }
 };
