@@ -1,8 +1,7 @@
 import axios from 'axios';
+import { getEnrolledModules, getUserData } from '@/controllers/algorithm';
 import { fetchStudentDataFromDB } from '@/repository/studentProfile';
 import { calculateCumulativeAverage, getLowestTwoChapters } from '@/utils/progressUtils';
-import { getEnrolledModules,getUserData } from '@/controllers/algorithm';
-
 
 // Fetch student data from MongoDB
 export const fetchStudentData = async (Student_id) => {
@@ -14,17 +13,17 @@ export const fetchStudentData = async (Student_id) => {
   }
 };
 
-const getChapterDescriptions = async (chapterName) => {
-  try {
-    const response = await axios.get(
-      `http://127.0.0.1:5000/get_description?chapter=${encodeURIComponent(chapterName)}`
-    );
+// const getChapterDescriptions = async (chapterName) => {
+//   try {
+//     const response = await axios.get(
+//       `http://127.0.0.1:5000/get_description?chapter=${encodeURIComponent(chapterName)}`
+//     );
 
-    return response.data.description;
-  } catch (error) {
-    throw new Error(`No description available for ${chapterName}`);
-  }
-};
+//     return response.data.description;
+//   } catch (error) {
+//     throw new Error(`No description available for ${chapterName}`);
+//   }
+// };
 
 export const predictExamScore = async (studentData) => {
   // Calculate cumulative average of quiz scores
@@ -41,18 +40,15 @@ export const predictExamScore = async (studentData) => {
   const lowestTwoChapters = getLowestTwoChapters(studentData);
 
   // Fetch descriptions for the lowest two chapters
-  const lowestTwoChaptersWithDescriptions = await Promise.all(
-    lowestTwoChapters.map(async (chapter) => {
-      const description = await getChapterDescription(chapter.chapter); // Call Python API for each chapter
+  const lowestTwoChaptersWithDescriptions = lowestTwoChapters.map((chapter) => {
+    //   const description = await getChapterDescription(chapter.chapter); // Call Python API for each chapter
 
-      return {
-        chapter: chapter.chapter,
-        description,
-        score: chapter.score
-      };
-    })
-  );
-
+    return {
+      chapter: chapter.chapter,
+      // description,
+      score: chapter.score
+    };
+  });
   // Prepare input data for the Python service
   const inputData = {
     focus_level: Math.round(studentData.focusLevel),
@@ -181,21 +177,20 @@ export const recommendTask = (performerType, lowestTwoChapters) => {
   return combinedTasks;
 };
 
-
-const getChapterDescription = async (chapterName) => {
-  try {
-    const response = await axios.get(
-      `http://127.0.0.1:5000/get_description?chapter=${encodeURIComponent(chapterName)}`
-    );
-    return response.data.description;
-  } catch (error) {
-    throw new Error(`No description available for ${chapterName}`);
-  }
-};
+// const getChapterDescription = async (chapterName) => {
+//   try {
+//     const response = await axios.get(
+//       `http://127.0.0.1:5000/get_description?chapter=${encodeURIComponent(chapterName)}`
+//     );
+//     return response.data.description;
+//   } catch (error) {
+//     throw new Error(`No description available for ${chapterName}`);
+//   }
+// };
 
 export const predictScoresForAllModules = async (userId) => {
   try {
-    const enrolledModules = await getUserModulesService(userId);
+    const enrolledModules = await getEnrolledModules(userId);
 
     if (!enrolledModules || enrolledModules.length === 0) {
       throw new Error('No modules found for this user.');
@@ -227,12 +222,12 @@ export const predictScoresForAllModules = async (userId) => {
 
     // Determine the module with the lowest score
     const lowestScoreModule = modulePredictions.reduce((prev, curr) =>
-      prev.predictedExamScore < curr.predictedExamScore ? prev : curr
+      (prev.predictedExamScore < curr.predictedExamScore ? prev : curr)
     );
 
     // Determine the module with the highest score
     const highestScoreModule = modulePredictions.reduce((prev, curr) =>
-      prev.predictedExamScore > curr.predictedExamScore ? prev : curr
+      (prev.predictedExamScore > curr.predictedExamScore ? prev : curr)
     );
 
     // Get the two lowest score lectures (across all modules)

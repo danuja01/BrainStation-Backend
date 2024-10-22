@@ -71,7 +71,7 @@ export const enrollModule = async (userId, moduleId) => {
     }
     throw new Error('Module already enrolled.');
   } catch (error) {
-    throw new Error(`Error enrolling module: ${  error.message}`);
+    throw new Error(`Error enrolling module: ${error.message}`);
   }
 };
 
@@ -82,7 +82,7 @@ export const unenrollModule = async (userId, moduleId) => {
     await user.save();
     return user;
   } catch (error) {
-    throw new Error(`Error unenrolling module: ${  error.message}`);
+    throw new Error(`Error unenrolling module: ${error.message}`);
   }
 };
 
@@ -91,7 +91,7 @@ export const getUserModules = async (userId) => {
     const user = await User.findById(userId).populate('enrolledModules');
     return user.enrolledModules;
   } catch (error) {
-    throw new Error(`Error retrieving user modules: ${  error.message}`);
+    throw new Error(`Error retrieving user modules: ${error.message}`);
   }
 };
 
@@ -100,6 +100,6 @@ export const isUserEnrolledInModule = async (userId, moduleId) => {
     const user = await User.findById(userId).populate('enrolledModules');
     return user.enrolledModules.some((module) => module._id.toString() === moduleId.toString());
   } catch (error) {
-    throw new Error(`Error checking module enrollment: ${  error.message}`);
+    throw new Error(`Error checking module enrollment: ${error.message}`);
   }
 };

@@ -41,8 +41,6 @@ progressRouter.post('/predict-all-modules', tracedAsyncHandler(postPredictionFor
 // Route to get completed modules by user ID
 progressRouter.get('/user/:userId/modules', tracedAsyncHandler(getModulesAndScoresByUserController));
 
-
 progressRouter.get('/predict-all-modules/:userId', tracedAsyncHandler(predictScoresForModules));
-
 
 export default progressRouter;
