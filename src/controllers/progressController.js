@@ -1,11 +1,14 @@
 import { moduleLogger } from '@sliit-foss/module-logger';
 import mongoose from 'mongoose';
-import { getUserData } from '@/controllers/algorithm';
+import { getUserData, getEnrolledModules } from '@/controllers/algorithm';
 import CompletedTask from '@/models/completedTaskModel';
 import Task from '@/models/taskModel';
 import { fetchStudentDataFromDB } from '@/repository/studentProfile';
-import { fetchStudentData, predictExamScore, recommendTask } from '@/services/progressService';
+import { fetchStudentData, predictExamScore, recommendTask,predictScoresForAllModules } from '@/services/progressService';
 import { makeResponse } from '@/utils';
+
+
+
 
 const logger = moduleLogger('progress-controller');
 
@@ -246,5 +249,26 @@ export const getCompletedTasksCount = async (req, res) => {
   } catch (error) {
     logger.error('Error fetching completed tasks count:', error);
     res.status(500).json({ message: 'Failed to fetch completed tasks count.' });
+  }
+};
+
+
+export const predictScoresForModules = async (req, res) => {
+  try {
+    // Get userId from URL parameters and trim any spaces or newlines
+    const { userId } = req.user._id;
+    const cleanUserId = userId.trim();  // This removes any extra characters like newlines or spaces
+
+    // Now call the prediction service with the cleaned userId
+    const predictions = await predictScoresForAllModules(cleanUserId);
+
+    if (!predictions) {
+      return res.status(404).json({ message: 'No predictions found for this user.' });
+    }
+
+    return res.status(200).json(predictions);
+  } catch (error) {
+    console.error('Error predicting scores for modules:', error);
+    return res.status(500).json({ message: `Failed to predict scores: ${error.message}` });
   }
 };

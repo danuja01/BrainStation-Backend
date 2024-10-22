@@ -8,7 +8,8 @@ import {
   getStudentDetailsController,
   getTaskRecommendationController,
   postPredictionController,
-  postPredictionForAllModulesController
+  postPredictionForAllModulesController,
+  predictScoresForModules
 } from '@/controllers/progressController';
 
 const progressRouter = express.Router();
@@ -39,5 +40,9 @@ progressRouter.get('/completed-tasks-count/:studentId', tracedAsyncHandler(getCo
 progressRouter.post('/predict-all-modules', tracedAsyncHandler(postPredictionForAllModulesController));
 // Route to get completed modules by user ID
 progressRouter.get('/user/:userId/modules', tracedAsyncHandler(getModulesAndScoresByUserController));
+
+
+progressRouter.get('/predict-all-modules/:userId', tracedAsyncHandler(predictScoresForModules));
+
 
 export default progressRouter;

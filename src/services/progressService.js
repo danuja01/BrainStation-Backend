@@ -1,6 +1,8 @@
 import axios from 'axios';
 import { fetchStudentDataFromDB } from '@/repository/studentProfile';
 import { calculateCumulativeAverage, getLowestTwoChapters } from '@/utils/progressUtils';
+import { getEnrolledModules,getUserData } from '@/controllers/algorithm';
+
 
 // Fetch student data from MongoDB
 export const fetchStudentData = async (Student_id) => {
@@ -12,7 +14,7 @@ export const fetchStudentData = async (Student_id) => {
   }
 };
 
-const getChapterDescription = async (chapterName) => {
+const getChapterDescriptions = async (chapterName) => {
   try {
     const response = await axios.get(
       `http://127.0.0.1:5000/get_description?chapter=${encodeURIComponent(chapterName)}`
@@ -177,4 +179,76 @@ export const recommendTask = (performerType, lowestTwoChapters) => {
   };
 
   return combinedTasks;
+};
+
+
+const getChapterDescription = async (chapterName) => {
+  try {
+    const response = await axios.get(
+      `http://127.0.0.1:5000/get_description?chapter=${encodeURIComponent(chapterName)}`
+    );
+    return response.data.description;
+  } catch (error) {
+    throw new Error(`No description available for ${chapterName}`);
+  }
+};
+
+export const predictScoresForAllModules = async (userId) => {
+  try {
+    const enrolledModules = await getUserModulesService(userId);
+
+    if (!enrolledModules || enrolledModules.length === 0) {
+      throw new Error('No modules found for this user.');
+    }
+
+    const modulePredictions = await Promise.all(
+      enrolledModules.map(async (module) => {
+        const studentData = await getUserData(userId, module._id);
+
+        const averageScore = calculateCumulativeAverage(studentData);
+        const lowestTwoChapters = getLowestTwoChapters(studentData); // This returns the 2 lowest chapters
+
+        const predictedExamScoreResponse = await axios.post('http://localhost:8000/predict_exam_score/', {
+          focus_level: Math.round(studentData.focusLevel),
+          cumulative_average: averageScore,
+          time_spent_studying: parseInt(studentData.timeSpentStudying, 10)
+        });
+
+        const predictedExamScore = parseFloat(predictedExamScoreResponse.data.predicted_exam_score) * 100;
+
+        return {
+          moduleId: module._id,
+          moduleName: module.name,
+          predictedExamScore,
+          lowestChapters: lowestTwoChapters // This should have lecture IDs and scores
+        };
+      })
+    );
+
+    // Determine the module with the lowest score
+    const lowestScoreModule = modulePredictions.reduce((prev, curr) =>
+      prev.predictedExamScore < curr.predictedExamScore ? prev : curr
+    );
+
+    // Determine the module with the highest score
+    const highestScoreModule = modulePredictions.reduce((prev, curr) =>
+      prev.predictedExamScore > curr.predictedExamScore ? prev : curr
+    );
+
+    // Get the two lowest score lectures (across all modules)
+    const lowestScoreLectures = [];
+    modulePredictions.forEach((module) => {
+      const sortedChapters = module.lowestChapters.sort((a, b) => a.score - b.score);
+      lowestScoreLectures.push(...sortedChapters.slice(0, 2)); // Push the 2 lowest score lectures
+    });
+
+    return {
+      modulePredictions,
+      lowestScoreLectures, // Return the 2 lowest lectures
+      lowestScoreModuleName: lowestScoreModule.moduleName,
+      highestScoreModuleName: highestScoreModule.moduleName
+    };
+  } catch (error) {
+    throw new Error(`Failed to predict scores for all modules: ${error.message}`);
+  }
 };

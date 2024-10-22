@@ -1,7 +1,7 @@
 import express from 'express';
 import { tracedAsyncHandler } from '@sliit-foss/functions';
 // Ensure this is a valid import
-import { getUserData } from '@/controllers/algorithm';
+import { getUserData,getEnrolledModules  } from '@/controllers/algorithm';
 
 // Ensure the path to the controller is correct
 
@@ -15,4 +15,17 @@ algorithmRouter.get('/user-data/:userId', tracedAsyncHandler(getUserData));
 // algorithmRouter.get('/predict/:userId', tracedAsyncHandler(getUserPrediction));
 
 // Export the router
+
+// New route to get enrolled modules by user ID
+algorithmRouter.get('/enrolled-modules/:userId', tracedAsyncHandler(async (req, res) => {
+  const { userId } = req.params;
+
+  try {
+    const modules = await getEnrolledModules(userId);
+    res.status(200).json(modules);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+}));
+
 export default algorithmRouter;

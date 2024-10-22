@@ -37,14 +37,15 @@ userRouter.patch(
   celebrate({ [Segments.BODY]: changePasswordSchema }),
   tracedAsyncHandler(changeAdminPassword)
 );
+
+userRouter.post('/enroll', authorizer(['STUDENT', 'LECTURER', 'ADMIN']), enrollModuleController);
+
+userRouter.delete('/unenroll', authorizer(['STUDENT', 'LECTURER', 'ADMIN']), unenrollModuleController);
+
 userRouter.patch(
   '/:id',
   celebrate({ [Segments.PARAMS]: userIdSchema, [Segments.BODY]: updateSchema }),
   tracedAsyncHandler(update)
 );
-
-userRouter.post('/enroll', authorizer(['STUDENT', 'LECTURER', 'ADMIN']), enrollModuleController);
-
-userRouter.delete('/unenroll', authorizer(['STUDENT', 'LECTURER', 'ADMIN']), unenrollModuleController);
 
 export default userRouter;
