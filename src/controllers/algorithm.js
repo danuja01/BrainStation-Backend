@@ -47,8 +47,7 @@ export const getUserData = async (userId, moduleId) => {
   }
 };
 
-
-//Enrolled Module By User ID
+// Enrolled Module By User ID
 export const getEnrolledModules = async (userId) => {
   try {
     const user = await User.findById(userId).populate('enrolledModules');
