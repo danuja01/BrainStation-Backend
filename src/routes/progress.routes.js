@@ -15,19 +15,18 @@ import { authorizer } from '@/middleware/auth';
 
 const progressRouter = express.Router();
 
-// Route to fetch student details by ID
-progressRouter.get(
-  '/student/:Student_id',
-  authorizer(['STUDENT', 'LECTURER', 'ADMIN']),
-  tracedAsyncHandler(getStudentDetailsController)
+
+// Route to get predictions by Student ID and moduleid
+progressRouter.post( '/predict',authorizer(['STUDENT', 'LECTURER', 'ADMIN']),tracedAsyncHandler(postPredictionController));
+
+//get predictions by Student ID 
+progressRouter.get('/predict-all-modules/:userId',authorizer(['STUDENT', 'LECTURER', 'ADMIN']),tracedAsyncHandler(predictScoresForModules)
 );
 
-// Route to get predictions by Student ID
-progressRouter.post(
-  '/predict',
-  authorizer(['STUDENT', 'LECTURER', 'ADMIN']),
-  tracedAsyncHandler(postPredictionController)
-);
+
+
+
+
 
 // Route to get task recommendations by Student ID
 progressRouter.post(
@@ -67,10 +66,5 @@ progressRouter.get(
   tracedAsyncHandler(getModulesAndScoresByUserController)
 );
 
-progressRouter.get(
-  '/predict-all-modules/:userId',
-  authorizer(['STUDENT', 'LECTURER', 'ADMIN']),
-  tracedAsyncHandler(predictScoresForModules)
-);
 
 export default progressRouter;
