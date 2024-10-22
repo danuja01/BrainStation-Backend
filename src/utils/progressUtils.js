@@ -28,3 +28,27 @@ export const getLowestTwoChapters = (studentData) => {
   // Return the two lowest-scoring quizzes
   return quizScores.slice(0, 2);
 };
+
+export const getStudySessionRecommendation = (modulePredictions) => {
+  // Assuming focus data is part of studentData
+  const focusTimeRatio = modulePredictions.map((prediction) => {
+    const ratio = prediction.focusLevel / prediction.timeSpentStudying;
+    if (ratio > 0.8) {
+      return {
+        moduleName: prediction.moduleName,
+        recommendation: 'Recommended: 45 minutes study followed by a 5-minute break.'
+      };
+    } else if (ratio > 0.5) {
+      return {
+        moduleName: prediction.moduleName,
+        recommendation: 'Recommended: 30 minutes study followed by a 10-minute break.'
+      };
+    }
+    return {
+      moduleName: prediction.moduleName,
+      recommendation: 'Recommended: 20 minutes study followed by a 15-minute break.'
+    };
+  });
+
+  return focusTimeRatio;
+};
