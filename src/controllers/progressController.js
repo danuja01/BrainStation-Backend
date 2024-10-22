@@ -260,10 +260,10 @@ export const predictScoresForModules = async (req, res) => {
   try {
     // Get userId from URL parameters and trim any spaces or newlines
     const userId = req.user._id;
-    const cleanUserId = userId.trim(); // This removes any extra characters like newlines or spaces
+    //const cleanUserId = userId.trim(); // This removes any extra characters like newlines or spaces
 
     // Now call the prediction service with the cleaned userId
-    const predictions = await predictScoresForAllModules(cleanUserId);
+    const predictions = await predictScoresForAllModules(userId);
 
     if (!predictions) {
       return res.status(404).json({ message: 'No predictions found for this user.' });
