@@ -16,7 +16,7 @@ const logger = moduleLogger('progress-controller');
 
 // Controller to fetch student details by ID
 export const getStudentDetailsController = async (req, res) => {
-  const { userId } = req.params;
+  const userId = req.user._id;
   const studentData = await fetchStudentData(userId);
 
   if (!studentData) {
@@ -27,7 +27,8 @@ export const getStudentDetailsController = async (req, res) => {
 };
 
 export const postPredictionController = async (req, res) => {
-  const { userId, moduleId } = req.body;
+  const userId = req.user._id;
+  const moduleId = req.body;
 
   if (!userId) {
     return makeResponse({ res, status: 400, message: 'Student ID is required' });
@@ -56,7 +57,8 @@ export const postPredictionController = async (req, res) => {
 };
 
 export const getTaskRecommendationController = async (req, res) => {
-  const { performer_type, lowest_two_chapters, userId, moduleId } = req.body;
+  const userId = req.user._id;
+  const { performer_type, lowest_two_chapters, moduleId } = req.body;
 
   try {
     let studentObjectId = null;
@@ -227,7 +229,7 @@ export const getCompletedTasksByTaskIdController = async (req, res) => {
 
 // Controller to fetch completed tasks count based on student ID
 export const getCompletedTasksCount = async (req, res) => {
-  const { studentId } = req.params; // Get the student ID from the request params
+  const studentId = req.user._id;
 
   try {
     // Fetch student data from the database to get the student object ID
@@ -257,7 +259,7 @@ export const getCompletedTasksCount = async (req, res) => {
 export const predictScoresForModules = async (req, res) => {
   try {
     // Get userId from URL parameters and trim any spaces or newlines
-    const { userId } = req.params;
+    const userId = req.user._id;
     const cleanUserId = userId.trim(); // This removes any extra characters like newlines or spaces
 
     // Now call the prediction service with the cleaned userId

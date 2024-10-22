@@ -1,4 +1,5 @@
 import express from 'express';
+import { protect } from '@/middleware';
 import algorithmRouter from './algorithm.routes';
 import analyticsRouter from './analytics.routes';
 import assrsResultRouter from './assrsResult.routes';
@@ -12,7 +13,6 @@ import questionRouter from './question.routes';
 import quizRouter from './quiz.routes';
 import sessionRouter from './record.routes';
 import userRouter from './user.routes';
-import { protect } from '@/middleware';
 
 const router = express.Router();
 
@@ -27,7 +27,7 @@ router.use('/lectures', lectureRouter);
 router.use('/modules', moduleRouter);
 router.use('/assrs', assrsResultRouter);
 router.use('/sessions', sessionRouter);
-router.use('/progress', progressRouter);
+router.use('/progress', protect, progressRouter);
 router.use('/algorithm', algorithmRouter);
 
 export default router;
