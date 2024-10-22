@@ -1,5 +1,4 @@
 import express from 'express';
-import { protect } from '@/middleware';
 import algorithmRouter from './algorithm.routes';
 import analyticsRouter from './analytics.routes';
 import assrsResultRouter from './assrsResult.routes';
@@ -13,6 +12,7 @@ import questionRouter from './question.routes';
 import quizRouter from './quiz.routes';
 import sessionRouter from './record.routes';
 import userRouter from './user.routes';
+import { protect } from '@/middleware';
 
 const router = express.Router();
 
