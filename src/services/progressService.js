@@ -190,54 +190,54 @@ export const recommendTask = (performerType, lowestTwoChapters) => {
 
 export const predictScoresForAllModules = async (userId) => {
   try {
-      // Fetch enrolled modules for the user
-      const enrolledModules = await getEnrolledModules(userId);
+    // Fetch enrolled modules for the user
+    const enrolledModules = await getEnrolledModules(userId);
 
-      if (!enrolledModules || enrolledModules.length === 0) {
-          throw new Error('No modules found for this user.');
-      }
+    if (!enrolledModules || enrolledModules.length === 0) {
+      throw new Error('No modules found for this user.');
+    }
 
-      const modulePredictions = await Promise.all(
-          enrolledModules.map(async (module) => {
-              const studentData = await getUserData(userId, module._id);
+    const modulePredictions = await Promise.all(
+      enrolledModules.map(async (module) => {
+        const studentData = await getUserData(userId, module._id);
 
-              // Calculate cumulative average and lowest chapters
-              const averageScore = parseFloat(studentData.averageScore);
-              const lowestTwoChapters = getLowestTwoChapters(studentData);
+        // Calculate cumulative average and lowest chapters
+        const averageScore = parseFloat(studentData.averageScore);
+        const lowestTwoChapters = getLowestTwoChapters(studentData);
 
-              // Predict exam score using external service
-              const response = await axios.post('http://localhost:8000/predict_exam_score/', {
-                  focus_level: Math.round(studentData.focusLevel),
-                  cumulative_average: averageScore,
-                  time_spent_studying: parseInt(studentData.timeSpentStudying, 10)
-              });
+        // Predict exam score using external service
+        const response = await axios.post('http://localhost:8000/predict_exam_score/', {
+          focus_level: Math.round(studentData.focusLevel),
+          cumulative_average: averageScore,
+          time_spent_studying: parseInt(studentData.timeSpentStudying, 10)
+        });
 
-              // Ensure the predicted score is scaled properly
-              const predictedExamScore = Math.min(response.data.predicted_exam_score, 100);  // Keep within 100
+        // Ensure the predicted score is scaled properly
+        const predictedExamScore = Math.min(response.data.predicted_exam_score, 100); // Keep within 100
 
-              return {
-                  moduleId: module._id,
-                  moduleName: module.name,
-                  predictedExamScore: predictedExamScore.toFixed(2), // Keep as percentage
-                  lowestChapters: lowestTwoChapters
-              };
-          })
-      );
+        return {
+          moduleId: module._id,
+          moduleName: module.name,
+          predictedExamScore: predictedExamScore.toFixed(2), // Keep as percentage
+          lowestChapters: lowestTwoChapters
+        };
+      })
+    );
 
-      // Identify the lowest and highest score modules
-      const lowestScoreModule = modulePredictions.reduce((prev, curr) =>
-          prev.predictedExamScore < curr.predictedExamScore ? prev : curr
-      );
-      const highestScoreModule = modulePredictions.reduce((prev, curr) =>
-          prev.predictedExamScore > curr.predictedExamScore ? prev : curr
-      );
+    // Identify the lowest and highest score modules
+    const lowestScoreModule = modulePredictions.reduce((prev, curr) =>
+      (prev.predictedExamScore < curr.predictedExamScore ? prev : curr)
+    );
+    const highestScoreModule = modulePredictions.reduce((prev, curr) =>
+      (prev.predictedExamScore > curr.predictedExamScore ? prev : curr)
+    );
 
-      return {
-          modulePredictions,
-          lowestScoreModule,
-          highestScoreModule
-      };
+    return {
+      modulePredictions,
+      lowestScoreModule,
+      highestScoreModule
+    };
   } catch (error) {
-      throw new Error(`Failed to predict scores for all modules: ${error.message}`);
+    throw new Error(`Failed to predict scores for all modules: ${error.message}`);
   }
 };
