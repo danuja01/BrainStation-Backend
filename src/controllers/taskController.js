@@ -7,12 +7,10 @@ import { recommendTask } from '@/services/taskService';
 const logger = moduleLogger('task-recommendation-controller');
 
 export const getTaskRecommendationController = async (req, res) => {
-  const { userId, performer_type, lowest_two_chapters } = req.body;
+  const { performer_type, lowest_two_chapters } = req.body;
+  const userId = req.user._id;
 
   try {
-    // Log incoming request data
-    console.log('Incoming request:', { userId, performer_type, lowest_two_chapters });
-
     // Validate inputs
     if (
       !userId ||
@@ -21,7 +19,6 @@ export const getTaskRecommendationController = async (req, res) => {
       !Array.isArray(lowest_two_chapters) ||
       lowest_two_chapters.length < 2
     ) {
-      console.log('Invalid or missing fields.');
       return res.status(400).json({ message: 'Missing or invalid required fields.' });
     }
 
@@ -29,7 +26,6 @@ export const getTaskRecommendationController = async (req, res) => {
     const existingTaskSet = await Task.findOne({ student: userId });
 
     if (existingTaskSet) {
-      console.log(`Removing existing task set for user ${userId}`);
       await Task.deleteOne({ student: userId });
     }
 
@@ -120,7 +116,7 @@ export const deleteSubtaskFromTaskController = async (req, res) => {
 };
 
 export const getCompletedTasksCount = async (req, res) => {
-  const { userId } = req.params;
+  const userId = req.user._id;
   logger.info('Received userId:', userId);
 
   // Validate if the userId is a valid MongoDB ObjectId
