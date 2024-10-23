@@ -158,8 +158,6 @@ export const getCompletedTasksCount = async (req, res) => {
   }
 };
 
-
-
 export const getCompletedTasksByUserIdController = async (req, res) => {
   const { userId } = req.params; // Extract userId from the request parameters
 
@@ -179,4 +177,3 @@ export const getCompletedTasksByUserIdController = async (req, res) => {
     res.status(500).json({ message: 'Failed to fetch completed tasks', error: error.message });
   }
 };
-

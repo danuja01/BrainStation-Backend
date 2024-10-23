@@ -9,7 +9,7 @@ export const recommendTask = (performerType, lowestTwoChapters) => {
   }
 
   // Ensure case-insensitive matching for performerType
-  const formattedPerformerType = performerType.trim().toLowerCase().replace(" performer", "");;
+  const formattedPerformerType = performerType.trim().toLowerCase().replace(' performer', '');
 
   const mostLowestMarksChapter = lowestTwoChapters[0]?.chapter || lowestTwoChapters[0];
   const secondLowestMarksChapter = lowestTwoChapters[1]?.chapter || lowestTwoChapters[1];
@@ -86,7 +86,7 @@ export const recommendTask = (performerType, lowestTwoChapters) => {
   ];
   // Task order based on performer type
   const taskOrder = {
-    low : [0, 1, 2],
+    low: [0, 1, 2],
     medium: [1, 0, 2],
     excellent: [0, 2, 1]
   };

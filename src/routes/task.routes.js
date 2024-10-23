@@ -2,8 +2,8 @@ import express from 'express';
 import { tracedAsyncHandler } from '@sliit-foss/functions';
 import {
   deleteSubtaskFromTaskController,
-  getCompletedTasksCount,
   getCompletedTasksByUserIdController,
+  getCompletedTasksCount,
   getTaskRecommendationController
 } from '@/controllers/taskController';
 import { authorizer } from '@/middleware';
@@ -21,12 +21,6 @@ taskRouter.get(
   tracedAsyncHandler(getCompletedTasksCount)
 );
 
-
-taskRouter.get(
-    '/completed-tasks/',
-    authorizer(['STUDENT', 'LECTURER', 'ADMIN']),
-    getCompletedTasksByUserIdController
-  );
-
+taskRouter.get('/completed-tasks/', authorizer(['STUDENT', 'LECTURER', 'ADMIN']), getCompletedTasksByUserIdController);
 
 export default taskRouter;
