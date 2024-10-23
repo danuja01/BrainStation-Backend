@@ -1,13 +1,12 @@
 import express from 'express';
 import { tracedAsyncHandler } from '@sliit-foss/functions';
 import {
- // deleteSubtaskFromTaskController,
-  //getCompletedTasksByTaskIdController,
+  // deleteSubtaskFromTaskController,
+  // getCompletedTasksByTaskIdController,
   // getCompletedTasksCount,
   // getModulesAndScoresByUserController,
   // getTaskRecommendationController,
-  postPredictionController,
-  // postPredictionForAllModulesController,
+  postPredictionController, // postPredictionForAllModulesController,
   predictScoresForModules
 } from '@/controllers/progressController';
 import { authorizer } from '@/middleware/auth';
