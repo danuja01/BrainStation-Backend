@@ -28,13 +28,12 @@ export const postPredictionController = async (req, res) => {
 export const predictScoresForModules = async (req, res) => {
   try {
     const userId = req.user._id;
-
     const predictions = await predictScoresForAllModules(userId);
     if (!predictions) {
       // Log if predictions are missing
       return res.status(404).json({ message: 'No predictions found for this user.' });
     }
-
+     console.log(predictions);
     return res.status(200).json(predictions);
   } catch (error) {
     // Log error details
