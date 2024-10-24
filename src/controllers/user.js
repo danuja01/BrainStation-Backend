@@ -4,6 +4,7 @@ import {
   changeAdminPasswordService,
   enrollModuleService,
   getUserByID,
+  getUserModulesService,
   getUsers,
   saveFcmTokenService,
   unenrollModuleService,
@@ -65,4 +66,11 @@ export const unenrollModuleController = async (req, res) => {
 
   const user = await unenrollModuleService(userId, moduleId);
   return makeResponse({ res, data: user, message: 'User unenrolled from module succesfully' });
+};
+
+export const getUserEnrollModulesController = async (req, res) => {
+  const userId = req.user._id;
+
+  const modules = await getUserModulesService(userId);
+  return makeResponse({ res, data: modules, message: 'User enrolled modules retrieved succesfully' });
 };
