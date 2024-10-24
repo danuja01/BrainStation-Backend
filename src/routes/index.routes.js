@@ -30,6 +30,6 @@ router.use('/assrs', protect, assrsResultRouter);
 router.use('/sessions', sessionRouter);
 router.use('/progress', protect, progressRouter);
 router.use('/algorithm', algorithmRouter);
-router.use('/task', taskRouter);
+router.use('/task', protect, taskRouter);
 
 export default router;
