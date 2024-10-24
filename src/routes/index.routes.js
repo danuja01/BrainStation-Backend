@@ -11,6 +11,7 @@ import progressRouter from './progress.routes';
 import questionRouter from './question.routes';
 import quizRouter from './quiz.routes';
 import sessionRouter from './record.routes';
+import taskRouter from './task.routes';
 import userRouter from './user.routes';
 import { protect } from '@/middleware';
 
@@ -27,7 +28,8 @@ router.use('/lectures', lectureRouter);
 router.use('/modules', moduleRouter);
 router.use('/assrs', assrsResultRouter);
 router.use('/sessions', sessionRouter);
-router.use('/progress', progressRouter);
+router.use('/progress', protect, progressRouter);
 router.use('/algorithm', algorithmRouter);
+router.use('/task', taskRouter);
 
 export default router;
