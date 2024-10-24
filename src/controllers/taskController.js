@@ -10,9 +10,6 @@ export const getTaskRecommendationController = async (req, res) => {
   const { userId, performer_type, lowest_two_chapters } = req.body;
 
   try {
-    // Log incoming request data
-    console.log('Incoming request:', { userId, performer_type, lowest_two_chapters });
-
     // Validate inputs
     if (
       !userId ||
