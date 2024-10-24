@@ -18,7 +18,6 @@ export const getTaskRecommendationController = async (req, res) => {
       !Array.isArray(lowest_two_chapters) ||
       lowest_two_chapters.length < 2
     ) {
-      console.log('Invalid or missing fields.');
       return res.status(400).json({ message: 'Missing or invalid required fields.' });
     }
 
@@ -26,7 +25,6 @@ export const getTaskRecommendationController = async (req, res) => {
     const existingTaskSet = await Task.findOne({ student: userId });
 
     if (existingTaskSet) {
-      console.log(`Removing existing task set for user ${userId}`);
       await Task.deleteOne({ student: userId });
     }
 
