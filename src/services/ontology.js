@@ -25,7 +25,7 @@ export const generateOntologyService = async (slides) => {
       }
     };
 
-    const response = await axios.post('http://localhost:8000/generate-mindmap/', slides, config);
+    const response = await axios.post('http://34.30.64.175:9004/generate-mindmap/', slides, config);
     const markdown = extractMarkdownContent(response.data.mindmap);
 
     return markdown;

@@ -1,7 +1,16 @@
 import express from 'express';
 import { tracedAsyncHandler } from '@sliit-foss/functions';
 import { Segments, celebrate } from 'celebrate';
-import { changeAdminPassword, createAdmin, getAll, getById, saveFcmToken, update } from '@/controllers/user';
+import {
+  changeAdminPassword,
+  createAdmin,
+  enrollModuleController,
+  getAll,
+  getById,
+  saveFcmToken,
+  unenrollModuleController,
+  update
+} from '@/controllers/user';
 import { authorizer } from '@/middleware/auth';
 import { addUserSchema, changePasswordSchema, updateSchema, userIdSchema } from '@/validations/user';
 
@@ -28,6 +37,11 @@ userRouter.patch(
   celebrate({ [Segments.BODY]: changePasswordSchema }),
   tracedAsyncHandler(changeAdminPassword)
 );
+
+userRouter.post('/enroll', authorizer(['STUDENT', 'LECTURER', 'ADMIN']), enrollModuleController);
+
+userRouter.delete('/unenroll', authorizer(['STUDENT', 'LECTURER', 'ADMIN']), unenrollModuleController);
+
 userRouter.patch(
   '/:id',
   celebrate({ [Segments.PARAMS]: userIdSchema, [Segments.BODY]: updateSchema }),
