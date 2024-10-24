@@ -7,12 +7,10 @@ import { recommendTask } from '@/services/taskService';
 const logger = moduleLogger('task-recommendation-controller');
 
 export const getTaskRecommendationController = async (req, res) => {
-  const { userId, performer_type, lowest_two_chapters } = req.body;
+  const { performer_type, lowest_two_chapters } = req.body;
+  const userId = req.user._id; // Assuming you're using a middleware to add `user` object to the request
 
   try {
-    // Log incoming request data
-    console.log('Incoming request:', { userId, performer_type, lowest_two_chapters });
-
     // Validate inputs
     if (
       !userId ||
@@ -21,22 +19,39 @@ export const getTaskRecommendationController = async (req, res) => {
       !Array.isArray(lowest_two_chapters) ||
       lowest_two_chapters.length < 2
     ) {
-      console.log('Invalid or missing fields.');
       return res.status(400).json({ message: 'Missing or invalid required fields.' });
     }
 
-    // Step 1: Remove any existing task set for the given userId
-    const existingTaskSet = await Task.findOne({ student: userId });
+    // Log the input values for debugging
+    console.log('userID:', userId);
+    console.log('performer_type:', performer_type);
+    console.log('lowest_two_chapters:', lowest_two_chapters);
+
+    // Step 1: Check if an existing task set exists for the same user and data
+    const existingTaskSet = await Task.findOne({
+      student: userId,
+      performer_type: performer_type,
+      lowest_two_chapters: { $eq: lowest_two_chapters }
+    });
 
     if (existingTaskSet) {
-      console.log(`Removing existing task set for user ${userId}`);
+      // If the data matches, return the existing task set
+      console.log('Existing task set found, returning it:', existingTaskSet);
+      return res.status(200).json({ data: existingTaskSet });
+    }
+
+    // Step 2: If no matching task set found, delete any old task set for the user
+    const oldTaskSet = await Task.findOne({ student: userId });
+    if (oldTaskSet) {
+      console.log('Deleting old task set for user:', userId);
       await Task.deleteOne({ student: userId });
     }
 
-    // Step 2: Generate new task recommendations based on the new data
+    // Step 3: Generate a new task set based on the new data
     const newTasks = recommendTask(performer_type, lowest_two_chapters);
+    console.log('New tasks generated:', newTasks);
 
-    // Step 3: Save the new task set with the userId
+    // Step 4: Save the new task set
     const newTask = new Task({
       performer_type,
       lowest_two_chapters,
@@ -45,18 +60,19 @@ export const getTaskRecommendationController = async (req, res) => {
     });
 
     const savedTask = await newTask.save();
+    console.log('New task set saved:', savedTask);
 
-    // Return the newly generated task set
+    // Log the successful creation
     logger.info('New task set created:', savedTask);
 
+    // Return the newly generated task set
     return res.status(201).json({ data: savedTask });
   } catch (error) {
-    // Log the error
+    // Log the error and return a 500 status code
     logger.error('Task generation error:', error.message);
     return res.status(500).json({ message: 'Task generation failed', error: error.message });
   }
 };
-
 export const deleteSubtaskFromTaskController = async (req, res) => {
   const { taskId, taskType, taskIndex, subTaskIndex } = req.body;
 
@@ -120,7 +136,7 @@ export const deleteSubtaskFromTaskController = async (req, res) => {
 };
 
 export const getCompletedTasksCount = async (req, res) => {
-  const { userId } = req.params;
+  const userId = req.user._id;
   logger.info('Received userId:', userId);
 
   // Validate if the userId is a valid MongoDB ObjectId
@@ -139,5 +155,26 @@ export const getCompletedTasksCount = async (req, res) => {
   } catch (error) {
     logger.error('Error fetching completed tasks count:', error.message);
     return res.status(500).json({ message: 'Failed to fetch completed tasks count.' });
+  }
+};
+
+export const getCompletedTasksByUserIdController = async (req, res) => {
+  const userId = req.user._id; // Extract userId from the request parameters
+
+  try {
+    // Fetch completed tasks for the given userId
+    const completedTasks = await CompletedTask.find({ student: userId });
+    console.log(completedTasks);
+
+    // If no completed tasks are found, return 404
+    if (completedTasks.length === 0) {
+      return res.status(404).json({ message: 'No completed tasks found for this user ID.' });
+    }
+
+    // Return the completed tasks with a 200 status
+    res.status(200).json({ completedTasks });
+  } catch (error) {
+    logger.error('Error fetching completed tasks by user ID:', error);
+    res.status(500).json({ message: 'Failed to fetch completed tasks', error: error.message });
   }
 };
