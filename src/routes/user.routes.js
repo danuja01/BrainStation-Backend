@@ -7,6 +7,7 @@ import {
   enrollModuleController,
   getAll,
   getById,
+  getUserEnrollModulesController,
   saveFcmToken,
   unenrollModuleController,
   update
@@ -23,6 +24,13 @@ userRouter.post(
   tracedAsyncHandler(createAdmin)
 );
 userRouter.get('/', authorizer(['ADMIN']), tracedAsyncHandler(getAll));
+
+userRouter.get(
+  '/user-modules',
+  authorizer(['STUDENT', 'LECTURER', 'ADMIN']),
+  tracedAsyncHandler(getUserEnrollModulesController)
+);
+
 userRouter.get(
   '/:id',
   authorizer(['ADMIN']),

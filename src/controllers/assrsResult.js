@@ -9,7 +9,7 @@ import { makeResponse } from '@/utils';
 
 // Function to create a new ASRS result
 export const createAssrResultController = async (req, res) => {
-  const userId = req.body.userId;
+  const userId = req.user._id;
   const result = await checkAssrResultExists(userId);
 
   if (result) {
@@ -39,7 +39,7 @@ export const createAssrResultController = async (req, res) => {
 
 // Function to check if an ASRS result exists for a specific user
 export const checkAssrResultExistsController = async (req, res) => {
-  const userId = req.params.userId;
+  const userId = req.user._id;
   const result = await checkAssrResultExists(userId);
 
   return res.status(200).json({ exists: !!result });
@@ -47,7 +47,7 @@ export const checkAssrResultExistsController = async (req, res) => {
 
 // Function to check if the existing ASRS result is older than 6 months
 export const checkAssrResultAgeController = async (req, res) => {
-  const userId = req.params.userId;
+  const userId = req.user._id;
   const result = await checkAssrResultExists(userId);
 
   if (result) {
@@ -65,7 +65,7 @@ export const checkAssrResultAgeController = async (req, res) => {
 
 // Function to update an ASRS result
 export const updateAssrResultController = async (req, res) => {
-  const userId = req.params.userId;
+  const userId = req.user._id;
   const updatedData = req.body;
   const updatedAssrResult = await modifyAssrResult(userId, updatedData);
   return res.status(200).json({ message: 'ASRS Result updated successfully', data: updatedAssrResult });

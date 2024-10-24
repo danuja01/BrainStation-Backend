@@ -1,4 +1,5 @@
 import express from 'express';
+import { protect } from '@/middleware';
 import algorithmRouter from './algorithm.routes';
 import analyticsRouter from './analytics.routes';
 import assrsResultRouter from './assrsResult.routes';
@@ -13,7 +14,6 @@ import quizRouter from './quiz.routes';
 import sessionRouter from './record.routes';
 import taskRouter from './task.routes';
 import userRouter from './user.routes';
-import { protect } from '@/middleware';
 
 const router = express.Router();
 
@@ -23,10 +23,10 @@ router.use('/questions', protect, questionRouter);
 router.use('/quizzes', protect, quizRouter);
 router.use('/analytics', protect, analyticsRouter);
 router.use('/forecast', protect, forcastRouter);
-router.use('/ontology', ontologyRouter);
-router.use('/lectures', lectureRouter);
+router.use('/ontology', protect, ontologyRouter);
+router.use('/lectures', protect, lectureRouter);
 router.use('/modules', moduleRouter);
-router.use('/assrs', assrsResultRouter);
+router.use('/assrs', protect, assrsResultRouter);
 router.use('/sessions', sessionRouter);
 router.use('/progress', protect, progressRouter);
 router.use('/algorithm', algorithmRouter);
