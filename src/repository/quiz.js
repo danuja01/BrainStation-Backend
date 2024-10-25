@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import { buildQuizAggregation, buildUserQuizzesDueDetailsAggregation } from '@/helpers/buildQuizAggregation';
+import { buildQuizAggregation, buildUserQuizzesDueDetailsAggregation } from '@/helpers/buildAggregations';
 import { convertToObjectId } from '@/helpers/convertToObjectId';
 import Quiz from '@/models/quiz';
 

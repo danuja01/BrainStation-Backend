@@ -96,3 +96,13 @@ export const buildUserQuizzesDueDetailsAggregation = (userId) => {
     }
   ];
 };
+
+export const buildQuestionCountByLectureAggregation = (lectureIds) => [
+  { $match: { lectureId: { $in: lectureIds } } },
+  {
+    $group: {
+      _id: '$lectureId',
+      questionCount: { $sum: 1 }
+    }
+  }
+];

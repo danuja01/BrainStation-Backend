@@ -10,11 +10,17 @@ import {
   getFlaggedQuestions,
   getOneQuestion,
   getQuestionById,
+  getQuestionCountByModule,
   updateQuestion,
   viewQuestions
 } from '@/controllers/question';
 import { authorizer } from '@/middleware/auth';
-import { bulkInsertQuestionsSchema, questionCreateSchema, questionIdSchema } from '@/validations/question';
+import {
+  bulkInsertQuestionsSchema,
+  moduleIdSchema,
+  questionCreateSchema,
+  questionIdSchema
+} from '@/validations/question';
 
 const questionRouter = express.Router();
 
@@ -41,6 +47,12 @@ questionRouter.get('/', tracedAsyncHandler(viewQuestions));
 // Flagged questions
 // REVOKED!
 questionRouter.get('/flagged', authorizer(['ADMIN']), tracedAsyncHandler(getFlaggedQuestions));
+
+questionRouter.get(
+  '/count/:moduleId',
+  celebrate({ [Segments.PARAMS]: moduleIdSchema }),
+  tracedAsyncHandler(getQuestionCountByModule)
+);
 
 // Individual question routes
 questionRouter.get('/:id', celebrate({ [Segments.PARAMS]: questionIdSchema }), tracedAsyncHandler(getQuestionById));

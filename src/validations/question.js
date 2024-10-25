@@ -4,6 +4,10 @@ export const questionIdSchema = {
   id: Joi.string().hex().length(24).required()
 };
 
+export const moduleIdSchema = {
+  moduleId: Joi.string().hex().length(24).required()
+};
+
 export const questionCreateSchema = {
   context: Joi.string().required(),
   question: Joi.string().required(),
