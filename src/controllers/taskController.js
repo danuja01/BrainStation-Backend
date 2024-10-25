@@ -17,9 +17,9 @@ export const getTaskRecommendationController = async (req, res) => {
     }
 
     // Log input values for debugging
-    console.log('userID:', userId);
-    console.log('performer_type:', performer_type);
-    console.log('lowest_two_chapters:', lowest_two_chapters || 'Not provided');
+    // console.log('userID:', userId);
+    // console.log('performer_type:', performer_type);
+    // console.log('lowest_two_chapters:', lowest_two_chapters || 'Not provided');
 
     // Step 1: Check if an existing task set exists for the same user and data
     const existingTaskSet = await Task.findOne({
@@ -29,14 +29,14 @@ export const getTaskRecommendationController = async (req, res) => {
     });
 
     if (existingTaskSet) {
-      console.log('Existing task set found, returning it:', existingTaskSet);
+      // console.log('Existing task set found, returning it:', existingTaskSet);
       return res.status(200).json({ data: existingTaskSet });
     }
 
     // Step 2: Delete any old task set for the user if no matching task set is found
     const oldTaskSet = await Task.findOne({ student: userId });
     if (oldTaskSet) {
-      console.log('Deleting old task set for user:', userId);
+      // console.log('Deleting old task set for user:', userId);
       await Task.deleteOne({ student: userId });
     }
 
@@ -47,10 +47,10 @@ export const getTaskRecommendationController = async (req, res) => {
       newTasks = recommendTask(performer_type, lowest_two_chapters);
     } else {
       // Generate tasks based only on performer_type when chapters are missing
-      console.log("lowest_two_chapters missing or incomplete, generating general tasks only.");
+      //   console.log('lowest_two_chapters missing or incomplete, generating general tasks only.');
       newTasks = recommendTask(performer_type, []); // Pass an empty array for chapters
     }
-    console.log('New tasks generated:', newTasks);
+    //  console.log('New tasks generated:', newTasks);
 
     // Step 4: Save the new task set
     const newTask = new Task({
@@ -61,7 +61,7 @@ export const getTaskRecommendationController = async (req, res) => {
     });
 
     const savedTask = await newTask.save();
-    console.log('New task set saved:', savedTask);
+    //   console.log('New task set saved:', savedTask);
 
     // Log the successful creation
     logger.info('New task set created:', savedTask);
@@ -73,8 +73,6 @@ export const getTaskRecommendationController = async (req, res) => {
     return res.status(500).json({ message: 'Task generation failed', error: error.message });
   }
 };
-
-
 
 export const deleteSubtaskFromTaskController = async (req, res) => {
   const { taskId, taskType, taskIndex, subTaskIndex } = req.body;
@@ -167,7 +165,7 @@ export const getCompletedTasksByUserIdController = async (req, res) => {
   try {
     // Fetch completed tasks for the given userId
     const completedTasks = await CompletedTask.find({ student: userId });
-    console.log(completedTasks);
+    // console.log(completedTasks);
 
     // If no completed tasks are found, return 404
     if (completedTasks.length === 0) {

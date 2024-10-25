@@ -8,14 +8,13 @@ import {
   getSessionByIdController,
   getSessionByUserController,
   getSessionDataController,
-  getSessionsOfUserByModuleController,
-  getStartAndEndTimesOfUsersModuleController,
+  getSessionsOfUserByModuleController, // getStartAndEndTimesOfUsersModuleController,
   getTotalFocusTimeOfUsersModuleController,
   getTotalSessionDurationByUserController
 } from '@/controllers/session';
+// import { authorizer } from '@/middleware/auth';
 import { focusRecordIdSchema } from '@/validations/focusRecords';
 
-import { authorizer } from '@/middleware/auth';
 const sessionRouter = express.Router();
 
 // Route to create a new session
@@ -41,16 +40,12 @@ sessionRouter.get(
 //   tracedAsyncHandler(getStartAndEndTimesOfUsersModuleController)
 // );
 
-
 // sessionRouter.get(
 //   '/start-end-times/',
 //   authorizer(['STUDENT', 'LECTURER', 'ADMIN']),
 //   celebrate({ [Segments.PARAMS]: focusRecordIdSchema }), // Validation with celebrate
 //   tracedAsyncHandler(getStartAndEndTimesOfUsersModuleController)
 // );
-
-
-
 
 // Route to get user total focus time per module
 sessionRouter.get(
