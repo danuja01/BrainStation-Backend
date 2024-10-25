@@ -7,8 +7,24 @@ import {
   // getModulesAndScoresByUserController,
   // getTaskRecommendationController,
   postPredictionController, // postPredictionForAllModulesController,
-  predictScoresForModules
+  predictScoresForModules,
+
+  getStudentCumulativeAverage 
 } from '@/controllers/progressController';
+
+import {
+  // deleteSubtaskFromTaskController,
+  // getCompletedTasksByTaskIdController,
+  // getCompletedTasksCount,
+  // getModulesAndScoresByUserController,
+  getStudentAlerts,
+  getLecturePerformance
+} from '@/controllers/dashboard';
+
+
+
+
+
 import { authorizer } from '@/middleware/auth';
 
 const progressRouter = express.Router();
@@ -27,42 +43,29 @@ progressRouter.get(
   tracedAsyncHandler(predictScoresForModules)
 );
 
-// // Route to get task recommendations by Student ID
-// progressRouter.post(
-//   '/task-recommendation',
-//   authorizer(['STUDENT', 'LECTURER', 'ADMIN']),
-//   tracedAsyncHandler(getTaskRecommendationController)
-// );
 
-// // progressRouter.post('/delete-subtasks', tracedAsyncHandler(deleteSubtaskFromTaskController));
 
-// progressRouter.post(
-//   '/delete-subtask',
-//   authorizer(['STUDENT', 'LECTURER', 'ADMIN']),
-//   (req, res, next) => {
-//     next(); // Pass the request to the actual controller
-//   },
-//   deleteSubtaskFromTaskController
-// );
+progressRouter.get(
+  '/cumulative-average',
+  authorizer(['STUDENT', 'LECTURER', 'ADMIN']),
+  tracedAsyncHandler(getStudentCumulativeAverage)
+);
 
-// progressRouter.get(
-//   '/completed-tasks/:taskId',
-//   authorizer(['STUDENT', 'LECTURER', 'ADMIN']),
-//   getCompletedTasksByTaskIdController
-// );
-// // Add this in your progress.routes.js
-// progressRouter.get('/completed-tasks-count/:studentId', tracedAsyncHandler(getCompletedTasksCount));
-// // progressRouter.get('/user-data/:userId', tracedAsyncHandler(getUserData));
-// progressRouter.post(
-//   '/predict-all-modules',
-//   authorizer(['STUDENT', 'LECTURER', 'ADMIN']),
-//   tracedAsyncHandler(postPredictionForAllModulesController)
-// );
-// // Route to get completed modules by user ID
-// progressRouter.get(
-//   '/user/:userId/modules',
-//   authorizer(['STUDENT', 'LECTURER', 'ADMIN']),
-//   tracedAsyncHandler(getModulesAndScoresByUserController)
-// );
+
+
+progressRouter.get(
+  '/lecture-performance/',
+  authorizer(['STUDENT', 'LECTURER', 'ADMIN']),
+  tracedAsyncHandler(getLecturePerformance)
+);
+
+
+progressRouter.get(
+  '/alerts',
+  authorizer(['STUDENT', 'LECTURER', 'ADMIN']),
+  tracedAsyncHandler(getStudentAlerts)
+);
+
+
 
 export default progressRouter;
