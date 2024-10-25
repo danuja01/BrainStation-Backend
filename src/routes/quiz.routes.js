@@ -7,6 +7,7 @@ import {
   getQuizzesController,
   getQuizzesScoreController,
   getUserQuizzesDueController,
+  getUserQuizzesDueDetailsController,
   respondToQuiz
 } from '@/controllers/quiz';
 import { quizResponseSchema } from '@/validations/quiz';
@@ -18,6 +19,7 @@ quizRouter.get('/score', tracedAsyncHandler(getQuizzesScoreController));
 quizRouter.post('/respond', celebrate({ [Segments.BODY]: quizResponseSchema }), tracedAsyncHandler(respondToQuiz));
 quizRouter.post('/feedback', tracedAsyncHandler(feedbackController));
 quizRouter.get('/due', tracedAsyncHandler(getUserQuizzesDueController));
+quizRouter.get('/due/details', tracedAsyncHandler(getUserQuizzesDueDetailsController));
 quizRouter.get('/attempt/:lectureId', tracedAsyncHandler(getAttemptQuizIndexController));
 
 export default quizRouter;

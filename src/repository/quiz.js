@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import { buildQuizAggregation } from '@/helpers/buildQuizAggregation';
+import { buildQuizAggregation, buildUserQuizzesDueDetailsAggregation } from '@/helpers/buildQuizAggregation';
 import { convertToObjectId } from '@/helpers/convertToObjectId';
 import Quiz from '@/models/quiz';
 
@@ -135,6 +135,16 @@ export const getUserQuizzesDueByToday = async ({
 
   const aggregate = buildQuizAggregation(filter, sort);
   return await Quiz.aggregatePaginate(aggregate, { page, limit });
+};
+
+export const getUserQuizzesDueDetails = async (userId) => {
+  const aggregationPipeline = buildUserQuizzesDueDetailsAggregation(userId);
+  const result = await Quiz.aggregate(aggregationPipeline);
+
+  return {
+    dueTodayCount: result[0]?.dueTodayCount || 0,
+    learningPhaseCount: result[0]?.learningPhaseCount || 0
+  };
 };
 
 export const getAttemptQuizIndex = async (userId, lectureId) => {

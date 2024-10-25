@@ -3,6 +3,7 @@ import {
   getQuizPerformance,
   getQuizzesScoreService,
   getQuizzesService,
+  getUserQuizzesDueDetailsService,
   getUserQuizzesDueService
 } from '@/services/quiz';
 import { handleQuizResponse } from '@/services/spacedRepetition';
@@ -52,6 +53,17 @@ export const getUserQuizzesDueController = async (req, res) => {
       data: quizzes,
       message: 'Quizzes due today or earlier retrieved successfully'
     });
+  } catch (error) {
+    return res.status(500).json({ message: 'Internal Server Error' });
+  }
+};
+
+export const getUserQuizzesDueDetailsController = async (req, res) => {
+  const userId = req.user._id;
+
+  try {
+    const dueDetails = await getUserQuizzesDueDetailsService(userId);
+    return makeResponse({ res, data: dueDetails, message: 'Quizzes due details retrieved successfully' });
   } catch (error) {
     return res.status(500).json({ message: 'Internal Server Error' });
   }
