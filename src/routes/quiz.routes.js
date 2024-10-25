@@ -3,6 +3,7 @@ import { tracedAsyncHandler } from '@sliit-foss/functions';
 import { Segments, celebrate } from 'celebrate';
 import { feedbackController } from '@/controllers/openai';
 import {
+  getAttemptQuizIndexController,
   getQuizzesController,
   getQuizzesScoreController,
   getUserQuizzesDueController,
@@ -17,5 +18,6 @@ quizRouter.get('/score', tracedAsyncHandler(getQuizzesScoreController));
 quizRouter.post('/respond', celebrate({ [Segments.BODY]: quizResponseSchema }), tracedAsyncHandler(respondToQuiz));
 quizRouter.post('/feedback', tracedAsyncHandler(feedbackController));
 quizRouter.get('/due', tracedAsyncHandler(getUserQuizzesDueController));
+quizRouter.get('/attempt/:lectureId', tracedAsyncHandler(getAttemptQuizIndexController));
 
 export default quizRouter;

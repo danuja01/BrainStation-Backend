@@ -136,3 +136,15 @@ export const getUserQuizzesDueByToday = async ({
   const aggregate = buildQuizAggregation(filter, sort);
   return await Quiz.aggregatePaginate(aggregate, { page, limit });
 };
+
+export const getAttemptQuizIndex = async (userId, lectureId) => {
+  const quizzes = await Quiz.find({ userId, lectureId }).sort({ attempt_question: -1 });
+
+  // Map the result to the desired format
+  const quizArray = quizzes.map((quiz) => ({
+    questionId: quiz.questionId,
+    attempt_question: quiz.attempt_question
+  }));
+
+  return quizArray;
+};
