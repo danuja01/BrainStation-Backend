@@ -8,6 +8,7 @@ import {
   findStartAndEndTimesOfUsersModule,
   findTotalFocusTimeOfUsersModule,
   findTotalSessionDurationByUser,
+  getAdhdClassificationFeedbackService,
   getSessionData
 } from '@/services/focus-record';
 import { makeResponse } from '@/utils/response';
@@ -132,4 +133,12 @@ export const getSessionDataController = async (req, res) => {
   } catch (error) {
     return res.status(500).json({ message: 'Internal Server Error' });
   }
+};
+
+export const getAdhdClassificationFeedbackController = async (req, res) => {
+  const userId = req.user._id;
+
+  const data = await getAdhdClassificationFeedbackService(userId);
+
+  return makeResponse({ res, data: data, message: 'feedback generated successfully' });
 };
