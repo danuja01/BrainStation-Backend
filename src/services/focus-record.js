@@ -18,7 +18,7 @@ export const addSession = async (data) => {
   try {
     await createSession(data);
   } catch (error) {
-    throw new createError(500, 'Error when saving session');
+    throw new createError(500, `Error when saving session- ${error}`);
   }
 };
 

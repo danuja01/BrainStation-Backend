@@ -1,12 +1,7 @@
-// import { moduleLogger } from '@sliit-foss/module-logger';
-// import mongoose from 'mongoose';
-import { getUserData } from '@/controllers/algorithm';
-// import CompletedTask from '@/models/completedTaskModel';
-// import Task from '@/models/taskModel';
+import { getEnrolledModules, getUserData } from '@/controllers/algorithm';
 import { predictExamScore, predictScoresForAllModules } from '@/services/progressService';
-import { makeResponse } from '@/utils';
+import { makeResponse } from '@/utils/response';
 
-// Controller to fetch student Prediction by student ID and Module ID
 export const postPredictionController = async (req, res) => {
   const { userId, moduleId } = req.body;
 
@@ -30,13 +25,47 @@ export const predictScoresForModules = async (req, res) => {
     const userId = req.user._id;
     const predictions = await predictScoresForAllModules(userId);
     if (!predictions) {
-      // Log if predictions are missing
       return res.status(404).json({ message: 'No predictions found for this user.' });
     }
     return res.status(200).json(predictions);
   } catch (error) {
-    // Log error details
     return res.status(500).json({ message: `Failed to predict scores: ${error.message}` });
+  }
+};
+
+export const getStudentCumulativeAverage = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const enrolledModules = await getEnrolledModules(userId);
+
+    if (!enrolledModules || enrolledModules.length === 0) {
+      return res.status(404).json({ message: 'No enrolled modules found for this student.' });
+    }
+
+    let totalAverageScore = 0;
+    let moduleCount = 0;
+
+    for (const module of enrolledModules) {
+      const moduleData = await getUserData(userId, module._id);
+
+      if (moduleData && moduleData.averageScore) {
+        totalAverageScore += parseFloat(moduleData.averageScore);
+        moduleCount++;
+      }
+    }
+
+    if (moduleCount === 0) {
+      return res.status(200).json({ message: 'No average scores available for enrolled modules.' });
+    }
+
+    const percentage = totalAverageScore / moduleCount; // Assuming averageScore is in a 0-100 scale
+
+    return res.status(200).json({ percentage: percentage.toFixed(2) });
+  } catch (error) {
+    return res.status(500).json({
+      message: 'Detailed error in cumulative average calculation',
+      error: error.message
+    });
   }
 };
 
