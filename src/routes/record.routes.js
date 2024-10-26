@@ -8,7 +8,8 @@ import {
   getSessionByIdController,
   getSessionByUserController,
   getSessionDataController,
-  getSessionsOfUserByModuleController, // getStartAndEndTimesOfUsersModuleController,
+  getSessionsOfUserByModuleController,
+  getStartAndEndTimesOfUsersModuleController,
   getTotalFocusTimeOfUsersModuleController,
   getTotalSessionDurationByUserController
 } from '@/controllers/session';
