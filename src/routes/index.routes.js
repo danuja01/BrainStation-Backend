@@ -27,7 +27,7 @@ router.use('/ontology', protect, ontologyRouter);
 router.use('/lectures', protect, lectureRouter);
 router.use('/modules', moduleRouter);
 router.use('/assrs', protect, assrsResultRouter);
-router.use('/sessions', sessionRouter);
+router.use('/sessions', protect, sessionRouter);
 router.use('/progress', protect, progressRouter);
 router.use('/algorithm', algorithmRouter);
 router.use('/task', protect, taskRouter);

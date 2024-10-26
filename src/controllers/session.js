@@ -13,7 +13,21 @@ import {
 import { makeResponse } from '@/utils/response';
 
 export const addSessionController = async (req, res) => {
-  const newSession = await addSession(req.body);
+  const session = {
+    userId: req.user._id,
+    moduleId: req.body.moduleId,
+    startTime: req.body.startTime,
+    stopTime: req.body.stopTime,
+    date: req.body.date,
+    final_classification: req.body.final_classification || null,
+    focus_time: req.body.focus_time || null,
+    total_movements: req.body.total_movements || null,
+    erratic_movements: req.body.erratic_movements || null,
+    erratic_percentage: req.body.erratic_percentage || null,
+    emotion_distribution: req.body.emotion_distribution || null
+  };
+
+  const newSession = await addSession(session);
   return makeResponse({ res, status: 201, data: newSession, message: 'Session added successfully' });
 };
 
@@ -28,7 +42,7 @@ export const getSessionByIdController = async (req, res) => {
 };
 
 export const getSessionByUserController = async (req, res) => {
-  const userId = req.params.userId;
+  const userId = req.user._id;
 
   const data = await findAllSessionsByUserId(userId, req.query);
 
@@ -37,7 +51,7 @@ export const getSessionByUserController = async (req, res) => {
 
 export const getSessionsOfUserByModuleController = async (req, res) => {
   try {
-    const userId = req.params.userId;
+    const userId = req.user._id;
     const moduleId = req.query.filter.moduleId;
 
     const data = await findSessionsOfUserByModule(userId, moduleId, req.query);
@@ -50,7 +64,7 @@ export const getSessionsOfUserByModuleController = async (req, res) => {
 
 export const getStartAndEndTimesOfUsersModuleController = async (req, res) => {
   try {
-    const userId = req.params.userId;
+    const userId = req.user._id;
     const moduleId = req.query.filter.moduleId;
 
     const data = await findStartAndEndTimesOfUsersModule(userId, moduleId);
@@ -63,7 +77,7 @@ export const getStartAndEndTimesOfUsersModuleController = async (req, res) => {
 
 export const getTotalFocusTimeOfUsersModuleController = async (req, res) => {
   try {
-    const userId = req.params.userId;
+    const userId = req.user._id;
     const moduleId = req.query.filter.moduleId;
 
     const data = await findTotalFocusTimeOfUsersModule(userId, moduleId);
@@ -76,7 +90,7 @@ export const getTotalFocusTimeOfUsersModuleController = async (req, res) => {
 
 export const getAverageFocusTimeofUsersModuleController = async (req, res) => {
   try {
-    const userId = req.params.userId;
+    const userId = req.user._id;
     const moduleId = req.query.filter.moduleId;
 
     const data = await findAverageFocusTimeofUsersModule(userId, moduleId);
@@ -89,7 +103,7 @@ export const getAverageFocusTimeofUsersModuleController = async (req, res) => {
 
 export const getAverageFocusTimeByUserController = async (req, res) => {
   try {
-    const userId = req.params.userId;
+    const userId = req.user._id;
 
     const data = await findAverageFocusTimeByUser(userId);
 
@@ -100,7 +114,7 @@ export const getAverageFocusTimeByUserController = async (req, res) => {
 };
 
 export const getTotalSessionDurationByUserController = async (req, res) => {
-  const userId = req.params.userId;
+  const userId = req.user._id;
 
   // Call the service function to get the total session duration
   const totalDuration = await findTotalSessionDurationByUser(userId);
@@ -110,7 +124,7 @@ export const getTotalSessionDurationByUserController = async (req, res) => {
 
 export const getSessionDataController = async (req, res) => {
   try {
-    const userId = req.params.userId;
+    const userId = req.user._id;
 
     const data = await getSessionData(userId);
 
