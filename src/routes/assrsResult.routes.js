@@ -4,6 +4,7 @@ import {
   checkAssrResultAgeController,
   checkAssrResultExistsController,
   createAssrResultController,
+  getAlternativeAssrController,
   getOneAssr,
   updateAssrResultController
 } from '@/controllers/assrsResult';
@@ -33,6 +34,12 @@ assrsResultRouter.get(
 );
 
 assrsResultRouter.get('/getByUser', authorizer(['STUDENT', 'LECTURER', 'ADMIN']), tracedAsyncHandler(getOneAssr));
+
+assrsResultRouter.get(
+  '/alternate-questions',
+  authorizer(['STUDENT', 'LECTURER', 'ADMIN']),
+  tracedAsyncHandler(getAlternativeAssrController)
+);
 
 // Route to update an ASRS result
 assrsResultRouter.patch(
