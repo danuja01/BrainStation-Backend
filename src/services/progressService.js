@@ -18,7 +18,7 @@ export const predictExamScore = async (studentData) => {
         const description = await getChapterDescriptions(chapter.chapter);
         return {
           chapter: chapter.chapter,
-          description: description, // Correct reference to description
+          description: description,
           score: chapter.score
         };
       } catch (error) {
@@ -70,12 +70,12 @@ export const predictScoresForAllModules = async (userId) => {
       throw new Error('No modules found for this user.');
     }
 
-    let focusToStudyRatio = null; // Initialize it to null for now
-    let totalScore = 0; // To calculate the overall average score
-    let lectureCount = 0; // To count total lectures
-    const completedModulePredictions = []; // For completed modules with scores
-    const noQuizModules = []; // For modules where no quizzes have been done
-    const lowestTwoChapters = []; // Overall lowest 2 chapters across all modules
+    let focusToStudyRatio = null;
+    let totalScore = 0;
+    let lectureCount = 0;
+    const completedModulePredictions = [];
+    const noQuizModules = [];
+    const lowestTwoChapters = [];
 
     // Go through each enrolled module
     await Promise.all(
@@ -83,32 +83,26 @@ export const predictScoresForAllModules = async (userId) => {
         const studentData = await getUserData(userId, module._id);
 
         if (studentData.quizzes.length === 0) {
-          // No quizzes completed in this module
           noQuizModules.push({
             moduleId: module._id,
             moduleName: module.name,
             predictedExamScore: 'You are not done any lectures in this module'
           });
         } else {
-          // Quizzes completed, calculate predicted score and lowest chapters
           const predictedExamScore = studentData.averageScore;
           const lowestModuleChapters = getLowestTwoChapters(studentData);
 
-          // Add module with predicted score
           completedModulePredictions.push({
             moduleId: module._id,
             moduleName: module.name,
             predictedExamScore
           });
 
-          // Add lowest chapters from this module to overall lowest chapter pool
           lowestTwoChapters.push(...lowestModuleChapters);
 
-          // Update total score and lecture count
           totalScore += parseFloat(studentData.totalScore);
           lectureCount += studentData.quizzes.length;
 
-          // Set focus-to-study ratio based on the first module where quizzes are done
           if (!focusToStudyRatio) {
             focusToStudyRatio = studentData.focusLevel / studentData.timeSpentStudying;
           }
@@ -135,7 +129,6 @@ export const predictScoresForAllModules = async (userId) => {
       })
     );
 
-    // Determine highest and lowest score modules from completed modules
     let highestScoreModule = null;
     let lowestScoreModule = null;
 
@@ -148,7 +141,6 @@ export const predictScoresForAllModules = async (userId) => {
       );
     }
 
-    // Handle the case where only one module is done and the other is enrolled but not completed
     if (completedModulePredictions.length === 1 && noQuizModules.length > 0) {
       lowestScoreModule = {
         moduleName: 'Not done any quizzes',
@@ -171,11 +163,11 @@ export const predictScoresForAllModules = async (userId) => {
     const studyRecommendations = [];
     if (focusToStudyRatio) {
       if (focusToStudyRatio > 0.75) {
-        studyRecommendations.push('Study for 1 hour and 15 minutes, followed by a 15-minute break.');
+        studyRecommendations.push(' 1 hour and 15 minutes, followed by a 15-minute break.');
       } else if (focusToStudyRatio > 0.5) {
-        studyRecommendations.push('Study for 45 minutes, followed by a 10-minute break.');
+        studyRecommendations.push('45 minutes, followed by a 10-minute break.');
       } else {
-        studyRecommendations.push('Study for 30 minutes, followed by a 5-minute break.');
+        studyRecommendations.push(' 30 minutes, followed by a 5-minute break.');
       }
       studyRecommendations.push('Take regular breaks to maintain focus and retention.');
     }
@@ -195,8 +187,8 @@ export const predictScoresForAllModules = async (userId) => {
             moduleId: lowestScoreModule.moduleId
           }
         : { message: 'No lowest score module available' },
-      studyRecommendations, // Add study session recommendations
-      performerType // Add performer type based on average score
+      studyRecommendations,
+      performerType
     };
   } catch (error) {
     throw new Error(`Failed to predict scores for all modules: ${error.message}`);
