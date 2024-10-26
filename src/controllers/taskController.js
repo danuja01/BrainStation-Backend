@@ -11,14 +11,8 @@ export const getTaskRecommendationController = async (req, res) => {
   const userId = req.user._id; // Assuming you're using a middleware to add `user` object to the request
 
   try {
-    // Validate inputs
-    if (
-      !userId ||
-      !performer_type ||
-      !lowest_two_chapters ||
-      !Array.isArray(lowest_two_chapters) ||
-      lowest_two_chapters.length < 2
-    ) {
+    // Validate required fields `userId` and `performer_type`
+    if (!userId || !performer_type) {
       return res.status(400).json({ message: 'Missing or invalid required fields.' });
     }
 
@@ -26,7 +20,7 @@ export const getTaskRecommendationController = async (req, res) => {
     const existingTaskSet = await Task.findOne({
       student: userId,
       performer_type: performer_type,
-      lowest_two_chapters: { $eq: lowest_two_chapters }
+      ...(lowest_two_chapters && { lowest_two_chapters: { $eq: lowest_two_chapters } })
     });
 
     if (existingTaskSet) {
@@ -34,19 +28,26 @@ export const getTaskRecommendationController = async (req, res) => {
       return res.status(200).json({ data: existingTaskSet });
     }
 
-    // Step 2: If no matching task set found, delete any old task set for the user
+    // Step 2: Delete any old task set for the user if no matching task set is found
     const oldTaskSet = await Task.findOne({ student: userId });
     if (oldTaskSet) {
       await Task.deleteOne({ student: userId });
     }
 
-    // Step 3: Generate a new task set based on the new data
-    const newTasks = recommendTask(performer_type, lowest_two_chapters);
+    // Step 3: Conditional Task Generation Based on Data Availability
+    let newTasks;
+    if (lowest_two_chapters && lowest_two_chapters.length >= 2) {
+      // Generate full task set including chapter-specific tasks
+      newTasks = recommendTask(performer_type, lowest_two_chapters);
+    } else {
+      // Generate tasks based only on performer_type when chapters are missing
+      newTasks = recommendTask(performer_type, []); // Pass an empty array for chapters
+    }
 
     // Step 4: Save the new task set
     const newTask = new Task({
       performer_type,
-      lowest_two_chapters,
+      lowest_two_chapters: lowest_two_chapters || [], // Save as empty array if not provided
       tasks: newTasks,
       student: userId
     });
@@ -59,11 +60,11 @@ export const getTaskRecommendationController = async (req, res) => {
     // Return the newly generated task set
     return res.status(201).json({ data: savedTask });
   } catch (error) {
-    // Log the error and return a 500 status code
     logger.error('Task generation error:', error.message);
     return res.status(500).json({ message: 'Task generation failed', error: error.message });
   }
 };
+
 export const deleteSubtaskFromTaskController = async (req, res) => {
   const { taskId, taskType, taskIndex, subTaskIndex } = req.body;
 
@@ -150,18 +151,15 @@ export const getCompletedTasksCount = async (req, res) => {
 };
 
 export const getCompletedTasksByUserIdController = async (req, res) => {
-  const userId = req.user._id; // Extract userId from the request parameters
+  const userId = req.user._id;
 
   try {
-    // Fetch completed tasks for the given userId
     const completedTasks = await CompletedTask.find({ student: userId });
 
-    // If no completed tasks are found, return 404
     if (completedTasks.length === 0) {
       return res.status(404).json({ message: 'No completed tasks found for this user ID.' });
     }
 
-    // Return the completed tasks with a 200 status
     res.status(200).json({ completedTasks });
   } catch (error) {
     logger.error('Error fetching completed tasks by user ID:', error);
