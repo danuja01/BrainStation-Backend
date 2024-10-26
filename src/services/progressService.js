@@ -18,7 +18,7 @@ export const predictExamScore = async (studentData) => {
         const description = await getChapterDescriptions(chapter.chapter);
         return {
           chapter: chapter.chapter,
-          description: description, 
+          description: description,
           score: chapter.score
         };
       } catch (error) {
@@ -70,12 +70,12 @@ export const predictScoresForAllModules = async (userId) => {
       throw new Error('No modules found for this user.');
     }
 
-    let focusToStudyRatio = null; 
-    let totalScore = 0; 
-    let lectureCount = 0; 
-    const completedModulePredictions = []; 
+    let focusToStudyRatio = null;
+    let totalScore = 0;
+    let lectureCount = 0;
+    const completedModulePredictions = [];
     const noQuizModules = [];
-    const lowestTwoChapters = []; 
+    const lowestTwoChapters = [];
 
     // Go through each enrolled module
     await Promise.all(
@@ -100,11 +100,9 @@ export const predictScoresForAllModules = async (userId) => {
 
           lowestTwoChapters.push(...lowestModuleChapters);
 
-         
           totalScore += parseFloat(studentData.totalScore);
           lectureCount += studentData.quizzes.length;
 
-          
           if (!focusToStudyRatio) {
             focusToStudyRatio = studentData.focusLevel / studentData.timeSpentStudying;
           }
@@ -142,7 +140,6 @@ export const predictScoresForAllModules = async (userId) => {
         (prev.predictedExamScore < curr.predictedExamScore ? prev : curr)
       );
     }
-
 
     if (completedModulePredictions.length === 1 && noQuizModules.length > 0) {
       lowestScoreModule = {
@@ -190,8 +187,8 @@ export const predictScoresForAllModules = async (userId) => {
             moduleId: lowestScoreModule.moduleId
           }
         : { message: 'No lowest score module available' },
-      studyRecommendations, 
-      performerType 
+      studyRecommendations,
+      performerType
     };
   } catch (error) {
     throw new Error(`Failed to predict scores for all modules: ${error.message}`);

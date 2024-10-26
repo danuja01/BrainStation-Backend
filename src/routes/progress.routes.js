@@ -1,12 +1,9 @@
 import express from 'express';
 import { tracedAsyncHandler } from '@sliit-foss/functions';
-import {
-  getLecturePerformance, 
-  getStudentAlerts
-} from '@/controllers/dashboard';
+import { getLecturePerformance, getStudentAlerts } from '@/controllers/dashboard';
 import {
   getStudentCumulativeAverage,
-  postPredictionController, 
+  postPredictionController,
   predictScoresForModules
 } from '@/controllers/progressController';
 import { authorizer } from '@/middleware/auth';

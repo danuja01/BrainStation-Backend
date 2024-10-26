@@ -2,22 +2,17 @@ import { getEnrolledModules, getUserData } from '@/controllers/algorithm';
 import { addSession } from '@/services/focus-record';
 import { makeResponse } from '@/utils';
 
-
-
 export const getLecturePerformance = async (req, res) => {
   try {
     const userId = req.user._id;
 
-  
     const enrolledModules = await getEnrolledModules(userId);
 
     const lecturePerformanceData = [];
 
-   
     for (const module of enrolledModules) {
       const moduleData = await getUserData(userId, module._id);
 
-      
       moduleData.quizzes.forEach((lecture) => {
         lecturePerformanceData.push({
           lectureTitle: lecture.lectureTitles,
@@ -28,7 +23,6 @@ export const getLecturePerformance = async (req, res) => {
 
     return res.status(200).json({ lecturePerformance: lecturePerformanceData });
   } catch (error) {
-    
     return res.status(500).json({ message: 'Failed to retrieve lecture performance', error: error.message });
   }
 };
@@ -53,17 +47,13 @@ export const getStudentAlerts = async (req, res) => {
     let moduleCount = 0;
 
     for (const module of enrolledModules) {
-      try {
-        const moduleData = await getUserData(userId, module._id);
+      const moduleData = await getUserData(userId, module._id);
 
-        if (moduleData) {
-          totalFocus += moduleData.focusLevel || 0;
-          totalStudyTime += moduleData.timeSpentStudying || 0;
-          totalExamScore += parseFloat(moduleData.averageScore) || 0;
-          moduleCount++;
-        }
-      } catch (error) {
-        
+      if (moduleData) {
+        totalFocus += moduleData.focusLevel || 0;
+        totalStudyTime += moduleData.timeSpentStudying || 0;
+        totalExamScore += parseFloat(moduleData.averageScore) || 0;
+        moduleCount++;
       }
     }
 
@@ -71,7 +61,6 @@ export const getStudentAlerts = async (req, res) => {
       return res.status(200).json({ message: 'No data available for enrolled modules.' });
     }
 
-   
     const averageFocus = totalFocus / moduleCount;
     const averageStudyTime = totalStudyTime / moduleCount;
     const averageExamScore = totalExamScore / moduleCount;

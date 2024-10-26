@@ -160,7 +160,7 @@ export const getCompletedTasksCount = async (req, res) => {
 };
 
 export const getCompletedTasksByUserIdController = async (req, res) => {
-  const userId = req.user._id; 
+  const userId = req.user._id;
 
   try {
     const completedTasks = await CompletedTask.find({ student: userId });

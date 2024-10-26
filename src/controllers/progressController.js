@@ -1,9 +1,6 @@
-
 import { getEnrolledModules, getUserData } from '@/controllers/algorithm';
-
 import { predictExamScore, predictScoresForAllModules } from '@/services/progressService';
 import { makeResponse } from '@/utils/response';
-
 
 export const postPredictionController = async (req, res) => {
   const { userId, moduleId } = req.body;
@@ -28,12 +25,10 @@ export const predictScoresForModules = async (req, res) => {
     const userId = req.user._id;
     const predictions = await predictScoresForAllModules(userId);
     if (!predictions) {
-    
       return res.status(404).json({ message: 'No predictions found for this user.' });
     }
     return res.status(200).json(predictions);
   } catch (error) {
-   
     return res.status(500).json({ message: `Failed to predict scores: ${error.message}` });
   }
 };
@@ -59,6 +54,7 @@ export const getStudentCumulativeAverage = async (req, res) => {
           moduleCount++;
         }
       } catch (error) {
+        console.error(`Error retrieving data for module ${module._id}:`, error);
       }
     }
 

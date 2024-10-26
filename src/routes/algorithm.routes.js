@@ -11,7 +11,7 @@ algorithmRouter.get(
 
 algorithmRouter.get(
   '/user-data/:userId/:moduleId',
-  tracedAsyncHandler(async (req, res) => res.status(200).json(await getUserData(req.params.userId))) 
+  tracedAsyncHandler(async (req, res) => res.status(200).json(await getUserData(req.params.userId)))
 );
 
 export default algorithmRouter;
