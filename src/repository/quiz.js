@@ -1,6 +1,12 @@
 import mongoose from 'mongoose';
-import { buildQuizAggregation, buildUserQuizzesDueDetailsAggregation } from '@/helpers/buildAggregations';
+import {
+  buildLectureQuizSummaryAggregation,
+  buildQuizAggregation,
+  buildUserQuizzesDueDetailsAggregation
+} from '@/helpers/buildAggregations';
 import { convertToObjectId } from '@/helpers/convertToObjectId';
+import Module from '@/models/module';
+import Question from '@/models/question';
 import Quiz from '@/models/quiz';
 import { QuizFeedback } from '@/models/quiz-feedback';
 
@@ -169,4 +175,18 @@ export const saveQuizFeedback = async (userId, lectureId, feedbackData) => {
 
   const newFeedback = new QuizFeedback({ ...feedbackData, userId, lectureId });
   return await newFeedback.save();
+};
+
+export const getLectureQuizSummary = async (userId, moduleId) => {
+  const convertedModuleId = new mongoose.Types.ObjectId(moduleId);
+  const module = await Module.findById(convertedModuleId).populate('lectures', '_id title');
+  if (!module) {
+    return [];
+  }
+
+  const lectureIds = module.lectures.map((lecture) => lecture._id);
+  const aggregationPipeline = buildLectureQuizSummaryAggregation(userId, lectureIds);
+  const summaryData = await Question.aggregate(aggregationPipeline);
+
+  return summaryData;
 };

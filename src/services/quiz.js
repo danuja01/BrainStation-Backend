@@ -1,5 +1,6 @@
 import {
   getAttemptQuizIndex,
+  getLectureQuizSummary,
   getQuizPerformanceData,
   getQuizzes,
   getQuizzesScore,
@@ -35,4 +36,8 @@ export const getAttemptQuizIndexService = async (userId, lectureId) => {
 
 export const saveQuizFeedbackService = async (userId, lectureId, data) => {
   return await saveQuizFeedback(userId, lectureId, data);
+};
+
+export const getLectureQuizSummaryService = async (userId, moduleId) => {
+  return await getLectureQuizSummary(userId, moduleId);
 };
