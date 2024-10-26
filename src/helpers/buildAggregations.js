@@ -1,3 +1,4 @@
+import mongoose from 'mongoose';
 import Quiz from '@/models/quiz';
 
 export const buildQuizAggregation = (filter, sort) => {
@@ -48,9 +49,60 @@ export const buildQuizAggregation = (filter, sort) => {
         'current_step': 1,
         'learningSteps': 1,
         'attemptCount': 1,
-        'updatedAt': 1
+        'updatedAt': 1,
+        'attempt_question': 1
       }
     },
     { $sort: sort }
   ]);
 };
+
+export const buildUserQuizzesDueDetailsAggregation = (userId) => {
+  const now = new Date();
+  const endOfTodayUTC = new Date(
+    Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + 1, 23, 59, 59, 999)
+  );
+
+  const userObjectId = new mongoose.Types.ObjectId(userId);
+
+  return [
+    { $match: { userId: userObjectId } },
+    {
+      $facet: {
+        dueToday: [
+          {
+            $match: {
+              next_review_date: { $lte: endOfTodayUTC },
+              status: { $nin: ['lapsed', 'new'] } // Exclude learning phase statuses
+            }
+          },
+          { $count: 'count' }
+        ],
+        learningPhase: [
+          {
+            $match: {
+              status: { $in: ['new', 'lapsed'] }
+            }
+          },
+          { $count: 'count' }
+        ]
+      }
+    },
+    {
+      $project: {
+        dueTodayCount: { $arrayElemAt: ['$dueToday.count', 0] },
+        learningPhaseCount: { $arrayElemAt: ['$learningPhase.count', 0] }
+      }
+    }
+  ];
+};
+
+export const buildQuestionCountByLectureAggregation = (lectureIds) => [
+  { $match: { lectureId: { $in: lectureIds } } },
+  {
+    $group: {
+      _id: '$lectureId',
+      questionCount: { $sum: 1 }
+    }
+  }
+];

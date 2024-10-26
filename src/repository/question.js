@@ -1,4 +1,6 @@
 import mongoose from 'mongoose';
+import { buildQuestionCountByLectureAggregation } from '@/helpers/buildAggregations';
+import Module from '@/models/module';
 import { Question } from '@/models/question';
 
 export const insertQuestion = async (data) => {
@@ -38,6 +40,28 @@ export const getOneQuestion = async (filters, options = {}) => {
 
 export const deleteQuestion = (id) => {
   return Question.findByIdAndDelete(id);
+};
+
+export const getQuestionCountByModule = async (moduleId) => {
+  const convertedModuleId = new mongoose.Types.ObjectId(moduleId);
+
+  const module = await Module.findById(convertedModuleId).populate('lectures', '_id title');
+  if (!module) {
+    return [];
+  }
+
+  const lectureIds = module.lectures.map((lecture) => lecture._id);
+
+  const questionCounts = await Question.aggregate(buildQuestionCountByLectureAggregation(lectureIds));
+
+  return module.lectures.map((lecture) => {
+    const questionData = questionCounts.find((q) => q._id.equals(lecture._id));
+    return {
+      lectureId: lecture._id,
+      lectureTitle: lecture.title,
+      questionCount: questionData ? questionData.questionCount : 0
+    };
+  });
 };
 
 // flagged questions

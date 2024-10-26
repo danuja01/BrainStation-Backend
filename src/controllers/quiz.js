@@ -1,18 +1,20 @@
 import {
+  getAttemptQuizIndexService,
   getQuizPerformance,
   getQuizzesScoreService,
   getQuizzesService,
+  getUserQuizzesDueDetailsService,
   getUserQuizzesDueService
 } from '@/services/quiz';
 import { handleQuizResponse } from '@/services/spacedRepetition';
 import { makeResponse } from '@/utils/response';
 
 export const respondToQuiz = async (req, res) => {
-  const { lectureId, questionId, moduleId, response } = req.body;
+  const { lectureId, questionId, moduleId, response, attempt_question } = req.body;
   const userId = req.user._id;
 
   try {
-    await handleQuizResponse(userId, lectureId, questionId, moduleId, response);
+    await handleQuizResponse(userId, lectureId, questionId, moduleId, attempt_question, response);
     return res.status(200).json({ message: 'Quiz response processed successfully' });
   } catch (error) {
     return res.status(500).json({ message: error.message });
@@ -56,6 +58,17 @@ export const getUserQuizzesDueController = async (req, res) => {
   }
 };
 
+export const getUserQuizzesDueDetailsController = async (req, res) => {
+  const userId = req.user._id;
+
+  try {
+    const dueDetails = await getUserQuizzesDueDetailsService(userId);
+    return makeResponse({ res, data: dueDetails, message: 'Quizzes due details retrieved successfully' });
+  } catch (error) {
+    return res.status(500).json({ message: 'Internal Server Error' });
+  }
+};
+
 export const getQuizPerformanceController = async (req, res) => {
   try {
     const userId = req.user._id;
@@ -69,5 +82,19 @@ export const getQuizPerformanceController = async (req, res) => {
     });
   } catch (error) {
     makeResponse({ res, message: 'Internal Server Error', status: 500 });
+  }
+};
+
+export const getAttemptQuizIndexController = async (req, res) => {
+  const userId = req.user._id;
+  const { lectureId } = req.params;
+
+  try {
+    const attemptQuizzes = await getAttemptQuizIndexService(userId, lectureId);
+    return makeResponse({ res, data: attemptQuizzes, message: 'Attempt index retrieved successfully' });
+  } catch (error) {
+    return res.status(500).json({
+      message: 'Internal Server Error'
+    });
   }
 };

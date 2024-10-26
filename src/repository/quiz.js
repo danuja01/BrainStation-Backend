@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import { buildQuizAggregation } from '@/helpers/buildQuizAggregation';
+import { buildQuizAggregation, buildUserQuizzesDueDetailsAggregation } from '@/helpers/buildAggregations';
 import { convertToObjectId } from '@/helpers/convertToObjectId';
 import Quiz from '@/models/quiz';
 
@@ -135,4 +135,26 @@ export const getUserQuizzesDueByToday = async ({
 
   const aggregate = buildQuizAggregation(filter, sort);
   return await Quiz.aggregatePaginate(aggregate, { page, limit });
+};
+
+export const getUserQuizzesDueDetails = async (userId) => {
+  const aggregationPipeline = buildUserQuizzesDueDetailsAggregation(userId);
+  const result = await Quiz.aggregate(aggregationPipeline);
+
+  return {
+    dueTodayCount: result[0]?.dueTodayCount || 0,
+    learningPhaseCount: result[0]?.learningPhaseCount || 0
+  };
+};
+
+export const getAttemptQuizIndex = async (userId, lectureId) => {
+  const quizzes = await Quiz.find({ userId, lectureId }).sort({ attempt_question: -1 });
+
+  // Map the result to the desired format
+  const quizArray = quizzes.map((quiz) => ({
+    questionId: quiz.questionId,
+    attempt_question: quiz.attempt_question
+  }));
+
+  return quizArray;
 };
