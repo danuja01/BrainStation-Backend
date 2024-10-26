@@ -46,15 +46,11 @@ export const getStudentCumulativeAverage = async (req, res) => {
     let moduleCount = 0;
 
     for (const module of enrolledModules) {
-      try {
-        const moduleData = await getUserData(userId, module._id);
+      const moduleData = await getUserData(userId, module._id);
 
-        if (moduleData && moduleData.averageScore) {
-          totalAverageScore += parseFloat(moduleData.averageScore);
-          moduleCount++;
-        }
-      } catch (error) {
-        console.error(`Error retrieving data for module ${module._id}:`, error);
+      if (moduleData && moduleData.averageScore) {
+        totalAverageScore += parseFloat(moduleData.averageScore);
+        moduleCount++;
       }
     }
 
@@ -72,6 +68,7 @@ export const getStudentCumulativeAverage = async (req, res) => {
     });
   }
 };
+
 export const getCompletedTasksCount = async () => {};
 
 export const getTaskRecommendationController = async () => {};
