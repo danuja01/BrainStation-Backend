@@ -22,11 +22,6 @@ export const getTaskRecommendationController = async (req, res) => {
       return res.status(400).json({ message: 'Missing or invalid required fields.' });
     }
 
-    // Log the input values for debugging
-    console.log('userID:', userId);
-    console.log('performer_type:', performer_type);
-    console.log('lowest_two_chapters:', lowest_two_chapters);
-
     // Step 1: Check if an existing task set exists for the same user and data
     const existingTaskSet = await Task.findOne({
       student: userId,
@@ -43,13 +38,11 @@ export const getTaskRecommendationController = async (req, res) => {
     // Step 2: If no matching task set found, delete any old task set for the user
     const oldTaskSet = await Task.findOne({ student: userId });
     if (oldTaskSet) {
-      console.log('Deleting old task set for user:', userId);
       await Task.deleteOne({ student: userId });
     }
 
     // Step 3: Generate a new task set based on the new data
     const newTasks = recommendTask(performer_type, lowest_two_chapters);
-    console.log('New tasks generated:', newTasks);
 
     // Step 4: Save the new task set
     const newTask = new Task({
@@ -60,7 +53,6 @@ export const getTaskRecommendationController = async (req, res) => {
     });
 
     const savedTask = await newTask.save();
-    console.log('New task set saved:', savedTask);
 
     // Log the successful creation
     logger.info('New task set created:', savedTask);
@@ -164,7 +156,6 @@ export const getCompletedTasksByUserIdController = async (req, res) => {
   try {
     // Fetch completed tasks for the given userId
     const completedTasks = await CompletedTask.find({ student: userId });
-    console.log(completedTasks);
 
     // If no completed tasks are found, return 404
     if (completedTasks.length === 0) {
