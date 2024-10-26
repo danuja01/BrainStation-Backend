@@ -160,19 +160,15 @@ export const getCompletedTasksCount = async (req, res) => {
 };
 
 export const getCompletedTasksByUserIdController = async (req, res) => {
-  const userId = req.user._id; // Extract userId from the request parameters
+  const userId = req.user._id; 
 
   try {
-    // Fetch completed tasks for the given userId
     const completedTasks = await CompletedTask.find({ student: userId });
-    // console.log(completedTasks);
 
-    // If no completed tasks are found, return 404
     if (completedTasks.length === 0) {
       return res.status(404).json({ message: 'No completed tasks found for this user ID.' });
     }
 
-    // Return the completed tasks with a 200 status
     res.status(200).json({ completedTasks });
   } catch (error) {
     logger.error('Error fetching completed tasks by user ID:', error);

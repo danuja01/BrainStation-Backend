@@ -1,33 +1,24 @@
 import express from 'express';
 import { tracedAsyncHandler } from '@sliit-foss/functions';
 import {
-  getLecturePerformance, // deleteSubtaskFromTaskController,
-  // getCompletedTasksByTaskIdController,
-  // getCompletedTasksCount,
-  // getModulesAndScoresByUserController,
+  getLecturePerformance, 
   getStudentAlerts
 } from '@/controllers/dashboard';
 import {
-  getStudentCumulativeAverage, // deleteSubtaskFromTaskController,
-  // getCompletedTasksByTaskIdController,
-  // getCompletedTasksCount,
-  // getModulesAndScoresByUserController,
-  // getTaskRecommendationController,
-  postPredictionController, // postPredictionForAllModulesController,
+  getStudentCumulativeAverage,
+  postPredictionController, 
   predictScoresForModules
 } from '@/controllers/progressController';
 import { authorizer } from '@/middleware/auth';
 
 const progressRouter = express.Router();
 
-// Route to get predictions by Student ID and moduleid
 progressRouter.post(
   '/predict',
   authorizer(['STUDENT', 'LECTURER', 'ADMIN']),
   tracedAsyncHandler(postPredictionController)
 );
 
-// get predictions by Student ID
 progressRouter.get(
   '/predict-all-modules/',
   authorizer(['STUDENT', 'LECTURER', 'ADMIN']),

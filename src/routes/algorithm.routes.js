@@ -10,9 +10,8 @@ algorithmRouter.get(
 );
 
 algorithmRouter.get(
-  '/user-data/:userId/:moduleId', // URL with userId and moduleId as parameters
-  //  authorizer(['STUDENT', 'LECTURER', 'ADMIN']), // Role-based authorization
-  tracedAsyncHandler(async (req, res) => res.status(200).json(await getUserData(req.params.userId))) // Controller to handle the request
+  '/user-data/:userId/:moduleId',
+  tracedAsyncHandler(async (req, res) => res.status(200).json(await getUserData(req.params.userId))) 
 );
 
 export default algorithmRouter;

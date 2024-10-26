@@ -1,14 +1,10 @@
-// import { moduleLogger } from '@sliit-foss/module-logger';
-// import mongoose from 'mongoose';
+
 import { getEnrolledModules, getUserData } from '@/controllers/algorithm';
-// import CompletedTask from '@/models/completedTaskModel';
-// import Task from '@/models/taskModel';
+
 import { predictExamScore, predictScoresForAllModules } from '@/services/progressService';
 import { makeResponse } from '@/utils/response';
 
-// Adjust the path based on your project structure
 
-// Controller to fetch student Prediction by student ID and Module ID
 export const postPredictionController = async (req, res) => {
   const { userId, moduleId } = req.body;
 
@@ -32,12 +28,12 @@ export const predictScoresForModules = async (req, res) => {
     const userId = req.user._id;
     const predictions = await predictScoresForAllModules(userId);
     if (!predictions) {
-      // Log if predictions are missing
+    
       return res.status(404).json({ message: 'No predictions found for this user.' });
     }
     return res.status(200).json(predictions);
   } catch (error) {
-    // Log error details
+   
     return res.status(500).json({ message: `Failed to predict scores: ${error.message}` });
   }
 };
@@ -63,7 +59,6 @@ export const getStudentCumulativeAverage = async (req, res) => {
           moduleCount++;
         }
       } catch (error) {
-        //    console.error(`Error retrieving data for module ${module._id}:`, error.message);
       }
     }
 
@@ -71,12 +66,10 @@ export const getStudentCumulativeAverage = async (req, res) => {
       return res.status(200).json({ message: 'No average scores available for enrolled modules.' });
     }
 
-    // Calculate the total percentage
     const percentage = totalAverageScore / moduleCount; // Assuming averageScore is in a 0-100 scale
 
     return res.status(200).json({ percentage: percentage.toFixed(2) });
   } catch (error) {
-    // console.error('Error in cumulative average calculation:', error);
     return res.status(500).json({
       message: 'Detailed error in cumulative average calculation',
       error: error.message

@@ -1,31 +1,23 @@
-// import { moduleLogger } from '@sliit-foss/module-logger';
-// import mongoose from 'mongoose';
-// import CompletedTask from '@/models/completedTaskModel';
-// import Task from '@/models/taskModel';
 import { getEnrolledModules, getUserData } from '@/controllers/algorithm';
-import { addSession } from '@/services/sessionService';
-// import { predictExamScore, predictScoresForAllModules } from '@/services/progressService';
+import { addSession } from '@/services/focus-record';
 import { makeResponse } from '@/utils';
 
-// Replace with the correct path
 
-// import { makeResponse } from '@/utils/response';
-// import {findStartAndEndTimesOfUsersModule} from '@/services/focus-record';
 
 export const getLecturePerformance = async (req, res) => {
   try {
     const userId = req.user._id;
 
-    // Fetch all modules the student is enrolled in
+  
     const enrolledModules = await getEnrolledModules(userId);
 
     const lecturePerformanceData = [];
 
-    // Loop through each module to fetch lecture data
+   
     for (const module of enrolledModules) {
       const moduleData = await getUserData(userId, module._id);
 
-      // Add lecture title and score to the response
+      
       moduleData.quizzes.forEach((lecture) => {
         lecturePerformanceData.push({
           lectureTitle: lecture.lectureTitles,
@@ -36,7 +28,7 @@ export const getLecturePerformance = async (req, res) => {
 
     return res.status(200).json({ lecturePerformance: lecturePerformanceData });
   } catch (error) {
-    //  console.error('Error retrieving lecture performance:', error);
+    
     return res.status(500).json({ message: 'Failed to retrieve lecture performance', error: error.message });
   }
 };
@@ -71,7 +63,7 @@ export const getStudentAlerts = async (req, res) => {
           moduleCount++;
         }
       } catch (error) {
-        //     console.error(`Error retrieving data for module ${module._id}:`, error.message);
+        
       }
     }
 
@@ -79,7 +71,7 @@ export const getStudentAlerts = async (req, res) => {
       return res.status(200).json({ message: 'No data available for enrolled modules.' });
     }
 
-    // Calculate averages
+   
     const averageFocus = totalFocus / moduleCount;
     const averageStudyTime = totalStudyTime / moduleCount;
     const averageExamScore = totalExamScore / moduleCount;
@@ -100,7 +92,6 @@ export const getStudentAlerts = async (req, res) => {
 
     return res.status(200).json({ alertMessage });
   } catch (error) {
-    //   console.error('Error generating student alerts:', error);
     return res.status(500).json({
       message: 'Failed to generate student alerts',
       error: error.message
