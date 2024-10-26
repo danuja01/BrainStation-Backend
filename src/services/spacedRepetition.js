@@ -95,7 +95,7 @@ class ReviewPhase {
   }
 }
 
-export const handleQuizResponse = async (userId, lectureId, questionId, moduleId, response) => {
+export const handleQuizResponse = async (userId, lectureId, questionId, moduleId, attempt_question, response) => {
   const quiz = await getQuizByQuestionIdAndUserId(userId, questionId);
 
   const today = new Date();
@@ -123,6 +123,7 @@ export const handleQuizResponse = async (userId, lectureId, questionId, moduleId
     await saveQuiz(newQuiz);
   } else {
     quiz.attemptCount += 1;
+    quiz.attempt_question = attempt_question;
     if (quiz.status === 'new' || quiz.status === 'lapsed') {
       const learningPhase = new LearningPhase(quiz);
       learningPhase.processStep(response);

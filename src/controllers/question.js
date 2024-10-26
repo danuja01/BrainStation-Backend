@@ -4,6 +4,7 @@ import {
   getFlaggedQuestionsService,
   getOneQuestionService,
   getQuestionByIdService,
+  getQuestionCountByModuleService,
   insertBulkQuestionsService,
   insertQuestionService,
   updateQuestionService,
@@ -44,6 +45,11 @@ export const updateQuestion = async (req, res) => {
 export const deleteQuestion = async (req, res) => {
   await deleteQuestionService(req.params.id);
   return makeResponse({ res, message: 'Question deleted successfully' });
+};
+
+export const getQuestionCountByModule = async (req, res) => {
+  const questionCounts = await getQuestionCountByModuleService(req.params.moduleId);
+  return makeResponse({ res, data: questionCounts, message: 'Question count by module retrieved successfully' });
 };
 
 export const getFlaggedQuestions = async (req, res) => {

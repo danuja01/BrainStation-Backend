@@ -1,4 +1,11 @@
-import { getQuizPerformanceData, getQuizzes, getQuizzesScore, getUserQuizzesDueByToday } from '@/repository/quiz';
+import {
+  getAttemptQuizIndex,
+  getQuizPerformanceData,
+  getQuizzes,
+  getQuizzesScore,
+  getUserQuizzesDueByToday,
+  getUserQuizzesDueDetails
+} from '@/repository/quiz';
 
 export const getQuizzesService = async (query) => {
   return await getQuizzes(query);
@@ -15,4 +22,12 @@ export const getQuizPerformance = async (userId) => {
 
 export const getUserQuizzesDueService = async (query, userId) => {
   return await getUserQuizzesDueByToday({ ...query, userId });
+};
+
+export const getUserQuizzesDueDetailsService = async (userId) => {
+  return await getUserQuizzesDueDetails(userId);
+};
+
+export const getAttemptQuizIndexService = async (userId, lectureId) => {
+  return await getAttemptQuizIndex(userId, lectureId);
 };

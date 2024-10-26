@@ -49,6 +49,10 @@ const quizSchema = new mongoose.Schema(
     current_step: {
       type: Number,
       default: 0
+    },
+    attempt_question: {
+      type: Number,
+      default: 0
     }
   },
   { timestamps: true }
