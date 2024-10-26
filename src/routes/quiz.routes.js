@@ -17,7 +17,7 @@ const quizRouter = express.Router();
 quizRouter.get('/', tracedAsyncHandler(getQuizzesController));
 quizRouter.get('/score', tracedAsyncHandler(getQuizzesScoreController));
 quizRouter.post('/respond', celebrate({ [Segments.BODY]: quizResponseSchema }), tracedAsyncHandler(respondToQuiz));
-quizRouter.post('/feedback', tracedAsyncHandler(feedbackController));
+quizRouter.post('/feedback/:lectureId', tracedAsyncHandler(feedbackController));
 quizRouter.get('/due', tracedAsyncHandler(getUserQuizzesDueController));
 quizRouter.get('/due/details', tracedAsyncHandler(getUserQuizzesDueDetailsController));
 quizRouter.get('/attempt/:lectureId', tracedAsyncHandler(getAttemptQuizIndexController));

@@ -2,6 +2,7 @@ import mongoose from 'mongoose';
 import { buildQuizAggregation, buildUserQuizzesDueDetailsAggregation } from '@/helpers/buildAggregations';
 import { convertToObjectId } from '@/helpers/convertToObjectId';
 import Quiz from '@/models/quiz';
+import { QuizFeedback } from '@/models/quiz-feedback';
 
 export const saveQuiz = async (quizData) => {
   const { questionId, userId } = quizData;
@@ -157,4 +158,15 @@ export const getAttemptQuizIndex = async (userId, lectureId) => {
   }));
 
   return quizArray;
+};
+
+export const saveQuizFeedback = async (userId, lectureId, feedbackData) => {
+  const existingFeedback = await QuizFeedback.findOne({ userId, lectureId });
+
+  if (existingFeedback) {
+    return await QuizFeedback.findByIdAndUpdate(existingFeedback._id, feedbackData, { new: true });
+  }
+
+  const newFeedback = new QuizFeedback({ ...feedbackData, userId, lectureId });
+  return await newFeedback.save();
 };
