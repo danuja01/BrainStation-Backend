@@ -31,7 +31,6 @@ export const getTaskRecommendationController = async (req, res) => {
 
     if (existingTaskSet) {
       // If the data matches, return the existing task set
-      console.log('Existing task set found, returning it:', existingTaskSet);
       return res.status(200).json({ data: existingTaskSet });
     }
 
