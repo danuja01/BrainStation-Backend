@@ -2,6 +2,7 @@ import {
   CalculateAssrsResult,
   addAssrResult,
   checkAssrResultExists,
+  getAlternativeAssrService,
   getOneAssrsService,
   modifyAssrResult
 } from '@/services/assrsResult';
@@ -74,4 +75,9 @@ export const updateAssrResultController = async (req, res) => {
 export const getOneAssr = async (req, res) => {
   const report = await getOneAssrsService(req.query, req.body);
   return makeResponse({ res, data: report, message: 'Assrs data retrieved successfully' });
+};
+
+export const getAlternativeAssrController = async (req, res) => {
+  const questions = await getAlternativeAssrService();
+  return makeResponse({ res, data: questions, message: 'Assrs data retrieved successfully' });
 };
