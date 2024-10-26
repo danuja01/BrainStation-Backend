@@ -6,14 +6,13 @@ import {
   getModulesController,
   updateModuleController
 } from '@/controllers/module';
-import { authorizer } from '@/middleware';
 
 const moduleRouter = express.Router();
 
-moduleRouter.post('/', authorizer(['STUDENT', 'LECTURER', 'ADMIN']), createModuleController);
-moduleRouter.get('/', authorizer(['STUDENT', 'LECTURER', 'ADMIN']), getModulesController);
-moduleRouter.get('/:id', authorizer(['STUDENT', 'LECTURER', 'ADMIN']), getModuleController);
-moduleRouter.patch('/:id', authorizer(['STUDENT', 'LECTURER', 'ADMIN']), updateModuleController);
-moduleRouter.post('/add-lecture', authorizer(['STUDENT', 'LECTURER', 'ADMIN']), addLectureController);
+moduleRouter.post('/', createModuleController);
+moduleRouter.get('/', getModulesController);
+moduleRouter.get('/:id', getModuleController);
+moduleRouter.patch('/:id', updateModuleController);
+moduleRouter.post('/add-lecture', addLectureController);
 
 export default moduleRouter;

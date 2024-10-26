@@ -6,20 +6,15 @@ import {
   getCompletedTasksCount,
   getTaskRecommendationController
 } from '@/controllers/taskController';
-import { authorizer } from '@/middleware';
 
 const taskRouter = express.Router();
 
-taskRouter.post('/recommend-task', authorizer(['STUDENT', 'LECTURER', 'ADMIN']), getTaskRecommendationController);
+taskRouter.post('/recommend-task', tracedAsyncHandler(getTaskRecommendationController));
 
-taskRouter.post('/delete-subtask', authorizer(['STUDENT', 'LECTURER', 'ADMIN']), deleteSubtaskFromTaskController);
+taskRouter.post('/delete-subtask', tracedAsyncHandler(deleteSubtaskFromTaskController));
 
-taskRouter.get(
-  '/completed-tasks-count',
-  authorizer(['STUDENT', 'LECTURER', 'ADMIN']),
-  tracedAsyncHandler(getCompletedTasksCount)
-);
+taskRouter.get('/completed-tasks-count', tracedAsyncHandler(getCompletedTasksCount));
 
-taskRouter.get('/completed-tasks/', authorizer(['STUDENT', 'LECTURER', 'ADMIN']), getCompletedTasksByUserIdController);
+taskRouter.get('/completed-tasks/', tracedAsyncHandler(getCompletedTasksByUserIdController));
 
 export default taskRouter;
