@@ -10,7 +10,9 @@ import {
   findTotalSessionDurationByUser,
   getAdhdClassificationFeedbackService,
   getSessionData,
-  getStudentsDataService
+  getStudentsDataService,
+  countSessionsByUserId ,
+  countSessionsByUserIdAndDate
 } from '@/services/focus-record';
 import { makeResponse } from '@/utils/response';
 
@@ -148,4 +150,38 @@ export const getSessionDataOfStudentsController = async (req, res) => {
   const data = await getStudentsDataService();
 
   return makeResponse({ res, data: data, message: 'Sessions retrieved successfully' });
+};
+
+export const getSessionCountByUserIdController = async (req, res) => {
+  try {
+    const userId = req.query.userId;  // Get userId from query parameters
+    console.log('UserId:', userId);   // Log the userId
+
+    const sessionCount = await countSessionsByUserId(userId);  // Call the service to count sessions
+
+    console.log('Session Count:', sessionCount);   // Log the session count
+
+    return makeResponse({ res, data: { sessionCount }, message: 'Session count retrieved successfully' });
+  } catch (error) {
+    console.error('Error fetching session count:', error.message);  // Log the error message
+    return res.status(500).json({ message: 'Internal Server Error' });
+  }
+};
+
+
+export const getDistinctSessionDaysByUserIdController = async (req, res) => {
+  try {
+    const userId = req.query.userId;
+
+    if (!userId) {
+      return res.status(400).json({ message: 'userId is required' });
+    }
+
+    const daysCount = await countDistinctSessionDaysByUserId(userId);
+
+    return makeResponse({ res, data: { daysCount }, message: 'Distinct session days count retrieved successfully' });
+  } catch (error) {
+    console.error('Error fetching distinct session days count:', error.message);
+    return res.status(500).json({ message: 'Internal Server Error' });
+  }
 };

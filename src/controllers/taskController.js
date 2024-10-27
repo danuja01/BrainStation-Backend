@@ -3,6 +3,9 @@ import mongoose from 'mongoose';
 import CompletedTask from '@/models/completedTaskModel';
 import Task from '@/models/taskModel';
 import { recommendTask } from '@/services/taskService';
+import NotCompletedTask from '@/models/notCompletedTaskModel';
+
+
 
 const logger = moduleLogger('task-recommendation-controller');
 
@@ -31,7 +34,15 @@ export const getTaskRecommendationController = async (req, res) => {
     // Step 2: Delete any old task set for the user if no matching task set is found
     const oldTaskSet = await Task.findOne({ student: userId });
     if (oldTaskSet) {
-      await Task.deleteOne({ student: userId });
+      const notCompletedTask = new NotCompletedTask({
+        task_id: oldTaskSet._id,
+        student: oldTaskSet.student,
+        performer_type: oldTaskSet.performer_type,
+        lowest_two_chapters: oldTaskSet.lowest_two_chapters,
+        createdAt: oldTaskSet.createdAt
+      });
+      await notCompletedTask.save();
+      await Task.deleteOne({ student: userId }); // Delete old task set from Task collection
     }
 
     // Step 3: Conditional Task Generation Based on Data Availability

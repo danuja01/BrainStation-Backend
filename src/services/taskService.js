@@ -1,5 +1,7 @@
 import { moduleLogger } from '@sliit-foss/module-logger';
 
+
+
 const logger = moduleLogger('task-recommendation-controller');
 
 export const recommendTask = (performerType, lowestTwoChapters) => {
@@ -11,35 +13,60 @@ export const recommendTask = (performerType, lowestTwoChapters) => {
   // Ensure case-insensitive matching for performerType
   const formattedPerformerType = performerType.trim().toLowerCase().replace(' performer', '');
 
-  const mostLowestMarksChapter = lowestTwoChapters[0]?.chapter || lowestTwoChapters[0];
-  const secondLowestMarksChapter = lowestTwoChapters[1]?.chapter || lowestTwoChapters[1];
+  // Function to clean chapter/module names and remove unwanted words like "lecture", standalone numbers
+  const cleanChapterName = (chapter) => {
+    const sanitizedChapter = chapter
+      .replace(/\b(lecture|lec)\b\s*\d*/gi, '') // Remove words like "lecture", "lec" and any following numbers
+      .replace(/\b\d+\b/g, '')                   // Remove any standalone numbers
+      .trim()                                    // Trim leading and trailing spaces
+      .replace(/\s+/g, ' ');                     // Replace multiple spaces with a single space
+
+    return sanitizedChapter;
+  };
+
+  // Function to convert cleaned chapter names into URL-safe format (replace spaces with '+')
+  const toURLFormat = (chapter) => {
+    return chapter.replace(/\s+/g, '+'); // Replace spaces with '+'
+  };
+
+  // Clean and prepare chapters for task generation
+  const mostLowestMarksChapter = cleanChapterName(lowestTwoChapters[0]?.chapter || lowestTwoChapters[0]);
+  const secondLowestMarksChapter = cleanChapterName(lowestTwoChapters[1]?.chapter || lowestTwoChapters[1]);
+
+  // Convert cleaned chapters to URL format for external resources
+  const mostLowestMarksChapterURL = toURLFormat(mostLowestMarksChapter);
+  const secondLowestMarksChapterURL = toURLFormat(secondLowestMarksChapter);
+
+  // Log chapter names and URL formats for debugging
+  logger.info(`Most Lowest Marks Chapter: ${mostLowestMarksChapter}`);
+  logger.info(`Second Lowest Marks Chapter: ${secondLowestMarksChapter}`);
+  logger.info(`URL for Most Lowest Marks Chapter: ${mostLowestMarksChapterURL}`);
+  logger.info(`URL for Second Lowest Marks Chapter: ${secondLowestMarksChapterURL}`);
 
   // Define weekly task list based on weakest chapters
   const weeklyTasks = [
     {
       task: 'Start Doing Past Papers and Related Questions',
       subTasks: [
-        `Focus on past papers from the last 3 years: https://mysligit-my.sharsepoint.com/.../Computing`,
-        `Specifically, practice the lowest scoring chapter: ${mostLowestMarksChapter}`,
-        `50 MCQ Questions for ${mostLowestMarksChapter}: https://mcqmate.com/search?term=${mostLowestMarksChapter} or Google search: https://google.com/search?q=${mostLowestMarksChapter}+MCQ`
+        'Focus on past papers from the last 3 years: https://mysliit-my.sharepoint.com/.../Computing',
+        `Specifically, practice Questions in ${mostLowestMarksChapter}`,
+        `Take this quiz on ${mostLowestMarksChapter}: https://quizlet.com/search?query=${mostLowestMarksChapterURL}`
       ]
     },
     {
-      task: 'Watch Educational Videos on Chapters 5 and 4',
+      task: 'Watch Educational Videos on Key Chapters',
       subTasks: [
-        `Video 1: Watch content on ${mostLowestMarksChapter}: https://www.youtube.com/results?search_query=${mostLowestMarksChapter}+lecture`,
-        `Video 2: Watch content on ${secondLowestMarksChapter}: https://www.youtube.com/results?search_query=${secondLowestMarksChapter}+lecture`,
-        `Video 3: Additional videos for ${mostLowestMarksChapter}: https://www.youtube.com/results?search_query=${mostLowestMarksChapter}+tutorial`
+        `Watch a video on ${mostLowestMarksChapter}: https://www.youtube.com/results?search_query=${mostLowestMarksChapterURL}+lecture`,
+        `Watch content on ${secondLowestMarksChapter}: https://www.youtube.com/results?search_query=${secondLowestMarksChapterURL}+lecture`,
+        'Summarize what you’ve learned after the video.'
       ],
       timeEstimate: '120 minutes'
     },
     {
       task: 'Follow this External Course',
       subTasks: [
-        `Udemy Course on ${mostLowestMarksChapter}: https://www.udemy.com/courses/search/?q=${mostLowestMarksChapter}`,
-        `Udemy Course on ${secondLowestMarksChapter}: https://www.udemy.com/courses/search/?q=${secondLowestMarksChapter}`,
-        `Coursera Course on ${mostLowestMarksChapter}: https://www.coursera.org/search?query=${mostLowestMarksChapter}`,
-        `Coursera Course on ${secondLowestMarksChapter}: https://www.coursera.org/search?query=${secondLowestMarksChapter}`
+        `Udemy Course on ${mostLowestMarksChapter}: https://www.udemy.com/courses/search/?q=${mostLowestMarksChapterURL}`,
+        `Coursera Course on ${secondLowestMarksChapter}: https://www.coursera.org/search?query=${secondLowestMarksChapterURL}`
       ],
       timeEstimate: '180 minutes'
     },
@@ -55,7 +82,8 @@ export const recommendTask = (performerType, lowestTwoChapters) => {
       task: 'Keep a Learning Journal',
       subTasks: [
         `Summarize the most important points from the ${mostLowestMarksChapter} lecture.`,
-        `Reflect on difficult topics like ${mostLowestMarksChapter} and ${secondLowestMarksChapter}, and write down key concepts.`
+        `Reflect on difficult topics like ${mostLowestMarksChapter} and ${secondLowestMarksChapter}, and write down key concepts.`,
+        'Join a study group or forum and participate in one discussion: https://stackoverflow.com/'
       ],
       timeEstimate: '45 minutes'
     }
@@ -66,7 +94,8 @@ export const recommendTask = (performerType, lowestTwoChapters) => {
     {
       task: 'Watch a 5-minute video in one weak area',
       subTasks: [
-        `Watch this YouTube video on ${mostLowestMarksChapter}: https://www.youtube.com/results?search_query=${mostLowestMarksChapter}+5-minute+video`
+        `Watch this YouTube video on ${mostLowestMarksChapter}: https://www.youtube.com/results?search_query=${mostLowestMarksChapterURL}+5-minute+video`,
+        'Write down one thing you didn’t know before and explain it in your own words.'
       ]
     },
     {
@@ -76,22 +105,22 @@ export const recommendTask = (performerType, lowestTwoChapters) => {
       ]
     },
     {
-      task: 'Write in your learning journal',
+      task: 'Write in your learning journal and Create Mind Map',
       subTasks: [
-        `Summarize what you learned today, focusing on the weak areas identified: ${mostLowestMarksChapter} and ${
-          secondLowestMarksChapter
-        }`
+        `Summarize what you learned today, focusing on the weak areas: ${mostLowestMarksChapter} and ${secondLowestMarksChapter}.`,
+        'Create a mind map of the concepts you learned today.'
       ]
     }
   ];
+
   // Task order based on performer type
   const taskOrder = {
-    low: [0, 1, 2],
+    low: [4, 1, 2],
     medium: [1, 0, 2],
     excellent: [0, 2, 1]
   };
 
-  // Log performer type and task order
+  // Log performer type and task order for debugging
   logger.info(`Performer Type: ${formattedPerformerType}`);
   logger.info(`Task Order for Performer: ${taskOrder[formattedPerformerType]}`);
 
@@ -109,13 +138,14 @@ export const recommendTask = (performerType, lowestTwoChapters) => {
     }
     logger.info(`Selected task at index ${index}:`, weeklyTasks[index]);
     return weeklyTasks[index];
-  });
+  }).filter(Boolean); // Filter out null values (if any)
 
   const combinedTasks = {
     weeklyTasks: selectedWeeklyTasks,
     dailyTasks: dailyTasks
   };
 
+  // Log combined tasks for debugging
   logger.info('Combined tasks:', combinedTasks);
   return combinedTasks;
 };
