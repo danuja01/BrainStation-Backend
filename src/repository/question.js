@@ -5,7 +5,7 @@ import { Question } from '@/models/question';
 
 export const insertQuestion = async (data) => {
   const newQuestion = new Question(data);
-  await newQuestion.save();
+  return await newQuestion.save();
 };
 
 export const insertBulkQuestions = async (dataArray) => {

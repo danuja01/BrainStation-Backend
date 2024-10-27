@@ -13,8 +13,9 @@ import {
 import { makeResponse } from '@/utils/response';
 
 export const createQuestion = async (req, res) => {
-  await insertQuestionService(req.body);
-  return makeResponse({ res, status: 201, message: 'Question added successfully' });
+  const question = await insertQuestionService(req.body);
+
+  return makeResponse({ res, data: question, status: 201, message: 'Question added successfully' });
 };
 
 export const bulkInsertQuestions = async (req, res) => {
