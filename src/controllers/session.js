@@ -126,7 +126,7 @@ export const getTotalSessionDurationByUserController = async (req, res) => {
 
 export const getSessionDataController = async (req, res) => {
   try {
-    const userId = req.user._id;
+    const userId = req.body.userId;
 
     const data = await getSessionData(userId);
 
