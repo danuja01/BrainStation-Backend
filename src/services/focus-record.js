@@ -14,6 +14,7 @@ import {
   getTotalFocusTime,
   getTotalSessionDurationByUser
 } from '@/repository/focus-record';
+import { getAllStudentIds } from '@/repository/user';
 
 export const addSession = async (data) => {
   try {
@@ -66,11 +67,12 @@ export const getSessionData = async (userId) => {
   const classification = await getMostFrequentFinalClassification(userId);
 
   const sessionData = {
+    studentId: userId,
     totalStudyTime: studyTime,
-    totalFocusTime: data[0].totalFocusTime,
-    totalMovements: data[0].totalMovements,
-    totalErraticMovements: data[0].totalErraticMovements,
-    adhdClassification: classification.mostFrequentClassification
+    totalFocusTime: data[0]?.totalFocusTime || 0, // Default to 0 if data[0] is undefined
+    totalMovements: data[0]?.totalMovements || 0, // Default to 0 if data[0] is undefined
+    totalErraticMovements: data[0]?.totalErraticMovements || 0, // Default to 0 if data[0] is undefined
+    adhdClassification: classification?.mostFrequentClassification || 'Unknown' // Default to "Unknown" if classification is null
   };
 
   return sessionData;
@@ -89,10 +91,17 @@ export const getAdhdClassificationFeedbackService = async (userId) => {
 
   // Todo: replace the url with hosted model url
   const response = await axios.post(
-    'http://127.0.0.1:8000/api/v1/adhd-feedback',
+    'http://34.30.64.175:9005/api/v1/adhd-feedback',
     { designation: classification },
     config
   );
 
   return response.data;
+};
+
+export const getStudentsDataService = async () => {
+  const studentIds = await getAllStudentIds();
+  const sessionDataPromises = studentIds.map(async (userId) => await getSessionData(userId));
+  const sessionDataArray = await Promise.all(sessionDataPromises);
+  return sessionDataArray;
 };
