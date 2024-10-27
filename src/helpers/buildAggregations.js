@@ -106,3 +106,109 @@ export const buildQuestionCountByLectureAggregation = (lectureIds) => [
     }
   }
 ];
+
+export const buildLectureQuizSummaryAggregation = (userId, lectureIds) => [
+  {
+    $match: { lectureId: { $in: lectureIds } }
+  },
+  {
+    $lookup: {
+      from: 'lectures',
+      localField: 'lectureId',
+      foreignField: '_id',
+      as: 'lectureDetails'
+    }
+  },
+  { $unwind: { path: '$lectureDetails', preserveNullAndEmptyArrays: true } },
+  {
+    $lookup: {
+      from: 'quizzes',
+      let: { questionId: '$_id', lectureId: '$lectureId' },
+      pipeline: [
+        {
+          $match: {
+            $expr: {
+              $and: [
+                { $eq: ['$questionId', '$$questionId'] },
+                { $eq: ['$lectureId', '$$lectureId'] },
+                { $eq: ['$userId', new mongoose.Types.ObjectId(userId)] }
+              ]
+            }
+          }
+        }
+      ],
+      as: 'userQuizDetails'
+    }
+  },
+  {
+    $lookup: {
+      from: 'quizfeedbacks',
+      let: { lectureId: '$lectureId' },
+      pipeline: [
+        {
+          $match: {
+            $expr: {
+              $and: [{ $eq: ['$lectureId', '$$lectureId'] }, { $eq: ['$userId', new mongoose.Types.ObjectId(userId)] }]
+            }
+          }
+        }
+      ],
+      as: 'feedback'
+    }
+  },
+  {
+    $group: {
+      _id: '$lectureId',
+      lectureTitle: { $first: '$lectureDetails.title' },
+      totalQuizzes: { $sum: 1 },
+      lapsedCount: {
+        $sum: {
+          $size: {
+            $filter: {
+              input: '$userQuizDetails',
+              as: 'quiz',
+              cond: { $eq: ['$$quiz.status', 'lapsed'] }
+            }
+          }
+        }
+      },
+      reviewCount: {
+        $sum: {
+          $size: {
+            $filter: {
+              input: '$userQuizDetails',
+              as: 'quiz',
+              cond: { $eq: ['$$quiz.status', 'review'] }
+            }
+          }
+        }
+      },
+      questions: {
+        $push: {
+          questionText: '$question',
+          answer: '$answer',
+          alternatives: '$alternative_questions'
+        }
+      },
+      feedback: { $first: { $arrayElemAt: ['$feedback', 0] } }
+    }
+  },
+  {
+    $project: {
+      _id: 0,
+      lectureId: '$_id',
+      lectureTitle: 1,
+      totalQuizzes: 1,
+      lapsedCount: 1,
+      reviewCount: 1,
+      questions: { $ifNull: ['$questions', []] },
+      feedback: {
+        strength: { $ifNull: ['$feedback.strength', []] },
+        weakness: { $ifNull: ['$feedback.weakness', []] }
+      }
+    }
+  },
+  {
+    $sort: { lectureTitle: 1 } // Optional sorting
+  }
+];
