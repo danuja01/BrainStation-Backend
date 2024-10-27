@@ -1,10 +1,12 @@
 import {
   getAttemptQuizIndex,
+  getLectureQuizSummary,
   getQuizPerformanceData,
   getQuizzes,
   getQuizzesScore,
   getUserQuizzesDueByToday,
-  getUserQuizzesDueDetails
+  getUserQuizzesDueDetails,
+  saveQuizFeedback
 } from '@/repository/quiz';
 
 export const getQuizzesService = async (query) => {
@@ -30,4 +32,12 @@ export const getUserQuizzesDueDetailsService = async (userId) => {
 
 export const getAttemptQuizIndexService = async (userId, lectureId) => {
   return await getAttemptQuizIndex(userId, lectureId);
+};
+
+export const saveQuizFeedbackService = async (userId, lectureId, data) => {
+  return await saveQuizFeedback(userId, lectureId, data);
+};
+
+export const getLectureQuizSummaryService = async (userId, moduleId) => {
+  return await getLectureQuizSummary(userId, moduleId);
 };
