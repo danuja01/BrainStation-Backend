@@ -6,34 +6,17 @@ import {
   postPredictionController,
   predictScoresForModules
 } from '@/controllers/progressController';
-import { authorizer } from '@/middleware/auth';
 
 const progressRouter = express.Router();
 
-progressRouter.post(
-  '/predict',
-  authorizer(['STUDENT', 'LECTURER', 'ADMIN']),
-  tracedAsyncHandler(postPredictionController)
-);
+progressRouter.post('/predict', tracedAsyncHandler(postPredictionController));
 
-progressRouter.get(
-  '/predict-all-modules/',
-  authorizer(['STUDENT', 'LECTURER', 'ADMIN']),
-  tracedAsyncHandler(predictScoresForModules)
-);
+progressRouter.get('/predict-all-modules/', tracedAsyncHandler(predictScoresForModules));
 
-progressRouter.get(
-  '/cumulative-average',
-  authorizer(['STUDENT', 'LECTURER', 'ADMIN']),
-  tracedAsyncHandler(getStudentCumulativeAverage)
-);
+progressRouter.get('/cumulative-average', tracedAsyncHandler(getStudentCumulativeAverage));
 
-progressRouter.get(
-  '/lecture-performance/',
-  authorizer(['STUDENT', 'LECTURER', 'ADMIN']),
-  tracedAsyncHandler(getLecturePerformance)
-);
+progressRouter.get('/lecture-performance/', tracedAsyncHandler(getLecturePerformance));
 
-progressRouter.get('/alerts', authorizer(['STUDENT', 'LECTURER', 'ADMIN']), tracedAsyncHandler(getStudentAlerts));
+progressRouter.get('/alerts', tracedAsyncHandler(getStudentAlerts));
 
 export default progressRouter;

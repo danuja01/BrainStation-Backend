@@ -1,5 +1,6 @@
 import {
   getAttemptQuizIndexService,
+  getLectureQuizSummaryService,
   getQuizPerformance,
   getQuizzesScoreService,
   getQuizzesService,
@@ -96,5 +97,17 @@ export const getAttemptQuizIndexController = async (req, res) => {
     return res.status(500).json({
       message: 'Internal Server Error'
     });
+  }
+};
+
+export const getLectureQuizSummaryController = async (req, res) => {
+  const userId = req.user._id;
+  const { moduleId } = req.params;
+
+  try {
+    const lectureSummary = await getLectureQuizSummaryService(userId, moduleId);
+    return makeResponse({ res, data: lectureSummary, message: 'Lecture quiz summary retrieved successfully' });
+  } catch (error) {
+    return res.status(500).json({ message: 'Internal Server Error' });
   }
 };

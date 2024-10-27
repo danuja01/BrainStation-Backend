@@ -1,3 +1,4 @@
+import axios from 'axios';
 import createError from 'http-errors';
 import {
   createSession,
@@ -18,7 +19,7 @@ export const addSession = async (data) => {
   try {
     await createSession(data);
   } catch (error) {
-    throw new createError(500, 'Error when saving session');
+    throw new createError(500, `Error when saving session- ${error}`);
   }
 };
 
@@ -73,4 +74,25 @@ export const getSessionData = async (userId) => {
   };
 
   return sessionData;
+};
+
+export const getAdhdClassificationFeedbackService = async (userId) => {
+  const data = await getMostFrequentFinalClassification(userId);
+  const classification = data.mostFrequentClassification;
+
+  const config = {
+    headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json'
+    }
+  };
+
+  // Todo: replace the url with hosted model url
+  const response = await axios.post(
+    'http://127.0.0.1:8000/api/v1/adhd-feedback',
+    { designation: classification },
+    config
+  );
+
+  return response.data;
 };

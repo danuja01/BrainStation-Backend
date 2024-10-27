@@ -6,29 +6,12 @@ import {
   getOntologyFileController,
   updateOntologyFileController
 } from '@/controllers/ontologyGenerator';
-import { authorizer } from '@/middleware';
 
 const ontologyRouter = express.Router();
 
-ontologyRouter.post(
-  '/generate-ontology',
-  authorizer(['STUDENT', 'LECTURER', 'ADMIN']),
-  tracedAsyncHandler(generateOntologyController)
-);
-ontologyRouter.put(
-  '/modify-ontology',
-  authorizer(['STUDENT', 'LECTURER', 'ADMIN']),
-  tracedAsyncHandler(updateOntologyFileController)
-);
-ontologyRouter.get(
-  '/file',
-  authorizer(['STUDENT', 'LECTURER', 'ADMIN']),
-  tracedAsyncHandler(getOntologyFileController)
-);
-ontologyRouter.get(
-  '/exists',
-  authorizer(['STUDENT', 'LECTURER', 'ADMIN']),
-  tracedAsyncHandler(checkOntologyExistsController)
-);
+ontologyRouter.post('/generate-ontology', tracedAsyncHandler(generateOntologyController));
+ontologyRouter.put('/modify-ontology', tracedAsyncHandler(updateOntologyFileController));
+ontologyRouter.get('/file', tracedAsyncHandler(getOntologyFileController));
+ontologyRouter.get('/exists', tracedAsyncHandler(checkOntologyExistsController));
 
 export default ontologyRouter;

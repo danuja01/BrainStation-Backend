@@ -1,3 +1,4 @@
+import axios from 'axios';
 import createError from 'http-errors';
 import { createAssrResult, findAssrResultByUserId, getOneAssrs, updateAssrResult } from '@/repository/assrResult';
 
@@ -28,4 +29,27 @@ export const getOneAssrsService = async (query, options) => {
   const report = await getOneAssrs(query, options);
   if (!report) throw new createError(422, 'Invalid question ID');
   return report;
+};
+
+export const getAlternativeAssrService = async () => {
+  const questions = [
+    'How often do you attend lectures?',
+    'How often do you ask questions during lectures?',
+    'How often do you complete your assignments on time?',
+    'How often do you review lecture notes after class?',
+    'How often do you participate in class discussions?',
+    'How often do you use additional resources for learning?'
+  ];
+
+  const config = {
+    headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json'
+    }
+  };
+
+  // Todo: replace the url with hosted model url
+  const response = await axios.post('http://127.0.0.1:8000/api/v1/generate-questions', { questions }, config);
+
+  return response.data;
 };
