@@ -9,7 +9,8 @@ import {
   findTotalFocusTimeOfUsersModule,
   findTotalSessionDurationByUser,
   getAdhdClassificationFeedbackService,
-  getSessionData
+  getSessionData,
+  getStudentsDataService
 } from '@/services/focus-record';
 import { makeResponse } from '@/utils/response';
 
@@ -125,7 +126,7 @@ export const getTotalSessionDurationByUserController = async (req, res) => {
 
 export const getSessionDataController = async (req, res) => {
   try {
-    const userId = req.user._id;
+    const userId = req.body.userId;
 
     const data = await getSessionData(userId);
 
@@ -141,4 +142,10 @@ export const getAdhdClassificationFeedbackController = async (req, res) => {
   const data = await getAdhdClassificationFeedbackService(userId);
 
   return makeResponse({ res, data: data, message: 'feedback generated successfully' });
+};
+
+export const getSessionDataOfStudentsController = async (req, res) => {
+  const data = await getStudentsDataService();
+
+  return makeResponse({ res, data: data, message: 'Sessions retrieved successfully' });
 };

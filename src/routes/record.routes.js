@@ -8,6 +8,7 @@ import {
   getSessionByIdController,
   getSessionByUserController,
   getSessionDataController,
+  getSessionDataOfStudentsController,
   getSessionsOfUserByModuleController,
   getStartAndEndTimesOfUsersModuleController,
   getTotalFocusTimeOfUsersModuleController,
@@ -41,6 +42,8 @@ sessionRouter.get('/average-focus-time', tracedAsyncHandler(getAverageFocusTimeo
 sessionRouter.get('/userByModule', tracedAsyncHandler(getSessionsOfUserByModuleController));
 
 sessionRouter.get('/sessionData', tracedAsyncHandler(getSessionDataController));
+
+sessionRouter.get('/userSessionData', tracedAsyncHandler(getSessionDataOfStudentsController));
 
 // Route to get user average focus time (without moduleId)
 sessionRouter.get('/average-focus-time-by-user', tracedAsyncHandler(getAverageFocusTimeByUserController));

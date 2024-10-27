@@ -14,7 +14,7 @@ import {
 
 export const insertQuestionService = async (data) => {
   try {
-    await insertQuestion(data);
+    return await insertQuestion(data);
   } catch (err) {
     throw new createError(500, 'Error when processing question');
   }
