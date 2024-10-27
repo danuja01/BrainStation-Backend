@@ -1,5 +1,7 @@
 import {
   addSession,
+  countDistinctSessionDaysByUserId,
+  countSessionsByUserId,
   findAllSessionsByUserId,
   findAverageFocusTimeByUser,
   findAverageFocusTimeofUsersModule,
@@ -148,4 +150,32 @@ export const getSessionDataOfStudentsController = async (req, res) => {
   const data = await getStudentsDataService();
 
   return makeResponse({ res, data: data, message: 'Sessions retrieved successfully' });
+};
+
+export const getSessionCountByUserIdController = async (req, res) => {
+  try {
+    const userId = req.query.userId; // Get userId from query parameters
+
+    const sessionCount = await countSessionsByUserId(userId); // Call the service to count sessions
+
+    return makeResponse({ res, data: { sessionCount }, message: 'Session count retrieved successfully' });
+  } catch (error) {
+    return res.status(500).json({ message: 'Internal Server Error' });
+  }
+};
+
+export const getDistinctSessionDaysByUserIdController = async (req, res) => {
+  try {
+    const userId = req.query.userId;
+
+    if (!userId) {
+      return res.status(400).json({ message: 'userId is required' });
+    }
+
+    const daysCount = await countDistinctSessionDaysByUserId(userId);
+
+    return makeResponse({ res, data: { daysCount }, message: 'Distinct session days count retrieved successfully' });
+  } catch (error) {
+    return res.status(500).json({ message: 'Internal Server Error' });
+  }
 };
