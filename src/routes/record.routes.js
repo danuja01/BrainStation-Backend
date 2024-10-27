@@ -5,16 +5,16 @@ import {
   getAdhdClassificationFeedbackController,
   getAverageFocusTimeByUserController,
   getAverageFocusTimeofUsersModuleController,
+  getDistinctSessionDaysByUserIdController,
   getSessionByIdController,
   getSessionByUserController,
+  getSessionCountByUserIdController,
   getSessionDataController,
   getSessionDataOfStudentsController,
   getSessionsOfUserByModuleController,
   getStartAndEndTimesOfUsersModuleController,
   getTotalFocusTimeOfUsersModuleController,
-  getTotalSessionDurationByUserController,
-  getDistinctSessionDaysByUserIdController,
-  getSessionCountByUserIdController
+  getTotalSessionDurationByUserController
 } from '@/controllers/session';
 
 const sessionRouter = express.Router();

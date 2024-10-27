@@ -1,12 +1,12 @@
 import express from 'express';
 import { tracedAsyncHandler } from '@sliit-foss/functions';
-import { getLecturePerformance, getStudentAlerts,getOldPerformanceTypesController } from '@/controllers/dashboard';
+import { getEnrolledModules, getUserData } from '@/controllers/algorithm';
+import { getLecturePerformance, getOldPerformanceTypesController, getStudentAlerts } from '@/controllers/dashboard';
 import {
   getStudentCumulativeAverage,
   postPredictionController,
   predictScoresForModules
 } from '@/controllers/progressController';
-import { getEnrolledModules, getUserData } from '@/controllers/algorithm';
 
 const progressRouter = express.Router();
 
@@ -20,13 +20,11 @@ progressRouter.get('/lecture-performance/', tracedAsyncHandler(getLecturePerform
 
 progressRouter.get('/alerts', tracedAsyncHandler(getStudentAlerts));
 
-progressRouter.get('/enrolled-modules/',tracedAsyncHandler( getEnrolledModules));
+progressRouter.get('/enrolled-modules/', tracedAsyncHandler(getEnrolledModules));
 
-progressRouter.get('/user-data/:moduleId', tracedAsyncHandler( getUserData));
+progressRouter.get('/user-data/:moduleId', tracedAsyncHandler(getUserData));
 
 // New route to get the ordered performer types from notcompleted tasks
 progressRouter.get('/performance-types', tracedAsyncHandler(getOldPerformanceTypesController));
-
-
 
 export default progressRouter;

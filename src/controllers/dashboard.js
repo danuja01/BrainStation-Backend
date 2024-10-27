@@ -1,10 +1,11 @@
+import { moduleLogger } from '@sliit-foss/module-logger';
 import { getEnrolledModules, getUserData } from '@/controllers/algorithm';
+import NotCompletedTask from '@/models/notCompletedTaskModel';
 import { addSession } from '@/services/focus-record';
 import { makeResponse } from '@/utils';
-import NotCompletedTask from '@/models/notCompletedTaskModel';
-import { moduleLogger } from '@sliit-foss/module-logger'; // Ensure the logger is imported correctly
-const logger = moduleLogger('dashboard-controller'); 
 
+// Ensure the logger is imported correctly
+const logger = moduleLogger('dashboard-controller');
 
 export const getLecturePerformance = async (req, res) => {
   try {

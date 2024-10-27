@@ -17,13 +17,4 @@ taskRouter.get('/completed-tasks-count', tracedAsyncHandler(getCompletedTasksCou
 
 taskRouter.get('/completed-tasks/', tracedAsyncHandler(getCompletedTasksByUserIdController));
 
-
-
-
-
-
-
-
-
-
 export default taskRouter;

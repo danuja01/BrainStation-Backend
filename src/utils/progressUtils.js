@@ -23,10 +23,9 @@ export const getLowestTwoChapters = (studentData) => {
   quizScores.sort((a, b) => a.score - b.score);
 
   // Remove duplicate chapters based on chapter name
-  const uniqueChapters = Array.from(new Set(quizScores.map(quiz => quiz.chapter)))
-    .map(uniqueChapter => {
-      return quizScores.find(quiz => quiz.chapter === uniqueChapter);
-    });
+  const uniqueChapters = Array.from(new Set(quizScores.map((quiz) => quiz.chapter))).map((uniqueChapter) => {
+    return quizScores.find((quiz) => quiz.chapter === uniqueChapter);
+  });
 
   // Return the lowest two unique chapters
   return uniqueChapters.slice(0, 2);

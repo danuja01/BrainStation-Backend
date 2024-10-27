@@ -5,7 +5,6 @@ import { makeResponse } from '@/utils/response';
 export const postPredictionController = async (req, res) => {
   const { moduleId } = req.body;
   const userId = req.user._id;
-  console.log(userId);
 
   if (!userId || !moduleId) {
     return makeResponse({ res, status: 400, message: 'User ID and Module ID are required' });

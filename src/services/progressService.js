@@ -2,7 +2,6 @@ import axios from 'axios';
 import { getEnrolledModules, getUserData } from '@/controllers/algorithm';
 import { calculateCumulativeAverage, getLowestTwoChapters } from '@/utils/progressUtils';
 
-
 export const predictExamScore = async (studentData) => {
   const cumulativeAverage = calculateCumulativeAverage(studentData);
   let performer_type = 'Low Performer';

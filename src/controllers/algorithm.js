@@ -1,5 +1,9 @@
 import User from '@/models/user';
-import { findAverageFocusTimeByUser, findTotalSessionDurationByUser ,countDistinctSessionDaysByUserId} from '@/services/focus-record';
+import {
+  countDistinctSessionDaysByUserId,
+  findAverageFocusTimeByUser,
+  findTotalSessionDurationByUser
+} from '@/services/focus-record';
 import { fetchModuleById } from '@/services/module';
 import { getQuizzesScoreService } from '@/services/quiz';
 
@@ -47,9 +51,6 @@ import { getQuizzesScoreService } from '@/services/quiz';
 //   }
 // };
 
-
-
-
 export const getUserData = async (userId, moduleId) => {
   const quizDataFilter = {
     moduleId: moduleId
@@ -57,12 +58,11 @@ export const getUserData = async (userId, moduleId) => {
   try {
     console.log(userId);
     const focusData = await findAverageFocusTimeByUser(userId);
-    console.log(focusData);
 
     const totalSessionDuration = await findTotalSessionDurationByUser(userId);
-    const distinctSessionDaysCount = await countDistinctSessionDaysByUserId(userId)
+    const distinctSessionDaysCount = await countDistinctSessionDaysByUserId(userId);
 
-    const studyTimeData =  distinctSessionDaysCount  > 0 ? totalSessionDuration  / distinctSessionDaysCount : 0;
+    const studyTimeData = distinctSessionDaysCount > 0 ? totalSessionDuration / distinctSessionDaysCount : 0;
 
     const quizData = await getQuizzesScoreService(userId, quizDataFilter);
     const moduleDetails = await fetchModuleById(moduleId);
@@ -75,11 +75,10 @@ export const getUserData = async (userId, moduleId) => {
 
     // Array to store the quiz results
     const formattedQuizzes = [];
-    console.log(quizData);
 
     for (const quiz of quizData?.docs || []) {
       const lectureScore = quiz.averageScore * 100 || 0;
-      console.log(lectureScore);
+
       totalScore += lectureScore;
       quizCount++;
 
@@ -102,8 +101,6 @@ export const getUserData = async (userId, moduleId) => {
     throw new Error('Error when combining user data');
   }
 };
-
-
 
 // Enrolled Module By User ID
 export const getEnrolledModules = async (userId) => {

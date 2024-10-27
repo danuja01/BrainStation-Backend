@@ -1,5 +1,7 @@
 import axios from 'axios';
 import createError from 'http-errors';
+import mongoose from 'mongoose';
+import FocusRecord from '@/models/focus-record';
 import {
   createSession,
   getAllSessionsByUserId,
@@ -106,22 +108,17 @@ export const getStudentsDataService = async () => {
   return sessionDataArray;
 };
 
-
-
 // New service function to count sessions by userId
 export const countSessionsByUserId = async (userId) => {
   try {
-    const userObjectId = new mongoose.Types.ObjectId(userId);  // Convert userId to ObjectId
+    const userObjectId = new mongoose.Types.ObjectId(userId); // Convert userId to ObjectId
     const sessionCount = await FocusRecord.countDocuments({ userId: userObjectId });
 
     return sessionCount;
   } catch (error) {
     throw new Error(`Error counting sessions: ${error.message}`);
   }
-
 };
-
-
 
 export const countDistinctSessionDaysByUserId = async (userId) => {
   try {
@@ -132,18 +129,16 @@ export const countDistinctSessionDaysByUserId = async (userId) => {
       { $match: { userId: userObjectId } },
       {
         $group: {
-          _id: { $dateToString: { format: "%Y-%m-%d", date: "$date" } },
+          _id: { $dateToString: { format: '%Y-%m-%d', date: '$date' } }
         }
       },
-      { $count: "distinctDaysCount" }
+      { $count: 'distinctDaysCount' }
     ]);
 
     const daysCount = distinctDays.length > 0 ? distinctDays[0].distinctDaysCount : 0;
-    console.log('Distinct Days Count:', daysCount);
 
     return daysCount;
   } catch (error) {
-    console.error('Error counting distinct session days:', error.message);
     throw new Error(`Error counting distinct session days: ${error.message}`);
   }
 };

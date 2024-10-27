@@ -1,11 +1,9 @@
 import { moduleLogger } from '@sliit-foss/module-logger';
 import mongoose from 'mongoose';
 import CompletedTask from '@/models/completedTaskModel';
+import NotCompletedTask from '@/models/notCompletedTaskModel';
 import Task from '@/models/taskModel';
 import { recommendTask } from '@/services/taskService';
-import NotCompletedTask from '@/models/notCompletedTaskModel';
-
-
 
 const logger = moduleLogger('task-recommendation-controller');
 

@@ -1,7 +1,5 @@
 import { moduleLogger } from '@sliit-foss/module-logger';
 
-
-
 const logger = moduleLogger('task-recommendation-controller');
 
 export const recommendTask = (performerType, lowestTwoChapters) => {
@@ -17,9 +15,9 @@ export const recommendTask = (performerType, lowestTwoChapters) => {
   const cleanChapterName = (chapter) => {
     const sanitizedChapter = chapter
       .replace(/\b(lecture|lec)\b\s*\d*/gi, '') // Remove words like "lecture", "lec" and any following numbers
-      .replace(/\b\d+\b/g, '')                   // Remove any standalone numbers
-      .trim()                                    // Trim leading and trailing spaces
-      .replace(/\s+/g, ' ');                     // Replace multiple spaces with a single space
+      .replace(/\b\d+\b/g, '') // Remove any standalone numbers
+      .trim() // Trim leading and trailing spaces
+      .replace(/\s+/g, ' '); // Replace multiple spaces with a single space
 
     return sanitizedChapter;
   };
@@ -131,14 +129,16 @@ export const recommendTask = (performerType, lowestTwoChapters) => {
   }
 
   // Select tasks based on performer type
-  const selectedWeeklyTasks = taskOrder[formattedPerformerType].map((index) => {
-    if (index >= weeklyTasks.length) {
-      logger.warn(`Invalid index ${index} for weekly tasks.`);
-      return null;
-    }
-    logger.info(`Selected task at index ${index}:`, weeklyTasks[index]);
-    return weeklyTasks[index];
-  }).filter(Boolean); // Filter out null values (if any)
+  const selectedWeeklyTasks = taskOrder[formattedPerformerType]
+    .map((index) => {
+      if (index >= weeklyTasks.length) {
+        logger.warn(`Invalid index ${index} for weekly tasks.`);
+        return null;
+      }
+      logger.info(`Selected task at index ${index}:`, weeklyTasks[index]);
+      return weeklyTasks[index];
+    })
+    .filter(Boolean); // Filter out null values (if any)
 
   const combinedTasks = {
     weeklyTasks: selectedWeeklyTasks,
