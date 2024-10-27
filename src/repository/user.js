@@ -103,3 +103,13 @@ export const isUserEnrolledInModule = async (userId, moduleId) => {
     throw new Error(`Error checking module enrollment: ${error.message}`);
   }
 };
+
+export const getAllStudentIds = async () => {
+  try {
+    const students = await User.find({ role: 'STUDENT' }).select('_id');
+    return students.map((student) => student._id);
+  } catch (error) {
+    console.error('Error fetching student IDs:', error);
+    throw error;
+  }
+};
