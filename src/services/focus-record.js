@@ -100,13 +100,8 @@ export const getAdhdClassificationFeedbackService = async (userId) => {
 };
 
 export const getStudentsDataService = async () => {
-  try {
-    const studentIds = await getAllStudentIds();
-    const sessionDataPromises = studentIds.map(async (userId) => await getSessionData(userId));
-    const sessionDataArray = await Promise.all(sessionDataPromises);
-    return sessionDataArray;
-  } catch (error) {
-    console.error('Error fetching session data for students:', error);
-    throw error;
-  }
+  const studentIds = await getAllStudentIds();
+  const sessionDataPromises = studentIds.map(async (userId) => await getSessionData(userId));
+  const sessionDataArray = await Promise.all(sessionDataPromises);
+  return sessionDataArray;
 };
