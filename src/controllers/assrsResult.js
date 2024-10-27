@@ -30,7 +30,7 @@ export const createAssrResultController = async (req, res) => {
 
   const data = {
     assrsResult: assrsResult,
-    userId: req.body.userId
+    userId: userId
   };
 
   await addAssrResult(data);
