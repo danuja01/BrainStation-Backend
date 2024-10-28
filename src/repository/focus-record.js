@@ -58,7 +58,9 @@ export const getStartAndEndTimesByUser = async (userId, { sort = { createdAt: -1
       return total + sessionTime;
     }, 0);
 
-    return totalTimeInMilliseconds;
+    const totalTimeInSeconds = totalTimeInMilliseconds / 1000;
+
+    return totalTimeInSeconds;
   } catch (error) {
     throw new Error(`Database query failed: ${error.message}`);
   }
