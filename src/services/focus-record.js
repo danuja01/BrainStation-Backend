@@ -80,10 +80,7 @@ export const getSessionData = async (userId) => {
   return sessionData;
 };
 
-export const getAdhdClassificationFeedbackService = async (userId) => {
-  const data = await getMostFrequentFinalClassification(userId);
-  const classification = data.mostFrequentClassification;
-
+export const getAdhdClassificationFeedbackService = async (classification) => {
   const config = {
     headers: {
       'Accept': 'application/json',
