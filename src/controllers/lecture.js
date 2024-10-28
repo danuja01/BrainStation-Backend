@@ -23,7 +23,6 @@ export const createLecture = async (req, res) => {
       filename: filename,
       contentType: mimetype
     });
-    console.log(process.env.LECTURE_URL);
     const response = await axios.post(`${process.env.LECTURE_URL}upload/`, formData, {
       headers: {
         ...formData.getHeaders()
