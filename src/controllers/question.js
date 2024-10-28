@@ -13,8 +13,9 @@ import {
 import { makeResponse } from '@/utils/response';
 
 export const createQuestion = async (req, res) => {
-  await insertQuestionService(req.body);
-  return makeResponse({ res, status: 201, message: 'Question added successfully' });
+  const question = await insertQuestionService(req.body);
+
+  return makeResponse({ res, data: question, status: 201, message: 'Question added successfully' });
 };
 
 export const bulkInsertQuestions = async (req, res) => {
@@ -38,8 +39,8 @@ export const getOneQuestion = async (req, res) => {
 };
 
 export const updateQuestion = async (req, res) => {
-  await updateQuestionService(req.params.id, req.body);
-  return makeResponse({ res, message: 'Question updated successfully' });
+  const question = await updateQuestionService(req.params.id, req.body);
+  return makeResponse({ res, data: question, message: 'Question updated successfully' });
 };
 
 export const deleteQuestion = async (req, res) => {
