@@ -3,9 +3,11 @@ import {
   addNewAdminUser,
   changeAdminPasswordService,
   enrollModuleService,
+  getOtherUsersService,
   getUserByID,
   getUserModulesService,
   getUsers,
+  getUsersByModuleService,
   saveFcmTokenService,
   unenrollModuleService,
   updateUserdetails
@@ -53,17 +55,14 @@ export const saveFcmToken = async (req, res) => {
 };
 
 export const enrollModuleController = async (req, res) => {
-  const userId = req.user._id;
-  const moduleId = req.body.moduleId;
+  const { userId, moduleId } = req.body;
 
   const user = await enrollModuleService(userId, moduleId);
   return makeResponse({ res, data: user, message: 'User enrolled in module succesfully' });
 };
 
 export const unenrollModuleController = async (req, res) => {
-  const userId = req.user._id;
-  const moduleId = req.body.moduleId;
-
+  const { userId, moduleId } = req.body;
   const user = await unenrollModuleService(userId, moduleId);
   return makeResponse({ res, data: user, message: 'User unenrolled from module succesfully' });
 };
@@ -73,4 +72,14 @@ export const getUserEnrollModulesController = async (req, res) => {
 
   const modules = await getUserModulesService(userId);
   return makeResponse({ res, data: modules, message: 'User enrolled modules retrieved succesfully' });
+};
+
+export const getOtherUsersController = async (req, res) => {
+  const students = await getOtherUsersService(req.params.id);
+  return makeResponse({ res, data: students, message: 'Users retrieved succesfully' });
+};
+
+export const getUsersByModuleController = async (req, res) => {
+  const students = await getUsersByModuleService(req.params.id);
+  return makeResponse({ res, data: students, message: 'Users retrieved succesfully' });
 };

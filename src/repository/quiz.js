@@ -53,10 +53,27 @@ export const getQuizzesScore = async ({ userId, filter = {}, sort = { createdAt:
   const aggregate = [
     { $match: filter },
     {
+      $lookup: {
+        from: 'questions',
+        localField: 'questionId',
+        foreignField: '_id',
+        as: 'questionDetails'
+      }
+    },
+    { $unwind: '$questionDetails' }, // Unwind to simplify access to question details
+    {
       $group: {
         _id: '$lectureId',
         totalQuizzes: { $sum: 1 },
-        correctAnswers: { $sum: { $cond: [{ $gt: ['$current_step', 0] }, 1, 0] } }
+        correctAnswers: { $sum: { $cond: [{ $gt: ['$current_step', 0] }, 1, 0] } },
+        quizDetails: {
+          $push: {
+            context: '$questionDetails.context',
+            question: '$questionDetails.question',
+            answer: '$questionDetails.answer',
+            status: '$status'
+          }
+        }
       }
     },
     {
@@ -79,8 +96,9 @@ export const getQuizzesScore = async ({ userId, filter = {}, sort = { createdAt:
         _id: 1,
         totalQuizzes: 1,
         correctAnswers: 1,
-        averageScore: 1,
-        lectureTitle: { $arrayElemAt: ['$lectureDetails.title', 0] }
+        averageScore: { $round: ['$averageScore', 2] },
+        lectureTitle: { $arrayElemAt: ['$lectureDetails.title', 0] },
+        quizDetails: 1
       }
     },
     { $sort: sort }

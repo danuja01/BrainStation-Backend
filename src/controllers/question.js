@@ -39,8 +39,8 @@ export const getOneQuestion = async (req, res) => {
 };
 
 export const updateQuestion = async (req, res) => {
-  await updateQuestionService(req.params.id, req.body);
-  return makeResponse({ res, message: 'Question updated successfully' });
+  const question = await updateQuestionService(req.params.id, req.body);
+  return makeResponse({ res, data: question, message: 'Question updated successfully' });
 };
 
 export const deleteQuestion = async (req, res) => {
