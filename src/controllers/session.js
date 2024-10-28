@@ -44,7 +44,7 @@ export const getSessionByIdController = async (req, res) => {
 };
 
 export const getSessionByUserController = async (req, res) => {
-  const userId = req.user._id;
+  const userId = req.params.id;
 
   const data = await findAllSessionsByUserId(userId, req.query);
 
@@ -126,8 +126,7 @@ export const getTotalSessionDurationByUserController = async (req, res) => {
 
 export const getSessionDataController = async (req, res) => {
   try {
-    const userId = req.body.userId;
-
+    const userId = req.params.id;
     const data = await getSessionData(userId);
 
     return makeResponse({ res, data, message: 'Sessions retrieved successfully' });
