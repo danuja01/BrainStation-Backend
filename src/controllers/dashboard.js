@@ -1,6 +1,11 @@
+import { moduleLogger } from '@sliit-foss/module-logger';
 import { getEnrolledModules, getUserData } from '@/controllers/algorithm';
+import NotCompletedTask from '@/models/notCompletedTaskModel';
 import { addSession } from '@/services/focus-record';
 import { makeResponse } from '@/utils';
+
+// Ensure the logger is imported correctly
+const logger = moduleLogger('dashboard-controller');
 
 export const getLecturePerformance = async (req, res) => {
   try {
@@ -85,5 +90,39 @@ export const getStudentAlerts = async (req, res) => {
       message: 'Failed to generate student alerts',
       error: error.message
     });
+  }
+};
+
+// Controller to fetch performance types for a particular user from notcompleted tasks
+export const getOldPerformanceTypesController = async (req, res) => {
+  const userId = req.user._id; // Assuming you have middleware to set req.user (e.g., JWT auth)
+
+  try {
+    logger.info(`Fetching performance types for user ID: ${userId}`);
+
+    // Fetch all notcompleted tasks for the particular user, sorted by createdAt
+    const notCompletedTasks = await NotCompletedTask.find({ student: userId })
+      .sort({ createdAt: 1 }) // Sort by oldest first
+      .select('performer_type createdAt'); // Selecting performer_type and createdAt fields only
+
+    if (!notCompletedTasks || notCompletedTasks.length === 0) {
+      logger.info(`No notcompleted tasks found for user ID: ${userId}`);
+      return res.status(404).json({ message: 'No notcompleted tasks found for this user.' });
+    }
+
+    // Extract performer types in the sorted order
+    const performerTypes = notCompletedTasks.map((task, index) => ({
+      order: index + 1,
+      performerType: task.performer_type,
+      createdAt: task.createdAt
+    }));
+
+    // Log the final performer types list for the specific user
+    logger.info('Retrieved performer types for user:', performerTypes);
+
+    return res.status(200).json({ performerTypes });
+  } catch (error) {
+    logger.error('Error fetching notcompleted performance types for user:', error.message);
+    return res.status(500).json({ message: 'Failed to retrieve performance types', error: error.message });
   }
 };

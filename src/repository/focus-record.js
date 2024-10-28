@@ -58,10 +58,7 @@ export const getStartAndEndTimesByUser = async (userId, { sort = { createdAt: -1
       return total + sessionTime;
     }, 0);
 
-    // Convert total time from milliseconds to hours
-    const totalTimeInHours = totalTimeInMilliseconds / (1000 * 60 * 60);
-
-    return totalTimeInHours;
+    return totalTimeInMilliseconds;
   } catch (error) {
     throw new Error(`Database query failed: ${error.message}`);
   }

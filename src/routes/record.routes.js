@@ -5,9 +5,12 @@ import {
   getAdhdClassificationFeedbackController,
   getAverageFocusTimeByUserController,
   getAverageFocusTimeofUsersModuleController,
+  getDistinctSessionDaysByUserIdController,
   getSessionByIdController,
   getSessionByUserController,
+  getSessionCountByUserIdController,
   getSessionDataController,
+  getSessionDataOfStudentsController,
   getSessionsOfUserByModuleController,
   getStartAndEndTimesOfUsersModuleController,
   getTotalFocusTimeOfUsersModuleController,
@@ -42,11 +45,17 @@ sessionRouter.get('/userByModule', tracedAsyncHandler(getSessionsOfUserByModuleC
 
 sessionRouter.get('/sessionData', tracedAsyncHandler(getSessionDataController));
 
+sessionRouter.get('/userSessionData', tracedAsyncHandler(getSessionDataOfStudentsController));
+
 // Route to get user average focus time (without moduleId)
 sessionRouter.get('/average-focus-time-by-user', tracedAsyncHandler(getAverageFocusTimeByUserController));
 
 // Route to get user total session duration by userId (sum of all session durations)
 sessionRouter.get('/total-session-duration-by-user', tracedAsyncHandler(getTotalSessionDurationByUserController));
+
+sessionRouter.get('/count', tracedAsyncHandler(getSessionCountByUserIdController));
+
+sessionRouter.get('/distinct-days', tracedAsyncHandler(getDistinctSessionDaysByUserIdController));
 
 // Route to get a session by ID
 sessionRouter.get('/:id', tracedAsyncHandler(getSessionByIdController));

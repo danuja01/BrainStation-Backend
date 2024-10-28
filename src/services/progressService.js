@@ -80,7 +80,7 @@ export const predictScoresForAllModules = async (userId) => {
           noQuizModules.push({
             moduleId: module._id,
             moduleName: module.name,
-            predictedExamScore: 'You are not done any lectures in this module'
+            predictedExamScore: 'You have not completed any lectures in this module.'
           });
         } else {
           const predictedExamScore = studentData.averageScore;
@@ -110,7 +110,7 @@ export const predictScoresForAllModules = async (userId) => {
           totalScore += parseFloat(studentData.totalScore);
           lectureCount += studentData.quizzes.length;
 
-          if (!focusToStudyRatio) {
+          if (studentData.timeSpentStudying > 0) {
             focusToStudyRatio = studentData.focusLevel / studentData.timeSpentStudying;
           }
         }
@@ -160,7 +160,7 @@ export const predictScoresForAllModules = async (userId) => {
     // Determine performer type based on average score
     let performerType = 'Low Performer';
     if (averageScore >= 80) {
-      performerType = 'High Performer';
+      performerType = 'Excellent Performer';
     } else if (averageScore >= 50) {
       performerType = 'Medium Performer';
     }
@@ -172,20 +172,16 @@ export const predictScoresForAllModules = async (userId) => {
 
     studyRecommendations.push(...recommendations);
 
+    studyRecommendations.push('Take regular breaks to maintain focus and retention.');
+
     return {
-      modulePredictions: [...completedModulePredictions, ...noQuizModules], // Merge completed and not done modules
-      lowestTwoChapters: formattedLowestTwoChapters, // Overall lowest 2 chapters
+      modulePredictions: [...completedModulePredictions, ...noQuizModules],
+      lowestTwoChapters: formattedLowestTwoChapters,
       highestScoreModule: highestScoreModule
-        ? {
-            moduleName: highestScoreModule.moduleName,
-            moduleId: highestScoreModule.moduleId
-          }
+        ? { moduleName: highestScoreModule.moduleName, moduleId: highestScoreModule.moduleId }
         : { message: 'No highest score module available' },
       lowestScoreModule: lowestScoreModule
-        ? {
-            moduleName: lowestScoreModule.moduleName,
-            moduleId: lowestScoreModule.moduleId
-          }
+        ? { moduleName: lowestScoreModule.moduleName, moduleId: lowestScoreModule.moduleId }
         : { message: 'No lowest score module available' },
       studyRecommendations,
       performerType

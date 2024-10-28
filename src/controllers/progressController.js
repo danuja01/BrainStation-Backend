@@ -3,7 +3,8 @@ import { predictExamScore, predictScoresForAllModules } from '@/services/progres
 import { makeResponse } from '@/utils/response';
 
 export const postPredictionController = async (req, res) => {
-  const { userId, moduleId } = req.body;
+  const { moduleId } = req.body;
+  const userId = req.user._id;
 
   if (!userId || !moduleId) {
     return makeResponse({ res, status: 400, message: 'User ID and Module ID are required' });

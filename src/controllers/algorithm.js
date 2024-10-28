@@ -1,15 +1,69 @@
 import User from '@/models/user';
-import { findAverageFocusTimeByUser, findTotalSessionDurationByUser } from '@/services/focus-record';
+import {
+  countDistinctSessionDaysByUserId,
+  findAverageFocusTimeByUser,
+  findTotalSessionDurationByUser
+} from '@/services/focus-record';
 import { fetchModuleById } from '@/services/module';
 import { getQuizzesScoreService } from '@/services/quiz';
+
+// export const getUserData = async (userId, moduleId) => {
+//   const quizDataFilter = {
+//     moduleId: moduleId
+//   };
+//   try {
+//     const focusData = await findAverageFocusTimeByUser(userId);
+//     const studyTimeData = await findTotalSessionDurationByUser(userId);
+//     const quizData = await getQuizzesScoreService(userId, quizDataFilter);
+//     const moduleDetails = await fetchModuleById(moduleId);
+//     if (!moduleDetails) {
+//       throw new Error(`Module with ID ${moduleId} not found`);
+//     }
+//     const moduleName = moduleDetails.name;
+//     let totalScore = 0;
+//     let quizCount = 0;
+
+//     // Array to store the quiz results
+//     const formattedQuizzes = [];
+
+//     for (const quiz of quizData?.docs || []) {
+//       const lectureScore = quiz.averageScore * 100 || 0;
+//       totalScore += lectureScore;
+//       quizCount++;
+
+//       formattedQuizzes.push({
+//         lectureTitles: quiz.lectureTitle,
+//         score: lectureScore
+//       });
+//     }
+//     const averageScore = quizCount > 0 ? totalScore / quizCount : 0;
+//     return {
+//       userId,
+//       focusLevel: focusData || null,
+//       timeSpentStudying: studyTimeData || null,
+//       quizzes: formattedQuizzes,
+//       moduleName: moduleName,
+//       totalScore: totalScore.toFixed(2) === '0.00' ? '1.50' : totalScore.toFixed(2),
+//       averageScore: averageScore.toFixed(2)
+//     };
+//   } catch (error) {
+//     throw new Error('Error when combining user data');
+//   }
+// };
 
 export const getUserData = async (userId, moduleId) => {
   const quizDataFilter = {
     moduleId: moduleId
   };
   try {
+    console.log(userId);
     const focusData = await findAverageFocusTimeByUser(userId);
-    const studyTimeData = await findTotalSessionDurationByUser(userId);
+
+    const totalSessionDuration = await findTotalSessionDurationByUser(userId);
+    const distinctSessionDaysCount = await countDistinctSessionDaysByUserId(userId);
+
+    const studyTimeData = distinctSessionDaysCount > 0 ? totalSessionDuration / distinctSessionDaysCount : 0;
+
     const quizData = await getQuizzesScoreService(userId, quizDataFilter);
     const moduleDetails = await fetchModuleById(moduleId);
     if (!moduleDetails) {
@@ -24,6 +78,7 @@ export const getUserData = async (userId, moduleId) => {
 
     for (const quiz of quizData?.docs || []) {
       const lectureScore = quiz.averageScore * 100 || 0;
+
       totalScore += lectureScore;
       quizCount++;
 
@@ -41,7 +96,7 @@ export const getUserData = async (userId, moduleId) => {
       timeSpentStudying: studyTimeData || null,
       quizzes: formattedQuizzes,
       moduleName: moduleName,
-      totalScore: totalScore.toFixed(2) === '0.00' ? '1.50' : totalScore.toFixed(2),
+      totalScore: totalScore.toFixed(2),
       averageScore: averageScore.toFixed(2)
     };
   } catch (error) {

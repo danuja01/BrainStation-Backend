@@ -55,7 +55,7 @@ app.use(
 
 app.use(queryMapper);
 
-app.get('/', (_, res) => res.status(200).json({ message: 'Server Up and Running' }));
+app.get('/', (_, res) => res.status(200).json({ message: 'Server Up and Running OD 1' }));
 
 app.use('/api', routes);
 
