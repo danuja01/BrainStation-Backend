@@ -89,7 +89,6 @@ export const unenrollModule = async (userId, moduleId) => {
 export const getUserModules = async (userId) => {
   try {
     const user = await User.findById(userId).populate('enrolledModules');
-    console.log(user);
     return user.enrolledModules;
   } catch (error) {
     throw new Error(`Error retrieving user modules: ${error.message}`);

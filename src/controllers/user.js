@@ -63,7 +63,6 @@ export const enrollModuleController = async (req, res) => {
 
 export const unenrollModuleController = async (req, res) => {
   const { userId, moduleId } = req.body;
-  console.log(userId);
   const user = await unenrollModuleService(userId, moduleId);
   return makeResponse({ res, data: user, message: 'User unenrolled from module succesfully' });
 };
