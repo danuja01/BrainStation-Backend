@@ -29,9 +29,11 @@ export const getUserData = async (userId, moduleId) => {
 
       formattedQuizzes.push({
         lectureTitles: quiz.lectureTitle,
-        score: lectureScore
+        score: lectureScore,
+        quizDetails: quiz.quizDetails
       });
     }
+
     const averageScore = quizCount > 0 ? totalScore / quizCount : 0;
     return {
       userId,
