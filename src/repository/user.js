@@ -108,3 +108,12 @@ export const getAllStudentIds = async () => {
   const students = await User.find({ role: 'STUDENT' }).select('_id');
   return students.map((student) => student._id);
 };
+
+export const getOtherUsers = async (moduleId) => {
+  const students = await User.find({ enrolledModules: { $ne: moduleId } }, 'name email role');
+  return students;
+};
+
+export const getUsersByModule = async (moduleId) => {
+  return await User.find({ enrolledModules: moduleId }, 'name email role');
+};

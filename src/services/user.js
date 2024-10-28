@@ -12,7 +12,9 @@ import {
   findOneAndUpdateUser,
   getAllUsers,
   getOneUser,
+  getOtherUsers,
   getUserModules,
+  getUsersByModule,
   isUserEnrolledInModule,
   unenrollModule,
   updateUserFcmToken
@@ -149,4 +151,12 @@ export const getUserModulesService = async (userId) => {
 
 export const checkUserEnrolledService = async (userId, moduleId) => {
   return await isUserEnrolledInModule(userId, moduleId);
+};
+
+export const getOtherUsersService = async (moduleId) => {
+  return await getOtherUsers(moduleId);
+};
+
+export const getUsersByModuleService = async (moduleId) => {
+  return await getUsersByModule(moduleId);
 };
