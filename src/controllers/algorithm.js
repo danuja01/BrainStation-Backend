@@ -56,7 +56,6 @@ export const getUserData = async (userId, moduleId) => {
     moduleId: moduleId
   };
   try {
-    console.log(userId);
     const focusData = await findAverageFocusTimeByUser(userId);
 
     const totalSessionDuration = await findTotalSessionDurationByUser(userId);
