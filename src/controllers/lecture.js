@@ -23,8 +23,7 @@ export const createLecture = async (req, res) => {
       filename: filename,
       contentType: mimetype
     });
-
-    const response = await axios.post('http://34.30.64.175:9000/upload/', formData, {
+    const response = await axios.post(`${process.env.LECTURE_URL}upload/`, formData, {
       headers: {
         ...formData.getHeaders()
       }
