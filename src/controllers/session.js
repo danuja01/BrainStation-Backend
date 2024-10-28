@@ -138,9 +138,9 @@ export const getSessionDataController = async (req, res) => {
 };
 
 export const getAdhdClassificationFeedbackController = async (req, res) => {
-  const userId = req.user._id;
+  const classification = req.body.classification;
 
-  const data = await getAdhdClassificationFeedbackService(userId);
+  const data = await getAdhdClassificationFeedbackService(classification);
 
   return makeResponse({ res, data: data, message: 'feedback generated successfully' });
 };

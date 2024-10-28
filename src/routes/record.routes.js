@@ -19,11 +19,11 @@ import {
 
 const sessionRouter = express.Router();
 
+// Route to get user feedback for adhd classification
+sessionRouter.post('/classification-feedback', tracedAsyncHandler(getAdhdClassificationFeedbackController));
+
 // Route to create a new session
 sessionRouter.post('/', tracedAsyncHandler(addSessionController));
-
-// Route to get user feedback for adhd classification
-sessionRouter.get('/classification-feedback', tracedAsyncHandler(getAdhdClassificationFeedbackController));
 
 // Route to get all sessions by user ID
 sessionRouter.get('/user/:id', tracedAsyncHandler(getSessionByUserController));

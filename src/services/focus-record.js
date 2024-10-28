@@ -80,10 +80,7 @@ export const getSessionData = async (userId) => {
   return sessionData;
 };
 
-export const getAdhdClassificationFeedbackService = async (userId) => {
-  const data = await getMostFrequentFinalClassification(userId);
-  const classification = data.mostFrequentClassification;
-
+export const getAdhdClassificationFeedbackService = async (classification) => {
   const config = {
     headers: {
       'Accept': 'application/json',
@@ -93,7 +90,7 @@ export const getAdhdClassificationFeedbackService = async (userId) => {
 
   // Todo: replace the url with hosted model url
   const response = await axios.post(
-    'http://34.30.64.175:9005/api/v1/adhd-feedback',
+    `${process.env.CLASSIFICATION_URL}api/v1/adhd-feedback`,
     { designation: classification },
     config
   );

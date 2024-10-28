@@ -49,7 +49,7 @@ export const getAlternativeAssrService = async () => {
   };
 
   // Todo: replace the url with hosted model url
-  const response = await axios.post('http://34.30.64.175:9006/api/v1/generate-questions', { questions }, config);
+  const response = await axios.post(`${process.env.ASRS_URL}api/v1/generate-questions`, { questions }, config);
 
   return response.data;
 };
