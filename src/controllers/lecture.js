@@ -36,7 +36,7 @@ export const createLecture = async (req, res) => {
     const data = await insertLectureService(lecture);
     await appendLectureToModule(moduleId, data._id);
 
-    return makeResponse({ res, status: 201, data, message: 'Lecture added successfully' });
+    return makeResponse({ res, status: 201, data: data, message: 'Lecture added successfully' });
   } catch (error) {
     return makeResponse({ res, status: 500, message: `Error when processing lecture - ${error}` });
   }
