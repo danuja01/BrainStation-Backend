@@ -16,6 +16,7 @@ export const recommendTask = (performerType, lowestTwoChapters) => {
     const sanitizedChapter = chapter
       .replace(/\b(lecture|lec)\b\s*\d*/gi, '') // Remove words like "lecture", "lec" and any following numbers
       .replace(/\b\d+\b/g, '') // Remove any standalone numbers
+      .replace(/-/g, '') // Remove hyphens
       .trim() // Trim leading and trailing spaces
       .replace(/\s+/g, ' '); // Replace multiple spaces with a single space
 
@@ -72,7 +73,7 @@ export const recommendTask = (performerType, lowestTwoChapters) => {
       task: 'Review Lecture Notes',
       subTasks: [
         `Focus on ${mostLowestMarksChapter}, particularly the key sections.`,
-        `Re-study mind maps for ${mostLowestMarksChapter}: (Link to the ontology diagram)`
+        `Re-study mind maps for ${mostLowestMarksChapter}`
       ],
       timeEstimate: '90 minutes'
     },
@@ -113,9 +114,9 @@ export const recommendTask = (performerType, lowestTwoChapters) => {
 
   // Task order based on performer type
   const taskOrder = {
-    low: [4, 1, 2],
-    medium: [1, 0, 2],
-    excellent: [0, 2, 1]
+    low: [3, 4, 0],
+    medium: [0, 1, 4],
+    excellent: [0, 2, 3]
   };
 
   // Log performer type and task order for debugging
