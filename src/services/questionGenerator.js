@@ -1,3 +1,4 @@
+import axios from 'axios';
 import OpenAI from 'openai';
 import extractJsonArray from '@/helpers/extractJsonArray';
 import { removeHTML } from '@/helpers/removeHTML';
@@ -5,6 +6,15 @@ import { removeHTML } from '@/helpers/removeHTML';
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY
 });
+
+export const generateQuetionLabel = async (content, answer) => {
+  const question = await axios.post(`${process.env.QUESTION_GENERATION_URL}/getquestion`, {
+    content,
+    answer
+  });
+
+  return question;
+};
 
 export const generateQuestions = async (slides) => {
   // Sanitize the HTML content of slides

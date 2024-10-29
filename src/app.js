@@ -1,17 +1,18 @@
 import crypto from 'crypto';
 import express from 'express';
 import context from 'express-http-context';
-import rateLimit from 'express-rate-limit';
+// import rateLimit from 'express-rate-limit';
 import httpLogger from '@sliit-foss/http-logger';
 import { moduleLogger } from '@sliit-foss/module-logger';
 import compression from 'compression';
 import cors from 'cors';
 import helmet from 'helmet';
 import { pick } from 'lodash';
-import { initializeChangeStreams } from './services/changeStream';
 import { default as connectDB } from '@/database';
 import { errorHandler, queryMapper, responseInterceptor } from '@/middleware';
 import { default as routes } from '@/routes/index.routes';
+// eslint-disable-next-line import/order
+import { initializeChangeStreams } from './services/changeStream';
 
 require('dotenv').config();
 
@@ -19,14 +20,14 @@ const logger = moduleLogger('app');
 
 const app = express();
 
-const limiter = rateLimit({
-  windowMs: 1 * 60 * 1000, // 1 minute
-  max: 100, // limit each IP to 100 requests per windowMs
-  standardHeaders: true,
-  legacyHeaders: false
-});
+// const limiter = rateLimit({
+//   windowMs: 1 * 60 * 1000, // 1 minute
+//   max: 100, // limit each IP to 100 requests per windowMs
+//   standardHeaders: true,
+//   legacyHeaders: false
+// });
 
-app.use(limiter);
+// app.use(limiter);
 
 app.use(helmet());
 
